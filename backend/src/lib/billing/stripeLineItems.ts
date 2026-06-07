@@ -1,7 +1,7 @@
 import type Stripe from 'stripe';
 import type { SubscriptionPlan } from '../../generated/prisma/index.js';
 import {
-  PLAN_PRICE_HT_EUR,
+  PLAN_PRICE_HT_CAD,
   PLAN_STRIPE_LABELS,
   stripeLineItemAmountCents,
   stripePriceIdForPlan,
@@ -19,17 +19,17 @@ export function buildSubscriptionLineItem(
     return { price: priceId, quantity: 1 };
   }
 
-  const ht = PLAN_PRICE_HT_EUR[plan];
+  const ht = PLAN_PRICE_HT_CAD[plan];
   const unitAmount = stripeLineItemAmountCents(plan);
 
   return {
     quantity: 1,
     price_data: {
-      currency: 'eur',
+      currency: 'cad',
       unit_amount: unitAmount,
       product_data: {
         name: PLAN_STRIPE_LABELS[plan],
-        description: `${ht.toFixed(2).replace('.', ',')} € HT/mois (comme sur la page Tarifs). TVA en sus.`,
+        description: `$${ht.toFixed(2)} CAD/mois avant TPS (comme sur la page Tarifs). TPS en sus.`,
       },
       recurring: { interval: 'month' },
     },

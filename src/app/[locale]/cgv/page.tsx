@@ -3,14 +3,14 @@ import { LegalPageLayout } from '@/components/legal/legal-page-layout';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Conditions générales — SoftFacture France (Nexiora)',
+  title: 'Conditions générales — SoftFacture Canada',
   description:
-    'CGV/CGU des abonnements SoftFacture France, marque Nexiora : tarifs HT, essai gratuit, paiement et résiliation.',
+    'CGU/CGV des abonnements SoftFacture Canada : tarifs en CAD, TPS/TVQ, essai gratuit, paiement et annulation.',
 };
 
 export default function CgvPage() {
   return (
-    <LegalPageLayout title="Conditions générales de vente et d'utilisation">
+    <LegalPageLayout title="Conditions générales d'utilisation et de vente">
       <CgvContent />
     </LegalPageLayout>
   );

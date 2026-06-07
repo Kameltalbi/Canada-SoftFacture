@@ -4,12 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
-import {
-  apiFetch,
-  downloadInvoiceFacturXFromApi,
-  downloadInvoiceFacturXXmlFromApi,
-  downloadInvoicePdfFromApi,
-} from '@/lib/api-client';
+import { apiFetch, downloadInvoicePdfFromApi } from '@/lib/api-client';
 import { useAuth } from '@/contexts/auth-context';
 import { Card, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,8 +12,6 @@ import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/badge';
 import { Modal } from '@/components/ui/modal';
 import { useToast } from '@/components/ui/toast';
-import { FEATURES } from '@/lib/feature-flags';
-import { invoiceToEinvoiceXml } from '@/lib/invoice-einvoice-xml';
 import { useDocumentNumberPreview } from '@/hooks/use-document-number-preview';
 import { format } from 'date-fns';
 
@@ -33,7 +26,7 @@ type Org = {
 
 type InvStatus = 'DRAFT' | 'VALIDATED' | 'SENT' | 'PARTIALLY_PAID' | 'PAID' | 'CANCELLED';
 
-type PayMethod = 'VIREMENT' | 'CHEQUE' | 'ESPECES' | 'CARTE';
+type PayMethod = 'VIREMENT' | 'CHEQUE' | 'ESPECES' | 'CARTE' | 'INTERAC';
 
 type PaymentRow = {
   id: string;
@@ -78,7 +71,6 @@ type InvDetail = {
     country: string;
   };
   organization: Org;
-  einvoiceTransmissions?: EinvoiceTransmissionRow[];
   lines: {
     id: string;
     description: string;
@@ -90,44 +82,6 @@ type InvDetail = {
     lineTotalTtc: unknown;
   }[];
 };
-
-type EinvoiceTransmissionRow = {
-  id: string;
-  status: 'PENDING' | 'DEPOSITED' | 'REJECTED' | 'REFUSED' | 'COLLECTED';
-  paProvider: string;
-  paExternalId: string | null;
-  lastError: string | null;
-  createdAt: string;
-  depositedAt: string | null;
-};
-
-function invoiceForEinvoiceXml(inv: InvDetail) {
-  return {
-    id: inv.id,
-    number: inv.number ?? `BROUILLON-${inv.id.slice(0, 8)}`,
-    issueDate: new Date(inv.issueDate),
-    dueDate: inv.dueDate ? new Date(inv.dueDate) : null,
-    currency: inv.currency,
-    operationNature: inv.operationNature,
-    vatOnDebits: inv.vatOnDebits,
-    useDifferentDeliveryAddress: inv.useDifferentDeliveryAddress,
-    deliveryAddress: inv.deliveryAddress,
-    deliveryCity: inv.deliveryCity,
-    deliveryCountry: inv.deliveryCountry,
-    subtotalHt: inv.subtotalHt,
-    vatTotal: inv.vatTotal,
-    totalTtc: inv.totalTtc,
-    company: {
-      name: inv.organization.name,
-      taxMatricule: inv.organization.taxMatricule,
-      address: inv.organization.address,
-      city: inv.organization.city,
-      country: inv.organization.country,
-    },
-    client: inv.client,
-    lines: inv.lines,
-  };
-}
 
 export default function InvoiceDetailPage() {
   const params = useParams<{ id: string }>();
@@ -150,7 +104,6 @@ export default function InvoiceDetailPage() {
   const [payMethod, setPayMethod] = useState<PayMethod>('VIREMENT');
   const [payRef, setPayRef] = useState('');
   const [payNotes, setPayNotes] = useState('');
-  const [transmitPending, setTransmitPending] = useState(false);
 
   const paidTotal = useMemo(() => {
     if (!inv?.payments?.length) return 0;
@@ -186,8 +139,6 @@ export default function InvoiceDetailPage() {
       toast.push(e instanceof Error ? e.message : 'Erreur', 'error')
     );
   }, [token, id, load, toast]);
-
-  const xml = useMemo(() => (inv ? invoiceToEinvoiceXml(invoiceForEinvoiceXml(inv)) : ''), [inv]);
 
   async function saveStatus() {
     if (!inv || !selectedStatus || selectedStatus === inv.status) return;
@@ -318,19 +269,6 @@ export default function InvoiceDetailPage() {
     }
   }
 
-  async function transmitToPa() {
-    setTransmitPending(true);
-    try {
-      await apiFetch(`/invoices/${id}/einvoice/transmit`, { method: 'POST' });
-      await load();
-      toast.push(t('einvoiceTransmitSuccess'));
-    } catch (e: unknown) {
-      toast.push(e instanceof Error ? e.message : 'Erreur', 'error');
-    } finally {
-      setTransmitPending(false);
-    }
-  }
-
   async function onDownloadPdf() {
     if (!inv) return;
     try {
@@ -339,32 +277,6 @@ export default function InvoiceDetailPage() {
       toast.push(e instanceof Error ? e.message : 'Erreur', 'error');
     }
   }
-
-  async function onDownloadFacturX() {
-    if (!inv?.number) return;
-    try {
-      await downloadInvoiceFacturXFromApi(inv.id, inv.number);
-      toast.push(t('exportFacturXDone'));
-    } catch (e: unknown) {
-      toast.push(e instanceof Error ? e.message : 'Erreur', 'error');
-    }
-  }
-
-  async function onDownloadFacturXXml() {
-    if (!inv?.number) return;
-    try {
-      await downloadInvoiceFacturXXmlFromApi(inv.id, inv.number);
-      toast.push(t('exportFacturXXmlDone'));
-    } catch (e: unknown) {
-      toast.push(e instanceof Error ? e.message : 'Erreur', 'error');
-    }
-  }
-
-  const canExportFacturX =
-    FEATURES.einvoiceUi &&
-    Boolean(inv?.number) &&
-    inv?.status !== 'DRAFT' &&
-    inv?.status !== 'CANCELLED';
 
   if (!inv) {
     return <p className="text-sm text-s-muted">{tc('loading')}</p>;
@@ -446,26 +358,6 @@ export default function InvoiceDetailPage() {
           <Button type="button" variant="secondary" size="sm" onClick={() => void onDownloadPdf()}>
             {t('exportPdf')}
           </Button>
-          {canExportFacturX ? (
-            <>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() => void onDownloadFacturX()}
-              >
-                {t('exportFacturX')}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => void onDownloadFacturXXml()}
-              >
-                {t('exportFacturXXml')}
-              </Button>
-            </>
-          ) : null}
           {inv.status === 'DRAFT' ? (
             <Button type="button" variant="danger" size="sm" onClick={() => setDelOpen(true)}>
               {t('deleteDraft')}
@@ -691,40 +583,6 @@ export default function InvoiceDetailPage() {
                   </Button>
                 </div>
               ) : null}
-            </Card>
-          ) : null}
-
-          {FEATURES.einvoiceUi ? (
-            <Card>
-              <CardTitle className="mb-2">{t('einvoiceXmlTitle')}</CardTitle>
-              <p className="mb-2 text-xs text-s-muted">{t('einvoiceXmlHint')}</p>
-              {inv.status !== 'DRAFT' && inv.status !== 'CANCELLED' ? (
-                <div className="mb-3 flex flex-wrap gap-2">
-                  <Button
-                    type="button"
-                    variant="primary"
-                    size="sm"
-                    disabled={transmitPending}
-                    onClick={() => void transmitToPa()}
-                  >
-                    {transmitPending ? tc('loading') : t('transmitToPa')}
-                  </Button>
-                </div>
-              ) : null}
-              {inv.einvoiceTransmissions?.length ? (
-                <ul className="mb-3 space-y-1 text-xs text-s-muted">
-                  {inv.einvoiceTransmissions.map((tx) => (
-                    <li key={tx.id}>
-                      {t(`einvoiceStatus_${tx.status}`)} —{' '}
-                      {new Date(tx.createdAt).toLocaleString('fr-FR')}
-                      {tx.lastError ? ` (${tx.lastError})` : ''}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-              <pre className="max-h-64 overflow-auto rounded-xl bg-s-navy/5 p-3 text-[10px] leading-relaxed text-s-navy">
-                {xml}
-              </pre>
             </Card>
           ) : null}
         </div>

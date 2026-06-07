@@ -28,6 +28,7 @@ function RegisterContent() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [pending, setPending] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
@@ -35,6 +36,11 @@ function RegisterContent() {
 
     if (phone.trim().length < 8) {
       toast.push(t('phoneInvalid'), 'error');
+      return;
+    }
+
+    if (!acceptTerms) {
+      toast.push(t('acceptTermsRequired'), 'error');
       return;
     }
 
@@ -48,6 +54,7 @@ function RegisterContent() {
         email: email.trim(),
         phone: phone.trim(),
         password,
+        acceptTerms: true,
       });
 
       toast.push(t('welcome'));
@@ -131,6 +138,39 @@ function RegisterContent() {
         </div>
 
         <p className="text-xs text-s-muted">{t('registerAdminNote')}</p>
+
+        <div className="rounded-xl border border-s-border bg-slate-50 p-4">
+          <label className="flex cursor-pointer items-start gap-3 text-sm text-slate-700">
+            <input
+              type="checkbox"
+              checked={acceptTerms}
+              onChange={(e) => setAcceptTerms(e.target.checked)}
+              className="mt-0.5 shrink-0"
+              required
+            />
+            <span>
+              {t('acceptTermsLabel')}{' '}
+              <Link
+                href="/cgv"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-emerald-700 underline"
+              >
+                {t('acceptTermsCgu')}
+              </Link>{' '}
+              {t('acceptTermsAnd')}{' '}
+              <Link
+                href="/politique-de-confidentialite"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-emerald-700 underline"
+              >
+                {t('acceptTermsPrivacy')}
+              </Link>{' '}
+              {t('acceptTermsEnd')}
+            </span>
+          </label>
+        </div>
 
         <Button type="submit" className="w-full" disabled={pending}>
           {pending ? '…' : t('submitRegister')}

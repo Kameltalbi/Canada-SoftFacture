@@ -22,7 +22,6 @@ import {
   DOCUMENT_TABLE_HEADER_CLASS,
 } from '@/components/invoices/document-editor-action-bar';
 import { calcLine } from '@/lib/money';
-import { FEATURES } from '@/lib/feature-flags';
 import { toNumber, cn } from '@/lib/utils';
 import {
   InvoiceEditorShell,
@@ -32,11 +31,6 @@ import type {
   AvailableDeposit,
   DocumentSettings,
 } from '@/components/invoices/document-settings-drawer';
-import {
-  InvoiceEinvoiceFieldsSection,
-  defaultInvoiceEinvoiceFields,
-  type InvoiceEinvoiceFields,
-} from '@/components/invoices/invoice-einvoice-fields';
 import { useDocumentNumberPreview } from '@/hooks/use-document-number-preview';
 
 type Line = {
@@ -184,9 +178,6 @@ export function NewInvoiceEditor({ invoiceKind = 'STANDARD' }: NewInvoiceEditorP
     showCurrencyOnLines: true,
     appliedDepositId: null,
   }));
-  const [einvoiceFields, setEinvoiceFields] = useState<InvoiceEinvoiceFields>(() =>
-    defaultInvoiceEinvoiceFields()
-  );
   const [lines, setLines] = useState<Line[]>(() => [emptyLine(20)]);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [savedDraftId, setSavedDraftId] = useState<string | null>(null);
@@ -362,7 +353,6 @@ export function NewInvoiceEditor({ invoiceKind = 'STANDARD' }: NewInvoiceEditorP
       kind: isDeposit ? ('DEPOSIT' as const) : ('STANDARD' as const),
       appliedDepositId: !isDeposit && appliedDepositId ? appliedDepositId : undefined,
       ...docSettings,
-      ...einvoiceFields,
       lines: payloadLines,
     };
 
@@ -380,17 +370,7 @@ export function NewInvoiceEditor({ invoiceKind = 'STANDARD' }: NewInvoiceEditorP
     });
     setSavedDraftId(inv.id);
     return inv.id;
-  }, [
-    clientId,
-    issueDate,
-    settings,
-    savedDraftId,
-    isDeposit,
-    lines,
-    notes,
-    subject,
-    einvoiceFields,
-  ]);
+  }, [clientId, issueDate, settings, savedDraftId, isDeposit, lines, notes, subject]);
 
   async function saveDraft() {
     setPending('draft');
@@ -735,28 +715,6 @@ export function NewInvoiceEditor({ invoiceKind = 'STANDARD' }: NewInvoiceEditorP
               />
             </div>
           </section>
-
-          {!isDeposit && FEATURES.einvoiceUi ? (
-            <InvoiceEinvoiceFieldsSection
-              value={einvoiceFields}
-              onChange={setEinvoiceFields}
-              vatOnDebitsAvailable={Boolean(user?.organization?.vatOnDebitsEnabled)}
-              labels={{
-                title: t('einvoiceSectionTitle'),
-                operationNature: t('operationNature'),
-                operationGoods: t('operationGoods'),
-                operationServices: t('operationServices'),
-                operationMixed: t('operationMixed'),
-                vatOnDebits: t('vatOnDebits'),
-                vatOnDebitsHint: t('vatOnDebitsHint'),
-                differentDelivery: t('differentDelivery'),
-                deliveryAddress: t('deliveryAddress'),
-                deliveryPostalCode: t('deliveryPostalCode'),
-                deliveryCity: t('deliveryCity'),
-                deliveryCountry: t('deliveryCountry'),
-              }}
-            />
-          ) : null}
 
           <section className="rounded-lg border border-s-border bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between gap-3">

@@ -8,11 +8,11 @@ import {
   getBillingProvider,
   getFrontendBaseUrl,
   isStripeCheckoutReady,
-  priceHtToTtcEur,
+  priceHtToTtcCad,
   priceTtcToCents,
   slugToSubscriptionPlan,
   subscriptionPlanToSlug,
-  PLAN_PRICE_HT_EUR,
+  PLAN_PRICE_HT_CAD,
   SUBSCRIPTION_VAT_RATE_PERCENT,
 } from '../lib/billing/index.js';
 import { isValidEmail, normalizeSiret, normalizeVatNumber } from '../lib/billing/validation.js';
@@ -29,26 +29,26 @@ const checkoutBodySchema = z.object({
   acceptTerms: z.literal(true, { message: 'Vous devez accepter les CGV' }),
 });
 
-/** Plans publics (tarifs France, HT). */
+/** Plans publics (tarifs Canada, avant TPS). */
 billingPublicRouter.get('/plans', (_req, res) => {
   const plans = BILLING_PLAN_SLUGS.map((slug) => {
     const apiPlan = slugToSubscriptionPlan(slug)!;
-    const priceHt = PLAN_PRICE_HT_EUR[apiPlan];
-    const priceTtc = priceHtToTtcEur(priceHt);
+    const priceHt = PLAN_PRICE_HT_CAD[apiPlan];
+    const priceTtc = priceHtToTtcCad(priceHt);
     return {
       slug,
       plan: apiPlan,
-      priceHtEur: priceHt,
-      priceTtcEur: priceTtc,
+      priceHtCad: priceHt,
+      priceTtcCad: priceTtc,
       vatRatePercent: SUBSCRIPTION_VAT_RATE_PERCENT,
       trialDays: TRIAL_DAYS,
-      currency: 'EUR',
-      country: 'FR',
+      currency: 'CAD',
+      country: 'CA',
     };
   });
   return res.json({
-    country: 'FR',
-    currency: 'EUR',
+    country: 'CA',
+    currency: 'CAD',
     vatRatePercent: SUBSCRIPTION_VAT_RATE_PERCENT,
     trialDays: TRIAL_DAYS,
     paymentProviderConfigured: isStripeCheckoutReady(),
@@ -127,8 +127,8 @@ billingProtectedRouter.post('/checkout', requireRoles('ADMIN'), async (req, res)
   const org = await prisma.organization.findUnique({ where: { id: orgId } });
   if (!org) return res.status(404).json({ error: 'Organisation introuvable' });
 
-  const priceHt = PLAN_PRICE_HT_EUR[plan];
-  const amountTtcCents = priceTtcToCents(priceHtToTtcEur(priceHt));
+  const priceHt = PLAN_PRICE_HT_CAD[plan];
+  const amountTtcCents = priceTtcToCents(priceHtToTtcCad(priceHt));
   const baseUrl = getFrontendBaseUrl();
   const successUrl = `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${baseUrl}/checkout/cancel?plan=${parsed.data.plan}`;
@@ -173,7 +173,7 @@ billingProtectedRouter.post('/checkout', requireRoles('ADMIN'), async (req, res)
     successUrl,
     cancelUrl,
     amountTtcCents,
-    currency: 'EUR',
+    currency: 'CAD',
     trialDays: TRIAL_DAYS,
   });
 

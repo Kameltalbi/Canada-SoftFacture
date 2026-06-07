@@ -103,7 +103,7 @@ type CustomTax = {
   updatedAt: string;
 };
 
-const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF'] as const;
+const CURRENCIES = ['CAD', 'USD', 'EUR', 'GBP', 'CHF'] as const;
 
 function SettingsPageContent() {
   const t = useTranslations('settings');
@@ -132,9 +132,9 @@ function SettingsPageContent() {
     address: '',
     city: '',
     postalCode: '',
-    country: 'FR',
-    defaultCurrency: 'EUR',
-    defaultVatRate: '20',
+    country: 'CA',
+    defaultCurrency: 'CAD',
+    defaultVatRate: '5',
     invoicePrefix: 'FAC',
     quotePrefix: 'DEV',
     documentFooterText: '',

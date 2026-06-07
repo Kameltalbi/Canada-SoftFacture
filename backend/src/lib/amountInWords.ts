@@ -82,9 +82,18 @@ function label(n: number, singular: string, plural: string): string {
   return n <= 1 ? singular : plural;
 }
 
-export function amountToFrenchWords(value: string | number, currency = 'EUR'): string {
+export function amountToFrenchWords(value: string | number, currency = 'CAD'): string {
   const numeric = typeof value === 'number' ? value : Number(value);
   if (!Number.isFinite(numeric)) return '';
+
+  if (currency === 'CAD') {
+    const rounded = Math.round(numeric * 100) / 100;
+    const dollars = Math.trunc(rounded);
+    const cents = Math.round((rounded - dollars) * 100);
+    const main = `${integerToFrenchWords(dollars)} ${label(dollars, 'dollar canadien', 'dollars canadiens')}`;
+    if (cents <= 0) return main;
+    return `${main} et ${integerToFrenchWords(cents)} ${label(cents, 'cent', 'cents')}`;
+  }
 
   if (currency === 'EUR') {
     const rounded = Math.round(numeric * 100) / 100;

@@ -7,11 +7,6 @@ import { canCancelInvoice, validateInvoiceInTransaction } from '../services/invo
 import { InsufficientStockError, reverseStockOnInvoiceCancel } from '../services/stockLedger.js';
 import { streamInvoicePdf } from '../services/pdfInvoice.js';
 import { buildInvoicePdfInputFromRecord } from '../services/invoicePdfPayload.js';
-import {
-  FacturXGenerateError,
-  generateFacturXPdf,
-  generateFacturXXml,
-} from '../services/facturXGenerate.js';
 import { computeNetToPay } from '../lib/invoiceTotals.js';
 import {
   documentLanguageSchema,
@@ -22,11 +17,6 @@ import {
   formatCreditNoteLineDescription,
   formatCreditNoteNotes,
 } from '../lib/documentPdfLabels.js';
-import {
-  EinvoiceTransmitError,
-  listInvoiceTransmissions,
-  transmitInvoiceToPa,
-} from '../services/einvoiceTransmit.js';
 
 const router = Router();
 const orgId = (req: Express.Request) => req.user!.organizationId!;
@@ -285,34 +275,6 @@ router.get('/:id/pdf', async (req, res) => {
   if (!inv) return res.status(404).json({ error: 'Introuvable' });
 
   streamInvoicePdf(res, buildInvoicePdfInputFromRecord(inv));
-});
-
-router.get('/:id/factur-x.pdf', async (req, res) => {
-  try {
-    const result = await generateFacturXPdf(req.params.id, orgId(req));
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
-    return res.send(result.pdf);
-  } catch (e) {
-    if (e instanceof FacturXGenerateError) {
-      return res.status(e.statusCode).json({ error: e.message });
-    }
-    throw e;
-  }
-});
-
-router.get('/:id/factur-x.xml', async (req, res) => {
-  try {
-    const result = await generateFacturXXml(req.params.id, orgId(req));
-    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
-    return res.send(result.xml);
-  } catch (e) {
-    if (e instanceof FacturXGenerateError) {
-      return res.status(e.statusCode).json({ error: e.message });
-    }
-    throw e;
-  }
 });
 
 router.post('/:id/validate', async (req, res) => {
@@ -736,23 +698,6 @@ router.delete('/:id', async (req, res) => {
   }
   await prisma.invoice.delete({ where: { id } });
   return res.status(204).send();
-});
-
-router.post('/:id/einvoice/transmit', async (req, res) => {
-  try {
-    const transmission = await transmitInvoiceToPa(req.params.id, orgId(req));
-    return res.status(201).json(transmission);
-  } catch (e) {
-    if (e instanceof EinvoiceTransmitError) {
-      return res.status(e.statusCode).json({ error: e.message });
-    }
-    throw e;
-  }
-});
-
-router.get('/:id/einvoice/transmissions', async (req, res) => {
-  const list = await listInvoiceTransmissions(req.params.id, orgId(req));
-  return res.json(list);
 });
 
 export default router;

@@ -19,25 +19,28 @@ const PLAN_TO_SLUG: Record<SubscriptionPlan, BillingPlanSlug> = {
 };
 
 /**
- * Prix HT mensuels — identiques à `src/lib/pricing-plans.ts` PLAN_PRICES_HT_EUR (page /tarifs).
+ * Prix avant TPS mensuels — identiques à `src/lib/pricing-plans.ts` PLAN_PRICES_HT_CAD (page /tarifs).
  */
-export const PLAN_PRICE_HT_EUR: Record<SubscriptionPlan, number> = {
-  STARTER: 7.9,
-  PRO: 12.9,
-  BUSINESS: 17.9,
+export const PLAN_PRICE_HT_CAD: Record<SubscriptionPlan, number> = {
+  STARTER: 10.9,
+  PRO: 17.9,
+  BUSINESS: 24.9,
 };
 
-/** @deprecated Utiliser PLAN_PRICE_HT_EUR */
-export const PLAN_PRICE_TTC_EUR = PLAN_PRICE_HT_EUR;
+/** @deprecated Utiliser PLAN_PRICE_HT_CAD */
+export const PLAN_PRICE_HT_EUR = PLAN_PRICE_HT_CAD;
+/** @deprecated Utiliser PLAN_PRICE_HT_CAD */
+export const PLAN_PRICE_TTC_EUR = PLAN_PRICE_HT_CAD;
 
-/** Libellés produit Stripe (marque SoftFacture France, éditeur Nexiora). */
+/** Libellés produit Stripe (marché canadien). */
 export const PLAN_STRIPE_LABELS: Record<SubscriptionPlan, string> = {
-  STARTER: `${APP_BRAND} Starter (Nexiora)`,
-  PRO: `${APP_BRAND} Pro (Nexiora)`,
-  BUSINESS: `${APP_BRAND} Business (Nexiora)`,
+  STARTER: `${APP_BRAND} Starter`,
+  PRO: `${APP_BRAND} Pro`,
+  BUSINESS: `${APP_BRAND} Business`,
 };
 
-export const SUBSCRIPTION_VAT_RATE_PERCENT = 20;
+/** TPS fédérale canadienne sur abonnements SaaS (5 %). */
+export const SUBSCRIPTION_VAT_RATE_PERCENT = 5;
 export const TRIAL_DAYS = 30;
 
 export function slugToSubscriptionPlan(slug: string): SubscriptionPlan | null {
@@ -51,8 +54,13 @@ export function subscriptionPlanToSlug(plan: SubscriptionPlan): BillingPlanSlug 
   return PLAN_TO_SLUG[plan];
 }
 
-export function priceHtToTtcEur(ht: number): number {
+export function priceHtToTtcCad(ht: number): number {
   return Math.round(ht * (1 + SUBSCRIPTION_VAT_RATE_PERCENT / 100) * 100) / 100;
+}
+
+/** @deprecated Utiliser priceHtToTtcCad */
+export function priceHtToTtcEur(ht: number): number {
+  return priceHtToTtcCad(ht);
 }
 
 export function priceHtToCents(ht: number): number {
@@ -86,9 +94,9 @@ export function isStripeCheckoutReady(): boolean {
   return isStripeEnabled();
 }
 
-/** Montant unitaire Stripe en centimes (toujours HT — TVA via Stripe Tax si activé). */
+/** Montant unitaire Stripe en centimes (toujours avant TPS — TPS via Stripe Tax si activé). */
 export function stripeLineItemAmountCents(plan: SubscriptionPlan): number {
-  return priceHtToCents(PLAN_PRICE_HT_EUR[plan]);
+  return priceHtToCents(PLAN_PRICE_HT_CAD[plan]);
 }
 
 export function isStripeAutomaticTaxEnabled(): boolean {

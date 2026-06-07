@@ -1,263 +1,259 @@
-import {
-  LEGAL_SITE,
-  brandOfCompanySentence,
-  companyLegalLabel,
-  formatLegalAddress,
-} from '@/lib/legal-site';
+import { LEGAL_SITE } from '@/lib/legal-site';
 import { LegalSection } from '@/components/legal/legal-page-layout';
-import { Link } from '@/i18n/navigation';
 
 export function PolitiqueConfidentialiteContent() {
   const L = LEGAL_SITE;
-  const dpoEmail = process.env.NEXT_PUBLIC_LEGAL_DPO_EMAIL ?? L.contactEmail;
+  const rpName = process.env.NEXT_PUBLIC_LEGAL_DPO_NAME ?? 'Omar Talbi';
+  const rpEmail = process.env.NEXT_PUBLIC_LEGAL_DPO_EMAIL ?? 'vieprivee@softfacture.ca';
 
   return (
     <>
-      <LegalSection id="introduction" title="1. Introduction">
+      <p className="mb-6 text-sm text-slate-500">
+        <strong>Dernière mise à jour :</strong> {L.lastUpdated}
+      </p>
+
+      <p className="mb-8 text-slate-700">
+        Chez <strong>{L.brand}</strong>, nous prenons la protection de vos renseignements personnels
+        et de vos données financières très au sérieux. La présente Politique de confidentialité
+        décrit de manière claire et transparente comment nous collectons, utilisons, stockons,
+        protégeons et supprimons vos renseignements personnels, conformément à la{' '}
+        <strong>Loi 25 du Québec</strong> et à la <strong>LPRPDE du Canada</strong>.
+      </p>
+      <p className="mb-8 text-slate-700">
+        Cette politique s&apos;applique à l&apos;utilisation de notre site web vitrine ainsi
+        qu&apos;à notre plateforme de facturation en mode SaaS (ci-après désignée « la Plateforme
+        »).
+      </p>
+
+      <LegalSection
+        id="responsable"
+        title="1. Responsable de la protection des renseignements personnels"
+      >
         <p>
-          {brandOfCompanySentence()} La présente politique de confidentialité décrit comment{' '}
-          <strong>{companyLegalLabel()}</strong> (ci-après « nous », la « Société »), éditeur de la
-          marque <strong>{L.brand}</strong>, collecte et traite les données à caractère personnel
-          dans le cadre du service en ligne de facturation et de devis, accessible depuis le site et
-          l&apos;application web.
+          Pour toute question, commentaire ou pour exercer vos droits relatifs à vos renseignements
+          personnels, vous pouvez communiquer directement avec notre responsable :
+        </p>
+        <ul className="list-inside list-disc space-y-1 pl-2">
+          <li>
+            <strong>Nom du responsable :</strong> {rpName}
+          </li>
+          <li>
+            <strong>Titre :</strong> Responsable de la protection des renseignements personnels
+          </li>
+          <li>
+            <strong>Adresse courriel dédiée :</strong>{' '}
+            <a href={`mailto:${rpEmail}`} className="text-emerald-700 underline">
+              {rpEmail}
+            </a>
+          </li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection
+        id="donnees-collectees"
+        title="2. Renseignements personnels que nous collectons"
+      >
+        <p>
+          Nous ne collectons que les renseignements personnels strictement nécessaires à la
+          fourniture de nos services de facturation.
+        </p>
+
+        <p className="mt-4">
+          <strong>A. Données collectées lors de la création d&apos;un compte</strong>
+        </p>
+        <ul className="list-inside list-disc space-y-1 pl-2">
+          <li>
+            Nom, prénom et adresse courriel de l&apos;administrateur et des utilisateurs autorisés.
+          </li>
+          <li>Nom de votre entreprise, adresse professionnelle et numéro de téléphone.</li>
+          <li>
+            Informations de facturation et de paiement (gérées de manière sécurisée par notre
+            passerelle de paiement tierce).
+          </li>
+        </ul>
+
+        <p className="mt-4">
+          <strong>
+            B. Données de facturation de vos propres clients (En tant que sous-traitant)
+          </strong>
         </p>
         <p>
-          Nous nous engageons à respecter le Règlement (UE) 2016/679 (RGPD) et la loi n° 78-17 du 6
-          janvier 1978 modifiée (« Informatique et Libertés »).
+          Dans le cadre de l&apos;utilisation de la Plateforme, vous entrez des données concernant
+          vos propres clients (noms, adresses, courriels, détails des prestations et montants).{' '}
+          <strong>
+            {L.brand} traite ces données uniquement en tant que sous-traitant (mandataire)
+          </strong>
+          , selon vos instructions exclusives, pour générer, envoyer et stocker vos factures.
+        </p>
+
+        <p className="mt-4">
+          <strong>C. Données de navigation (Cookies)</strong>
+        </p>
+        <ul className="list-inside list-disc space-y-1 pl-2">
+          <li>Adresse IP, type de navigateur, pages consultées sur notre site vitrine.</li>
+          <li>
+            Les cookies strictement nécessaires à la sécurité et au maintien de votre session de
+            facturation sur la Plateforme sont activés par défaut. Les cookies d&apos;analyse ou de
+            marketing sont bloqués par défaut et requièrent votre consentement explicite.
+          </li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection id="finalites" title="3. Finalités du traitement">
+        <p>Nous utilisons vos renseignements personnels uniquement pour les fins suivantes :</p>
+        <ul className="list-inside list-disc space-y-1 pl-2">
+          <li>Créer, gérer et sécuriser votre compte utilisateur sur {L.brand}.</li>
+          <li>Assurer le bon fonctionnement technique de la Plateforme et générer vos factures.</li>
+          <li>Traiter vos paiements d&apos;abonnement de manière sécurisée.</li>
+          <li>Assurer le support technique et répondre à vos demandes d&apos;assistance.</li>
+          <li>Respecter nos obligations légales et fiscales en matière de comptabilité.</li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection
+        id="hebergement"
+        title="4. Hébergement et Souveraineté des données (100 % Québec)"
+      >
+        <p>Pour vous garantir une sécurité juridique et technique optimale face à la Loi 25 :</p>
+        <ul className="list-inside list-disc space-y-1 pl-2">
+          <li>
+            L&apos;infrastructure principale, les bases de données et les sauvegardes de {L.brand}{' '}
+            sont <strong>intégralement et physiquement hébergées au Québec, Canada</strong>.
+          </li>
+          <li>
+            Aucun transfert transfrontalier de vos données principales de facturation n&apos;est
+            effectué en dehors de la province du Québec pour le stockage.
+          </li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection id="tiers" title="5. Partage des données avec des tiers">
+        <p>
+          Nous ne vendons, n&apos;échangeons ni ne louons vos renseignements personnels à des tiers.
+          Vos données ne sont partagées qu&apos;avec des sous-traitants de confiance indispensables
+          à l&apos;exécution de nos services, notamment :
+        </p>
+        <ul className="list-inside list-disc space-y-1 pl-2">
+          <li>Notre fournisseur d&apos;infrastructure cloud (hébergé au Québec).</li>
+          <li>
+            Notre passerelle de paiement sécurisée (ex. Stripe) pour la gestion des transactions.
+          </li>
+          <li>
+            Notre service d&apos;envoi de courriels transactionnels pour l&apos;expédition
+            automatisée de vos factures.
+          </li>
+        </ul>
+        <p className="mt-3">
+          Tous nos sous-traitants sont liés par des ententes contractuelles strictes et doivent
+          déployer des mesures de sécurité équivalentes à celles exigées par la Loi 25.
         </p>
       </LegalSection>
 
-      <LegalSection id="roles" title="2. Responsable de traitement et sous-traitance">
+      <LegalSection id="duree" title="6. Durée de conservation, destruction et anonymisation">
         <p>
-          <strong>Données de compte et d&apos;abonnement</strong> (inscription, facturation SaaS,
-          support) : {L.companyName}, {formatLegalAddress()} —{' '}
-          <a href={`mailto:${L.contactEmail}`} className="text-emerald-700 underline">
-            {L.contactEmail}
+          Nous conservons vos renseignements personnels aussi longtemps que votre compte {L.brand}{' '}
+          est actif, ou selon les obligations légales applicables (notamment les exigences de
+          conservation des dossiers fiscaux).
+        </p>
+        <p className="mt-3">En cas de résiliation de votre abonnement :</p>
+        <ul className="list-inside list-disc space-y-1 pl-2">
+          <li>
+            Vos données d&apos;accès et utilisateurs sont conservées pendant une période de grâce de{' '}
+            <strong>90 jours</strong>, puis sont définitivement <strong>détruites</strong> de nos
+            serveurs.
+          </li>
+          <li>
+            Conformément à la Loi 25, les données de facturation résiduelles nécessaires à nos
+            analyses internes et statistiques globales font l&apos;objet d&apos;un processus d&apos;
+            <strong>anonymisation irréversible</strong>. Il devient alors totalement impossible de
+            les associer à une personne physique.
+          </li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection id="securite" title="7. Sécurité des données">
+        <p>
+          Nous appliquons des mesures de sécurité techniques et organisationnelles rigoureuses pour
+          protéger vos renseignements personnels contre l&apos;accès non autorisé, la perte, le vol
+          ou la modification :
+        </p>
+        <ul className="list-inside list-disc space-y-1 pl-2">
+          <li>
+            Chiffrement de toutes les données en transit (protocole HTTPS/TLS) et au repos
+            (at-rest).
+          </li>
+          <li>
+            Isolation stricte des données (Multi-Tenancy) empêchant toute interconnexion entre les
+            comptes de différentes entreprises.
+          </li>
+          <li>
+            Tenue d&apos;un registre interne des incidents de confidentialité et processus
+            d&apos;alerte rapide en cas de risque de préjudice sérieux.
+          </li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection id="droits" title="8. Vos droits (Accès, Rectification et Portabilité)">
+        <p>
+          En vertu des lois canadiennes et québécoises, vous disposez de droits majeurs concernant
+          vos renseignements personnels :
+        </p>
+        <ul className="list-inside list-disc space-y-1 pl-2">
+          <li>
+            <strong>Droit d&apos;accès et de rectification :</strong> Vous pouvez consulter,
+            modifier ou mettre à jour vos renseignements personnels à tout moment depuis votre
+            tableau de bord {L.brand} ou en contactant {rpName}.
+          </li>
+          <li>
+            <strong>Droit à la portabilité des données :</strong> Vous pouvez demander et
+            télécharger un export complet de vos données de facturation et de profil dans un format
+            technologique structuré, couramment utilisé et lisible par ordinateur (format JSON ou
+            CSV).
+          </li>
+          <li>
+            <strong>Droit au retrait du consentement :</strong> Vous pouvez retirer votre
+            consentement à l&apos;utilisation de vos données non essentielles (comme les cookies
+            marketing) via notre centre de gestion des préférences.
+          </li>
+        </ul>
+        <p className="mt-3">
+          Pour exercer l&apos;un de ces droits, veuillez adresser une demande écrite à{' '}
+          <strong>{rpName}</strong> à l&apos;adresse :{' '}
+          <a href={`mailto:${rpEmail}`} className="text-emerald-700 underline">
+            {rpEmail}
           </a>
-          .
+          . Nous répondrons à votre demande dans un délai maximum de <strong>30 jours</strong>,
+          conformément à la loi.
         </p>
-        <p>
-          <strong>Données saisies par l&apos;Utilisateur dans le Service</strong> (clients finaux,
-          factures, devis, produits, coordonnées bancaires sur documents, etc.) : en principe,{' '}
-          l&apos;Utilisateur (votre entreprise) agit en <strong>responsable de traitement</strong>{' '}
-          pour ses propres clients et contacts ; {L.companyName} agit en{' '}
-          <strong>sous-traitant</strong> au sens de l&apos;article 28 du RGPD, pour héberger et
-          traiter ces données selon vos instructions et notre documentation contractuelle (
-          <Link href="/cgv" className="text-emerald-700 underline">
-            CGV/CGU
-          </Link>
-          ).
-        </p>
-      </LegalSection>
-
-      <LegalSection id="donnees-collectees" title="3. Données collectées">
-        <p>
-          <strong>3.1 Compte utilisateur et abonnement</strong>
-        </p>
-        <ul className="list-inside list-disc space-y-1 pl-2">
-          <li>Identité : nom, prénom, raison sociale</li>
-          <li>Contact : adresse email, téléphone (si renseigné)</li>
-          <li>Connexion : mot de passe (stocké de manière hachée), journaux techniques</li>
-          <li>Facturation : SIRET, n° TVA, adresse de facturation, historique d&apos;abonnement</li>
-          <li>
-            Paiement : données gérées par le prestataire de paiement (ex. Stripe), non stockées en
-            clair par {L.brand}
-          </li>
-        </ul>
-        <p>
-          <strong>3.2 Utilisation du Service</strong>
-        </p>
-        <ul className="list-inside list-disc space-y-1 pl-2">
-          <li>Données relatives à vos clients, produits, factures, devis, paiements enregistrés</li>
-          <li>Paramètres organisation (logo, mentions, modèles PDF, langue des documents)</li>
-          <li>
-            Données de connexion : adresse IP, horodatages, type de navigateur (sécurité et support)
-          </li>
-        </ul>
-        <p>
-          <strong>3.3 Données que nous ne collectons pas volontairement</strong>
-        </p>
-        <p>
-          Nous ne demandons pas de données sensibles au sens de l&apos;article 9 du RGPD (origine
-          raciale, santé, etc.). Évitez d&apos;en saisir dans les champs libres du Service.
-        </p>
-      </LegalSection>
-
-      <LegalSection id="finalites" title="4. Finalités et bases légales">
-        <div className="overflow-x-auto">
-          <table className="mt-2 w-full min-w-[480px] border-collapse text-left text-xs">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="px-2 py-2 font-semibold">Finalité</th>
-                <th className="px-2 py-2 font-semibold">Base légale</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              <tr>
-                <td className="px-2 py-2">Création et gestion du compte</td>
-                <td className="px-2 py-2">Exécution du contrat (art. 6.1.b RGPD)</td>
-              </tr>
-              <tr>
-                <td className="px-2 py-2">Fourniture du Service (facturation, devis)</td>
-                <td className="px-2 py-2">Exécution du contrat</td>
-              </tr>
-              <tr>
-                <td className="px-2 py-2">Facturation et recouvrement de l&apos;abonnement</td>
-                <td className="px-2 py-2">Contrat / obligation légale comptable</td>
-              </tr>
-              <tr>
-                <td className="px-2 py-2">Support client et sécurité</td>
-                <td className="px-2 py-2">Intérêt légitime / contrat</td>
-              </tr>
-              <tr>
-                <td className="px-2 py-2">Amélioration du Service (statistiques agrégées)</td>
-                <td className="px-2 py-2">Intérêt légitime</td>
-              </tr>
-              <tr>
-                <td className="px-2 py-2">Prospection B2B (newsletter, si consentement)</td>
-                <td className="px-2 py-2">Consentement (art. 6.1.a)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </LegalSection>
-
-      <LegalSection id="destinataires" title="5. Destinataires et sous-traitants">
-        <p>Les données peuvent être communiquées à :</p>
-        <ul className="list-inside list-disc space-y-1 pl-2">
-          <li>Personnel habilité de {L.companyName}</li>
-          <li>
-            Hébergeur et prestataires techniques : {L.hostName} ({L.hostAddress})
-          </li>
-          <li>Prestataire de paiement (abonnement en ligne)</li>
-          <li>Autorités compétentes sur demande légale</li>
-        </ul>
-        <p>
-          Nos sous-traitants sont choisis pour leurs garanties de sécurité et, lorsque requis, font
-          l&apos;objet de clauses contractuelles types (transferts hors UE) ou sont situés dans
-          l&apos;Union européenne.
-        </p>
-      </LegalSection>
-
-      <LegalSection id="duree" title="6. Durée de conservation">
-        <ul className="list-inside list-disc space-y-1 pl-2">
-          <li>
-            <strong>Compte actif</strong> : pendant la durée de l&apos;abonnement puis archivage
-            limité.
-          </li>
-          <li>
-            <strong>Compte fermé</strong> : suppression ou anonymisation sous 3 ans après clôture,
-            sauf obligation légale de conservation (comptabilité : 10 ans pour pièces comptables
-            liées à la relation commerciale avec {L.companyName}).
-          </li>
-          <li>
-            <strong>Journaux techniques</strong> : jusqu&apos;à 12 mois sauf incident de sécurité.
-          </li>
-          <li>
-            <strong>Données de vos clients</strong> (saisies par vous) : selon vos propres
-            obligations ; vous pouvez exporter ou supprimer vos données depuis le Service.
-          </li>
-        </ul>
-      </LegalSection>
-
-      <LegalSection id="securite" title="7. Sécurité">
-        <p>
-          Nous mettons en œuvre des mesures techniques et organisationnelles appropriées :
-          chiffrement des communications (HTTPS), hachage des mots de passe, contrôle d&apos;accès
-          par rôles, sauvegardes, journalisation. Aucun système n&apos;étant infaillible, nous vous
-          invitons à utiliser un mot de passe robuste et à le garder confidentiel.
-        </p>
-      </LegalSection>
-
-      <LegalSection id="droits" title="8. Vos droits">
-        <p>Vous disposez des droits suivants sur vos données personnelles :</p>
-        <ul className="list-inside list-disc space-y-1 pl-2">
-          <li>Accès, rectification, effacement</li>
-          <li>Limitation du traitement, opposition</li>
-          <li>Portabilité (données fournies dans un format structuré)</li>
-          <li>Retrait du consentement (sans affecter la licéité antérieure)</li>
-          <li>Directives post-mortem (France)</li>
-        </ul>
-        <p>
-          Pour exercer vos droits :{' '}
-          <a href={`mailto:${L.contactEmail}`} className="text-emerald-700 underline">
-            {L.contactEmail}
-          </a>
-          {dpoEmail !== L.contactEmail ? (
-            <>
-              {' '}
-              ou le délégué à la protection des données :{' '}
-              <a href={`mailto:${dpoEmail}`} className="text-emerald-700 underline">
-                {dpoEmail}
-              </a>
-            </>
-          ) : null}
-          . Une pièce d&apos;identité pourra être demandée en cas de doute raisonnable. Réponse sous
-          un mois (prolongation possible de deux mois si complexité).
-        </p>
-        <p>
-          Réclamation auprès de la CNIL :{' '}
+        <p className="mt-3">
+          Vous pouvez également déposer une plainte auprès de la{' '}
           <a
-            href="https://www.cnil.fr/fr/plaintes"
+            href="https://www.cai.gouv.qc.ca"
             className="text-emerald-700 underline"
             target="_blank"
             rel="noopener noreferrer"
           >
-            www.cnil.fr/fr/plaintes
+            Commission d&apos;accès à l&apos;information du Québec (CAI)
+          </a>{' '}
+          ou du{' '}
+          <a
+            href="https://www.priv.gc.ca"
+            className="text-emerald-700 underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Commissariat à la protection de la vie privée du Canada
           </a>
           .
         </p>
       </LegalSection>
 
-      <LegalSection id="cookies" title="9. Cookies et traceurs">
+      <LegalSection id="modifications" title="9. Modifications de la présente politique">
         <p>
-          <strong>Cookies strictement nécessaires</strong> : session, authentification, préférences
-          essentielles — dispensés de consentement.
-        </p>
-        <p>
-          <strong>Cookies de mesure d&apos;audience ou marketing</strong> : le cas échéant, soumis à
-          votre consentement via un bandeau (à déployer si des outils tiers sont activés).
-        </p>
-        <p>
-          Vous pouvez configurer votre navigateur pour refuser les cookies ; certaines
-          fonctionnalités du Service pourraient alors être indisponibles.
-        </p>
-      </LegalSection>
-
-      <LegalSection id="mineurs" title="10. Mineurs">
-        <p>
-          Le Service s&apos;adresse aux professionnels et aux adultes. Il n&apos;est pas destiné aux
-          mineurs de moins de 15 ans sans autorisation parentale.
-        </p>
-      </LegalSection>
-
-      <LegalSection id="modifications" title="11. Modifications">
-        <p>
-          Nous pouvons mettre à jour cette politique. La date en tête de page sera révisée ; en cas
-          de changement substantiel, nous vous en informerons par email ou notification dans
-          l&apos;application.
-        </p>
-      </LegalSection>
-
-      <LegalSection id="contact" title="12. Contact">
-        <p>
-          <strong>{L.companyName}</strong> — {formatLegalAddress()}
-          <br />
-          Email :{' '}
-          <a href={`mailto:${L.contactEmail}`} className="text-emerald-700 underline">
-            {L.contactEmail}
-          </a>
-        </p>
-        <p className="text-slate-600">
-          Voir aussi nos{' '}
-          <Link href="/mentions-legales" className="text-emerald-700 underline">
-            mentions légales
-          </Link>{' '}
-          et nos{' '}
-          <Link href="/cgv" className="text-emerald-700 underline">
-            CGV/CGU
-          </Link>
-          .
+          Nous nous réservons le droit de modifier cette Politique de confidentialité pour refléter
+          les changements technologiques ou l&apos;évolution de la réglementation. En cas de
+          modification majeure, une notification sera affichée de manière visible sur la Plateforme
+          lors de votre connexion.
         </p>
       </LegalSection>
     </>

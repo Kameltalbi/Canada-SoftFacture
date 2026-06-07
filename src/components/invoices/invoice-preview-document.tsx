@@ -261,7 +261,7 @@ export function InvoicePreviewDocument({
         <p className="font-semibold" style={{ color: colors.accent }}>
           {data.labels.paymentMethods}
         </p>
-        <p className="mt-1">Virement bancaire · Chèque</p>
+        <p className="mt-1">Virement bancaire · Chèque · Interac</p>
       </div>
     </PrintableA4>
   );

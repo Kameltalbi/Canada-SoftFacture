@@ -22,6 +22,7 @@ import billingProtectedRoutes, { billingPublicRouter } from './routes/billing.ro
 import billingWebhooksRoutes from './routes/billing.webhooks.routes.js';
 import receivedInvoicesRoutes from './routes/receivedInvoices.routes.js';
 import paWebhooksRoutes from './routes/pa.webhooks.routes.js';
+import privacyRoutes from './routes/privacy.routes.js';
 import { authMiddleware, requireOrg, requireRoles } from './middleware/auth.js';
 import { requireOnboardingComplete } from './middleware/onboarding.js';
 import { isEinvoiceFeaturesEnabled } from './lib/featureFlags.js';
@@ -161,6 +162,15 @@ export function createApp() {
   );
 
   app.use('/api/superadmin', authMiddleware, requireRoles('SUPERADMIN'), superadminRoutes);
+
+  // Loi 25 / PIPEDA — Conformité vie privée (admin uniquement)
+  app.use(
+    '/api/privacy',
+    authMiddleware,
+    requireOrg,
+    requireRoles('ADMIN', 'SUPERADMIN'),
+    privacyRoutes
+  );
 
   app.use(
     (err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

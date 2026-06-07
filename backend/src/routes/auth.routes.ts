@@ -13,6 +13,8 @@ import { logoUrlForApi } from '../lib/orgLogoApi.js';
 
 const router = Router();
 
+const CURRENT_TERMS_VERSION = 'v1.0-2026-06';
+
 const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
@@ -20,6 +22,9 @@ const registerSchema = z.object({
   lastName: z.string().min(1).max(60),
   organizationName: z.string().min(2).max(200),
   phone: z.string().min(8).max(24),
+  acceptTerms: z.literal(true, {
+    message: 'Vous devez accepter les CGU et la Politique de confidentialité.',
+  }),
 });
 
 router.post(
@@ -49,7 +54,8 @@ router.post(
           defaultCurrency: 'EUR',
         },
       });
-      const user = await tx.user.create({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const user = await (tx as any).user.create({
         data: {
           email: normalizedEmail,
           passwordHash,
@@ -57,6 +63,8 @@ router.post(
           phone: normalizedPhone,
           role: 'ADMIN',
           organizationId: org.id,
+          termsAcceptedAt: new Date(),
+          termsVersion: CURRENT_TERMS_VERSION,
         },
       });
       return { org, user };

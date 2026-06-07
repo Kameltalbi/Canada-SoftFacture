@@ -79,6 +79,7 @@ type AuthContextValue = {
     lastName: string;
     organizationName: string;
     phone: string;
+    acceptTerms?: boolean;
   }) => Promise<ApiUser>;
   logout: () => void;
   refreshMe: () => Promise<void>;

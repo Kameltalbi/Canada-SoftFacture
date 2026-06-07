@@ -26,6 +26,7 @@ import { ProfileMenu } from '@/components/layout/profile-menu';
 import { TenantHeaderPlan } from '@/components/layout/tenant-header-plan';
 import { useLogout } from '@/hooks/use-logout';
 import { FEATURES } from '@/lib/feature-flags';
+import { LocaleSwitcher } from '@/components/locale-switcher';
 import { organizationManagesStock } from '@/lib/stock-management';
 
 const billingLinks = [
@@ -356,6 +357,7 @@ export function AppShell({
             <span className="text-brand">{headerTime}</span>
           </time>
           <div className="flex shrink-0 items-center justify-self-end gap-2">
+            {FEATURES.localeSwitcher ? <LocaleSwitcher /> : null}
             <ProfileMenu user={user} onLogout={logoutAndRedirect} />
           </div>
         </header>

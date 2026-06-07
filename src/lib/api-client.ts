@@ -169,41 +169,6 @@ function triggerBlobDownload(blob: Blob, filename: string) {
   URL.revokeObjectURL(href);
 }
 
-export async function downloadInvoiceFacturXFromApi(invoiceId: string, filename: string) {
-  const url = `${getApiBase()}/invoices/${invoiceId}/factur-x.pdf`;
-  const token = getToken();
-  const res = await fetch(url, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error(formatDownloadError(t, res.status, res.statusText));
-  }
-  const blob = await res.blob();
-  const name = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
-  triggerBlobDownload(
-    blob,
-    name.includes('factur-x') ? name : name.replace(/\.pdf$/i, '-factur-x.pdf')
-  );
-}
-
-export async function downloadInvoiceFacturXXmlFromApi(invoiceId: string, filename: string) {
-  const url = `${getApiBase()}/invoices/${invoiceId}/factur-x.xml`;
-  const token = getToken();
-  const res = await fetch(url, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error(formatDownloadError(t, res.status, res.statusText));
-  }
-  const blob = await res.blob();
-  const name = filename.endsWith('.xml')
-    ? filename
-    : `${filename.replace(/\.pdf$/i, '')}-factur-x.xml`;
-  triggerBlobDownload(blob, name);
-}
-
 export async function downloadQuotePdfFromApi(quoteId: string, filename: string) {
   const url = `${getApiBase()}/quotes/${quoteId}/pdf`;
   const token = getToken();
@@ -237,95 +202,6 @@ export async function previewOtherDocumentPdf(): Promise<void> {
   const href = URL.createObjectURL(blob);
   window.open(href, '_blank', 'noopener,noreferrer');
   window.setTimeout(() => URL.revokeObjectURL(href), 60_000);
-}
-
-export type ReceivedInvoiceStatus = 'RECEIVED' | 'ACCEPTED' | 'DISPUTED' | 'REFUSED' | 'COLLECTED';
-
-export type ReceivedInvoiceListRow = {
-  id: string;
-  invoiceNumber: string;
-  issueDate: string;
-  dueDate: string | null;
-  currency: string;
-  supplierName: string;
-  supplierSiren: string | null;
-  totalTtc: unknown;
-  status: ReceivedInvoiceStatus;
-  source: 'UPLOAD' | 'PA_WEBHOOK' | 'PA_SYNC';
-  buyerMismatch: boolean;
-  receivedAt: string;
-  facturXProfile: string | null;
-};
-
-export type ReceivedInvoiceDetail = ReceivedInvoiceListRow & {
-  supplierSiret: string | null;
-  supplierVat: string | null;
-  buyerName: string | null;
-  buyerSiren: string | null;
-  subtotalHt: unknown;
-  vatTotal: unknown;
-  statusNote: string | null;
-  statusUpdatedAt: string;
-  paProvider: string;
-  paExternalId: string | null;
-};
-
-export async function importReceivedFacturXPdfFromApi(file: File) {
-  const form = new FormData();
-  form.append('file', file);
-  const url = `${getApiBase()}/received-invoices/import`;
-  const token = getToken();
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    body: form,
-  });
-  const text = await res.text();
-  let data: unknown = null;
-  if (text) {
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = null;
-    }
-  }
-  if (!res.ok) {
-    if (data && typeof data === 'object' && data !== null && 'error' in data) {
-      throw new Error(String((data as ApiErrorBody).error ?? res.statusText));
-    }
-    throw new Error(formatApiError(text, res.status, res.statusText));
-  }
-  return data as ReceivedInvoiceDetail & { warning?: string };
-}
-
-export async function downloadReceivedInvoicePdfFromApi(id: string, invoiceNumber: string) {
-  const url = `${getApiBase()}/received-invoices/${id}/pdf`;
-  const token = getToken();
-  const res = await fetch(url, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error(formatDownloadError(t, res.status, res.statusText));
-  }
-  const blob = await res.blob();
-  const safe = invoiceNumber.replace(/[^\w.-]/g, '_');
-  triggerBlobDownload(blob, `${safe}-recu.pdf`);
-}
-
-export async function downloadReceivedInvoiceXmlFromApi(id: string, invoiceNumber: string) {
-  const url = `${getApiBase()}/received-invoices/${id}/xml`;
-  const token = getToken();
-  const res = await fetch(url, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error(formatDownloadError(t, res.status, res.statusText));
-  }
-  const blob = await res.blob();
-  const safe = invoiceNumber.replace(/[^\w.-]/g, '_');
-  triggerBlobDownload(blob, `${safe}-recu.xml`);
 }
 
 export async function uploadOrganizationLogo(file: File): Promise<{ logoUrl: string | null }> {

@@ -44,6 +44,7 @@ enum PaymentMethod {
   CHEQUE
   ESPECES
   CARTE
+  INTERAC
 }
 
 enum QuoteStatus {
@@ -169,9 +170,9 @@ model Organization {
   address          String?
   city             String?
   postalCode       String?
-  country          String   @default("FR")
-  defaultCurrency  String   @default("EUR")
-  defaultVatRate   Decimal  @db.Decimal(5, 2) @default(20)
+  country          String   @default("CA")
+  defaultCurrency  String   @default("CAD")
+  defaultVatRate   Decimal  @db.Decimal(5, 2) @default(5)
   invoicePrefix    String   @default("FAC")
   invoiceSequence  Int      @default(0)
   lastInvoiceYear  Int      @default(0)
@@ -279,7 +280,7 @@ model BillingCheckoutSession {
   provider            BillingProvider       @default(NONE)
   providerSessionId   String?
   amountTtcCents      Int
-  currency            String                @default("EUR")
+  currency            String                @default("CAD")
   successUrl          String
   cancelUrl           String
   customerEmail       String?
@@ -306,6 +307,9 @@ model User {
   organization     Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   invitationsSent  UserInvitation[] @relation("InvitationsSent")
   passwordResets   PasswordReset[]
+  /** Loi 25 — Consentement aux CGU/DPA/Politique de confidentialité */
+  termsAcceptedAt  DateTime?
+  termsVersion     String?
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 
@@ -339,7 +343,7 @@ model Client {
   address        String?
   postalCode     String?
   city           String?
-  country        String   @default("FR")
+  country        String   @default("CA")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   invoices       Invoice[]
@@ -429,7 +433,7 @@ model Invoice {
   issueDate      DateTime
   dueDate        DateTime?
   status         InvoiceStatus @default(DRAFT)
-  currency       String        @default("EUR")
+  currency       String        @default("CAD")
   applyVat       Boolean       @default(true)
   applyFiscalStamp Boolean     @default(false)
   fiscalStamp    Decimal       @default(1.000) @db.Decimal(14, 3)
@@ -484,7 +488,7 @@ model RecurringInvoice {
   status              RecurringStatus    @default(ACTIVE)
   autoValidate        Boolean            @default(true)
   dueDaysAfter        Int                @default(30)
-  currency            String             @default("EUR")
+  currency            String             @default("CAD")
   applyVat            Boolean            @default(true)
   applyFiscalStamp    Boolean            @default(false)
   fiscalStamp         Decimal            @default(1.000) @db.Decimal(14, 3)
@@ -552,7 +556,7 @@ model ReceivedInvoice {
   invoiceNumber    String
   issueDate        DateTime
   dueDate          DateTime?
-  currency         String                 @default("EUR")
+  currency         String                 @default("CAD")
   supplierName     String
   supplierSiren    String?
   supplierSiret    String?
@@ -623,7 +627,7 @@ model Quote {
   issueDate        DateTime
   validUntil       DateTime?
   status           QuoteStatus @default(DRAFT)
-  currency         String      @default("EUR")
+  currency         String      @default("CAD")
   applyVat         Boolean     @default(true)
   applyFiscalStamp Boolean     @default(false)
   fiscalStamp      Decimal     @default(1.000) @db.Decimal(14, 3)
@@ -697,4 +701,109 @@ model InvoiceAuditLog {
 
   @@index([organizationId])
   @@index([organizationId, validatedAt])
+}
+
+// ─────────────────────────────────────────────────────────────────
+// LOI 25 / PIPEDA — Modules conformité vie privée
+// ─────────────────────────────────────────────────────────────────
+
+/** Type d'événement traçable (art. 63.1 Loi 25 — registre CAI). */
+enum DataAccessEventType {
+  DATA_EXPORT          // Portabilité : export complet par l'admin
+  DATA_VIEW_SENSITIVE  // Consultation d'un champ sensible chiffré
+  DATA_UPDATE          // Modification de données personnelles
+  DATA_DELETE          // Suppression manuelle de données
+  ACCOUNT_PURGE        // Purge automatique post-résiliation (90 j)
+  ACCOUNT_ANONYMIZE    // Anonymisation des données financières
+  LOGIN_SUCCESS
+  LOGIN_FAILURE
+  PERMISSION_CHANGE    // Changement de rôle / droits
+  PRIVACY_INCIDENT     // Incident déclarable à la CAI
+}
+
+/**
+ * Table de registre d'accès aux données — art. 63.1 Loi 25.
+ * IMMUABLE : aucune route UPDATE/DELETE n'est exposée sur cette table.
+ * Chaque ligne est un fait historique signé par un hash de chaîne.
+ */
+model DataAccessLog {
+  id             String              @id @default(cuid())
+  organizationId String?
+  /** Utilisateur responsable de l'action (null = système/cron). */
+  actorId        String?
+  actorEmail     String?
+  event          DataAccessEventType
+  /** Ressource ciblée, ex: "client:abc123", "invoice:xyz789". */
+  targetResource String?
+  /** Détails supplémentaires en JSON (non modifiable post-création). */
+  details        Json?
+  /** IP source de la requête. */
+  ipAddress      String?
+  userAgent      String?
+  /** Hash SHA-256 de la ligne précédente → chaîne d'intégrité. */
+  previousHash   String?
+  /** Hash SHA-256 de cette ligne (calculé à l'insertion). */
+  rowHash        String
+  createdAt      DateTime            @default(now())
+
+  @@index([organizationId])
+  @@index([actorId])
+  @@index([event])
+  @@index([createdAt])
+}
+
+/** Statut d'une demande de résiliation / suppression de compte. */
+enum DeletionRequestStatus {
+  PENDING      // En attente du délai de grâce
+  GRACE_PERIOD // Dans les 90 jours
+  PURGING      // Purge en cours
+  COMPLETED    // Données supprimées / anonymisées
+  CANCELLED    // Annulation avant la purge
+}
+
+/**
+ * Demande de fin de cycle de vie d'un compte (art. 28 Loi 25).
+ * Déclenche le cron d'anonymisation après 90 jours.
+ */
+model OrganizationDeletionRequest {
+  id               String                @id @default(cuid())
+  organizationId   String                @unique
+  /** Date à laquelle le compte a été marqué "résilié". */
+  requestedAt      DateTime              @default(now())
+  /** Date à partir de laquelle la purge peut être exécutée (+90 j). */
+  purgeEligibleAt  DateTime
+  status           DeletionRequestStatus @default(PENDING)
+  /** Date effective d'exécution de la purge. */
+  purgedAt         DateTime?
+  /** Rapport de purge (JSON : comptes supprimés, factures anonymisées, etc.). */
+  purgeReport      Json?
+  /** Identifiant de l'admin qui a déclenché la demande. */
+  requestedById    String?
+
+  @@index([status])
+  @@index([purgeEligibleAt])
+}
+
+/** Incident de confidentialité déclarable à la CAI (art. 3.5 Loi 25). */
+model PrivacyIncident {
+  id              String   @id @default(cuid())
+  organizationId  String?
+  /** Description de l'incident. */
+  description     String   @db.Text
+  /** Données personnelles impliquées. */
+  dataCategories  String[]
+  /** Nombre de personnes affectées (estimé). */
+  affectedCount   Int?
+  /** Déclaré à la CAI ? */
+  reportedToCai   Boolean  @default(false)
+  reportedToCaiAt DateTime?
+  /** Mesures correctives prises. */
+  mitigations     String?  @db.Text
+  /** Identifiant de l'admin qui a créé l'incident. */
+  reportedById    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([createdAt])
 }

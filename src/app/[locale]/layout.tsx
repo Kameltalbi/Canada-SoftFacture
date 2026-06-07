@@ -5,6 +5,7 @@ import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { Providers } from '@/components/providers';
+import { CookieBanner } from '@/components/marketing/cookie-banner';
 import '../globals.css';
 
 const dmSans = DM_Sans({
@@ -50,6 +51,7 @@ export default async function LocaleLayout({
       <body className="min-h-screen bg-s-bg font-sans text-s-navy antialiased">
         <NextIntlClientProvider messages={messages}>
           <Providers>{children}</Providers>
+          <CookieBanner />
         </NextIntlClientProvider>
       </body>
     </html>

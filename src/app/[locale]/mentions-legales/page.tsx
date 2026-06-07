@@ -3,14 +3,14 @@ import { LegalPageLayout } from '@/components/legal/legal-page-layout';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Mentions légales — SoftFacture France (Nexiora)',
+  title: 'Informations légales — SoftFacture Canada',
   description:
-    'Mentions légales du service SoftFacture France, marque de la société Nexiora : éditeur, hébergement et données personnelles.',
+    'Informations légales du service SoftFacture Canada : fournisseur, hébergement, NEQ, TPS/TVQ et renseignements personnels.',
 };
 
 export default function MentionsLegalesPage() {
   return (
-    <LegalPageLayout title="Mentions légales">
+    <LegalPageLayout title="Informations légales">
       <MentionsLegalesContent />
     </LegalPageLayout>
   );
