@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+/* Hero & marque : vert principal #039d77 */
+:root {
+  --hero-bg: #039d77;
+  --brand: #039d77;
+  --brand-hover: #027a5e;
+  --brand-dark: #015a46;
+  --brand-soft: #e6faf4;
+  --brand-glow: rgba(3, 157, 119, 0.35);
+  /* Bleu « facture » du wordmark logo */
+  --brand-blue: #2563eb;
+  --brand-blue-hover: #1d4ed8;
+  --brand-blue-soft: #eff6ff;
+  --s-bg: #f4f6f8;
+  --s-surface: #ffffff;
+  --s-navy: #0f172a;
+  --s-navy-soft: #1e293b;
+  --s-accent: var(--brand);
+  --s-accent-hover: var(--brand-hover);
+  --s-accent-soft: var(--brand-soft);
+  --s-muted: #64748b;
+  --s-border: #e8ecf0;
+  --s-shadow: 0 20px 50px -20px rgba(15, 23, 42, 0.15);
+  --charcoal: #1a1d23;
+  --cream: #fffbeb;
+  --amber-tag: #f59e0b;
+}
+
+@theme inline {
+  --color-hero-bg: var(--hero-bg);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-blue-hover: var(--brand-blue-hover);
+  --color-brand-blue-soft: var(--brand-blue-soft);
+  --color-s-bg: var(--s-bg);
+  --color-s-surface: var(--s-surface);
+  --color-s-navy: var(--s-navy);
+  --color-s-navy-soft: var(--s-navy-soft);
+  --color-s-accent: var(--s-accent);
+  --color-s-accent-hover: var(--s-accent-hover);
+  --color-s-accent-soft: var(--s-accent-soft);
+  --color-s-muted: var(--s-muted);
+  --color-s-border: var(--s-border);
+  --color-charcoal: var(--charcoal);
+  --color-cream: var(--cream);
+  --shadow-s-card: var(--s-shadow);
+  --font-sans: var(--font-dm), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: var(--s-bg);
+  color: var(--s-navy);
+}
+
+/* ====== A4 Print Styles ====== */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  html, body {
+    width: 210mm;
+    height: 297mm;
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide app shell, nav, sidebar during print */
+  nav, aside, header, .no-print, [data-no-print] {
+    display: none !important;
+  }
+
+  /* Show only print area */
+  .print-area {
+    position: static !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Prevent page break inside elements */
+  .print-no-break {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Force page break */
+  .print-page-break {
+    page-break-before: always;
+    break-before: page;
+  }
+}
+
+/* A4 page container for screen preview */
+.a4-page {
+  width: 210mm;
+  min-height: 297mm;
+  box-sizing: border-box;
+  position: relative;
+  background: #ffffff;
+  margin: 0 auto;
+}
+
+@media screen {
+  .a4-page {
+    box-shadow: 0 4px 24px -4px rgba(15, 23, 42, 0.12);
+    border-radius: 4px;
+  }
+}

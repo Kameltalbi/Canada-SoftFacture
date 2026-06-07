@@ -1,0 +1,700 @@
+// SoftFacture API — schéma SaaS multi-tenant (PostgreSQL / compatible Supabase)
+// MVP : auth, organisations, clients, produits, factures, lignes
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  SUPERADMIN
+  ADMIN
+  USER
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  CANCELLED
+  VALIDATED
+  PARTIALLY_PAID
+}
+
+enum InvoiceKind {
+  STANDARD
+  DEPOSIT
+  CREDIT_NOTE
+}
+
+enum DocumentLanguage {
+  FR
+  EN
+  DE
+  ES
+  IT
+}
+
+enum PaymentMethod {
+  VIREMENT
+  CHEQUE
+  ESPECES
+  CARTE
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CONVERTED
+}
+
+enum RecurringFrequency {
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum RecurringStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum StockMovementType {
+  IN
+  OUT
+  ADJUSTMENT
+}
+
+enum StockMovementSource {
+  INITIAL
+  INVOICE
+  CREDIT_NOTE
+  INVENTORY
+  CANCEL_REVERSAL
+}
+
+/** PRODUCT = stockable ; SERVICE = jamais en stock. */
+enum ProductKind {
+  PRODUCT
+  SERVICE
+}
+
+enum PdfDocumentTemplate {
+  CLASSIC
+  MODERN
+  MINIMAL
+  MONO
+  BLUE_PRO
+}
+
+enum SubscriptionPlan {
+  STARTER
+  PRO
+  BUSINESS
+}
+
+enum BillingStatus {
+  NONE
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+}
+
+enum BillingProvider {
+  NONE
+  STRIPE
+}
+
+enum BillingCheckoutStatus {
+  PENDING
+  COMPLETED
+  EXPIRED
+  CANCELED
+}
+
+/** Nature de l'opération (mention obligatoire e-facture France). */
+enum InvoiceOperationNature {
+  GOODS
+  SERVICES
+  MIXED
+}
+
+/** Plateforme Agréée connectée (OD → PA). */
+enum PaProvider {
+  NONE
+  MOCK
+}
+
+/** Statuts cycle de vie côté PA (DGFiP). */
+enum EInvoiceTransmissionStatus {
+  PENDING
+  DEPOSITED
+  REJECTED
+  REFUSED
+  COLLECTED
+}
+
+/** Source de réception d'une facture fournisseur. */
+enum ReceivedInvoiceSource {
+  UPLOAD
+  PA_WEBHOOK
+  PA_SYNC
+}
+
+/** Cycle de vie côté destinataire (réception France). */
+enum ReceivedInvoiceStatus {
+  RECEIVED
+  ACCEPTED
+  DISPUTED
+  REFUSED
+  COLLECTED
+}
+
+model Organization {
+  id               String   @id @default(cuid())
+  name             String
+  logoUrl          String?
+  taxMatricule     String?
+  address          String?
+  city             String?
+  postalCode       String?
+  country          String   @default("FR")
+  defaultCurrency  String   @default("EUR")
+  defaultVatRate   Decimal  @db.Decimal(5, 2) @default(20)
+  invoicePrefix    String   @default("FAC")
+  invoiceSequence  Int      @default(0)
+  lastInvoiceYear  Int      @default(0)
+  invoiceNumberFormat String @default("{PREFIX}-{YYYY}-{SEQ:4}")
+  invoiceResetYearly  Boolean @default(true)
+  quotePrefix      String   @default("DEV")
+  quoteSequence    Int      @default(0)
+  lastQuoteYear    Int      @default(0)
+  quoteNumberFormat String  @default("{PREFIX}-{YYYY}-{SEQ:4}")
+  quoteResetYearly  Boolean @default(true)
+  depositPrefix       String  @default("ACO")
+  depositSequence     Int     @default(0)
+  lastDepositYear     Int     @default(0)
+  depositNumberFormat String  @default("{PREFIX}-{YYYY}-{SEQ:4}")
+  depositResetYearly  Boolean @default(true)
+  creditNotePrefix       String  @default("AVR")
+  creditNoteSequence     Int     @default(0)
+  lastCreditNoteYear     Int     @default(0)
+  creditNoteNumberFormat String  @default("{PREFIX}-{YYYY}-{SEQ:4}")
+  creditNoteResetYearly  Boolean @default(true)
+  subscriptionPlan        SubscriptionPlan    @default(STARTER)
+  billingStatus           BillingStatus       @default(NONE)
+  billingProvider         BillingProvider     @default(NONE)
+  billingEmail            String?
+  billingLegalName        String?
+  billingSiret            String?
+  billingVatNumber        String?
+  stripeCustomerId        String?
+  stripeSubscriptionId    String?
+  trialEndsAt             DateTime?
+  currentPeriodEnd        DateTime?
+  pendingSubscriptionPlan SubscriptionPlan?
+  invoicePdfTemplate      PdfDocumentTemplate @default(CLASSIC)
+  quotePdfTemplate        PdfDocumentTemplate @default(CLASSIC)
+  otherDocumentPdfTemplate PdfDocumentTemplate @default(CLASSIC)
+  pdfPrimaryColor         String              @default("#0f766e")
+  pdfFontFamily           String              @default("Open Sans")
+  pdfAppearance           Json?
+  invoicePdfAccentColor   String?
+  quotePdfAccentColor     String?
+  otherDocumentPdfAccentColor String?
+  documentFooterText String? @db.Text
+  onboardingCompletedAt DateTime?
+  /** Régime TVA sur les débits (option org.) */
+  vatOnDebitsEnabled Boolean @default(false)
+  /** Micro-entrepreneur / franchise TVA (art. 293 B CGI) */
+  isMicroEntrepreneur Boolean @default(false)
+  /** Mentions légales structurées (SARL, capital, RCS...) */
+  legalForm       String?
+  shareCapital    String?
+  rcsCity         String?
+  /** Siège social pour mentions légales */
+  legalAddress    String?
+  legalPostalCode String?
+  legalCity       String?
+  /** Suivi des quantités en stock (produits physiques). Désactivé par défaut pour les prestataires de services. */
+  stockManagementEnabled Boolean @default(false)
+  paProvider         PaProvider @default(NONE)
+  paAccountRef       String?
+  paConnectedAt      DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  users    User[]
+  clients  Client[]
+  products Product[]
+  invoices Invoice[]
+  payments Payment[]
+  quotes   Quote[]
+  customTaxes CustomTax[]
+  recurringInvoices RecurringInvoice[]
+  productCategories ProductCategory[]
+  stockMovements    StockMovement[]
+  billingCheckoutSessions BillingCheckoutSession[]
+  userInvitations       UserInvitation[]
+  einvoiceTransmissions EInvoiceTransmission[]
+  receivedInvoices      ReceivedInvoice[]
+  invoiceAuditLogs      InvoiceAuditLog[]
+}
+
+model UserInvitation {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email          String
+  name           String?
+  role           UserRole     @default(USER)
+  token          String       @unique
+  invitedById    String?
+  invitedBy      User?        @relation("InvitationsSent", fields: [invitedById], references: [id], onDelete: SetNull)
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime     @default(now())
+
+  @@unique([organizationId, email])
+  @@index([organizationId])
+}
+
+model BillingCheckoutSession {
+  id                  String                @id @default(cuid())
+  organizationId      String
+  organization        Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan                SubscriptionPlan
+  status              BillingCheckoutStatus @default(PENDING)
+  provider            BillingProvider       @default(NONE)
+  providerSessionId   String?
+  amountTtcCents      Int
+  currency            String                @default("EUR")
+  successUrl          String
+  cancelUrl           String
+  customerEmail       String?
+  billingLegalName    String?
+  billingSiret        String?
+  billingVatNumber    String?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  expiresAt           DateTime?
+
+  @@index([organizationId])
+  @@index([providerSessionId])
+}
+
+model User {
+  id               String        @id @default(cuid())
+  email            String        @unique
+  passwordHash     String
+  name             String?
+  phone            String?
+  role             UserRole      @default(USER)
+  isActive         Boolean       @default(true)
+  organizationId   String?
+  organization     Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitationsSent  UserInvitation[] @relation("InvitationsSent")
+  passwordResets   PasswordReset[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([organizationId])
+}
+
+model PasswordReset {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Client {
+  id             String   @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  email          String?
+  phone          String?
+  taxId          String?
+  /** SIREN acheteur (9 chiffres) — obligatoire e-facture B2B */
+  siren          String?
+  /** Client professionnel (B2B) — déclenche mentions L441-10 sur les factures */
+  isCompany      Boolean  @default(false)
+  address        String?
+  postalCode     String?
+  city           String?
+  country        String   @default("FR")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  invoices       Invoice[]
+  quotes         Quote[]
+  recurringInvoices RecurringInvoice[]
+
+  @@index([organizationId])
+  @@index([organizationId, name])
+}
+
+model ProductCategory {
+  id             String   @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  products       Product[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+model Product {
+  id             String   @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  categoryId     String?
+  category       ProductCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  kind           ProductKind @default(PRODUCT)
+  name           String
+  description    String?
+  unitPriceHt    Decimal  @db.Decimal(12, 3)
+  vatRate        Decimal  @db.Decimal(5, 2) @default(20)
+  unit           String   @default("unité")
+  stockQuantity  Decimal  @default(0) @db.Decimal(12, 3)
+  stockAlertThreshold Decimal? @db.Decimal(12, 3)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  invoiceLines   InvoiceLine[]
+  quoteLines     QuoteLine[]
+  recurringLines RecurringInvoiceLine[]
+  stockMovements StockMovement[]
+
+  @@index([organizationId])
+  @@index([categoryId])
+}
+
+model StockMovement {
+  id             String              @id @default(cuid())
+  organizationId String
+  organization   Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  productId      String
+  product        Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  type           StockMovementType
+  source         StockMovementSource @default(INITIAL)
+  quantity       Decimal             @db.Decimal(12, 3)
+  note           String?
+  invoiceId      String?
+  invoice        Invoice?            @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  invoiceLineId  String?
+  createdAt      DateTime            @default(now())
+
+  @@index([organizationId])
+  @@index([productId])
+  @@index([invoiceId])
+  @@index([createdAt])
+}
+
+model Invoice {
+  id             String        @id @default(cuid())
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  clientId       String
+  client         Client        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  number         String?
+  invoiceYear    Int?
+  sequenceNumber Int?
+  kind           InvoiceKind   @default(STANDARD)
+  advanceDeduction Decimal     @default(0) @db.Decimal(14, 3)
+  netToPay       Decimal?      @db.Decimal(14, 3)
+  appliedDepositId String?
+  appliedDeposit   Invoice?    @relation("DepositApplication", fields: [appliedDepositId], references: [id], onDelete: SetNull)
+  depositApplications Invoice[] @relation("DepositApplication")
+  issueDate      DateTime
+  dueDate        DateTime?
+  status         InvoiceStatus @default(DRAFT)
+  currency       String        @default("EUR")
+  applyVat       Boolean       @default(true)
+  applyFiscalStamp Boolean     @default(false)
+  fiscalStamp    Decimal       @default(1.000) @db.Decimal(14, 3)
+  discountEnabled Boolean      @default(false)
+  discountRate   Decimal       @default(0) @db.Decimal(5, 2)
+  showCurrencyOnLines Boolean  @default(true)
+  documentLanguage DocumentLanguage @default(FR)
+  notes          String?
+  operationNature InvoiceOperationNature @default(SERVICES)
+  vatOnDebits    Boolean       @default(false)
+  useDifferentDeliveryAddress Boolean @default(false)
+  deliveryAddress String?
+  deliveryPostalCode String?
+  deliveryCity   String?
+  deliveryCountry String?
+  subtotalHt     Decimal       @db.Decimal(14, 3)
+  vatTotal       Decimal       @db.Decimal(14, 3)
+  totalTtc       Decimal       @db.Decimal(14, 3)
+  quoteId        String?       @unique
+  sourceQuote    Quote?        @relation("QuoteToInvoice", fields: [quoteId], references: [id], onDelete: SetNull)
+  recurringInvoiceId String?
+  recurringInvoice   RecurringInvoice? @relation(fields: [recurringInvoiceId], references: [id], onDelete: SetNull)
+  creditedInvoiceId  String?       @unique
+  creditedInvoice    Invoice?      @relation("CreditNoteLink", fields: [creditedInvoiceId], references: [id], onDelete: SetNull)
+  creditNote         Invoice?      @relation("CreditNoteLink")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  lines          InvoiceLine[]
+  payments       Payment[]
+  stockMovements StockMovement[]
+  einvoiceTransmissions EInvoiceTransmission[]
+  auditLog              InvoiceAuditLog?
+
+  @@unique([organizationId, number])
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([recurringInvoiceId])
+}
+
+model RecurringInvoice {
+  id                  String             @id @default(cuid())
+  organizationId      String
+  organization        Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  clientId            String
+  client              Client             @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  title               String?
+  frequency           RecurringFrequency
+  dayOfMonth          Int?
+  startDate           DateTime
+  endDate             DateTime?
+  nextRunDate         DateTime
+  status              RecurringStatus    @default(ACTIVE)
+  autoValidate        Boolean            @default(true)
+  dueDaysAfter        Int                @default(30)
+  currency            String             @default("EUR")
+  applyVat            Boolean            @default(true)
+  applyFiscalStamp    Boolean            @default(false)
+  fiscalStamp         Decimal            @default(1.000) @db.Decimal(14, 3)
+  discountEnabled     Boolean            @default(false)
+  discountRate        Decimal            @default(0) @db.Decimal(5, 2)
+  showCurrencyOnLines Boolean            @default(true)
+  documentLanguage    DocumentLanguage   @default(FR)
+  notes               String?
+  lastGeneratedAt     DateTime?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  lines               RecurringInvoiceLine[]
+  generatedInvoices   Invoice[]
+
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([organizationId, nextRunDate])
+}
+
+model RecurringInvoiceLine {
+  id                  String           @id @default(cuid())
+  recurringInvoiceId  String
+  recurringInvoice    RecurringInvoice @relation(fields: [recurringInvoiceId], references: [id], onDelete: Cascade)
+  productId           String?
+  product             Product?         @relation(fields: [productId], references: [id])
+  description         String
+  quantity            Decimal          @db.Decimal(12, 3)
+  unitPriceHt         Decimal          @db.Decimal(12, 3)
+  taxRate             Decimal          @db.Decimal(5, 2)
+  sortOrder           Int              @default(0)
+
+  @@index([recurringInvoiceId])
+}
+
+model EInvoiceTransmission {
+  id             String                     @id @default(cuid())
+  organizationId String
+  organization   Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invoiceId      String
+  invoice        Invoice                    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  paProvider     PaProvider
+  status         EInvoiceTransmissionStatus @default(PENDING)
+  paExternalId   String?
+  lastError      String?
+  depositedAt    DateTime?
+  rejectedAt     DateTime?
+  refusedAt      DateTime?
+  collectedAt    DateTime?
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+
+  @@index([organizationId])
+  @@index([invoiceId])
+  @@index([organizationId, status])
+}
+
+model ReceivedInvoice {
+  id               String                 @id @default(cuid())
+  organizationId   String
+  organization     Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  source           ReceivedInvoiceSource  @default(UPLOAD)
+  paProvider       PaProvider             @default(NONE)
+  paExternalId     String?
+  status           ReceivedInvoiceStatus  @default(RECEIVED)
+  invoiceNumber    String
+  issueDate        DateTime
+  dueDate          DateTime?
+  currency         String                 @default("EUR")
+  supplierName     String
+  supplierSiren    String?
+  supplierSiret    String?
+  supplierVat      String?
+  buyerSiren       String?
+  buyerName        String?
+  subtotalHt       Decimal                @db.Decimal(14, 3)
+  vatTotal         Decimal                @db.Decimal(14, 3)
+  totalTtc         Decimal                @db.Decimal(14, 3)
+  facturXProfile   String?
+  pdfFilename      String
+  xmlContent       String                 @db.Text
+  buyerMismatch    Boolean                @default(false)
+  statusNote       String?
+  receivedAt       DateTime               @default(now())
+  statusUpdatedAt  DateTime               @default(now())
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  @@unique([organizationId, supplierSiren, invoiceNumber])
+  @@index([organizationId])
+  @@index([organizationId, status])
+  @@index([organizationId, receivedAt])
+}
+
+model Payment {
+  id             String        @id @default(cuid())
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invoiceId      String
+  invoice        Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  amount         Decimal       @db.Decimal(14, 3)
+  paymentDate    DateTime
+  method         PaymentMethod
+  reference      String?
+  notes          String?
+  createdAt      DateTime      @default(now())
+
+  @@index([organizationId])
+  @@index([invoiceId])
+}
+
+model InvoiceLine {
+  id           String   @id @default(cuid())
+  invoiceId    String
+  invoice      Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  productId    String?
+  product      Product? @relation(fields: [productId], references: [id])
+  description  String
+  quantity     Decimal  @db.Decimal(12, 3)
+  unitPriceHt  Decimal  @db.Decimal(12, 3)
+  taxRate      Decimal  @db.Decimal(5, 2)
+  lineTotalHt  Decimal  @db.Decimal(14, 3)
+  lineVat      Decimal  @db.Decimal(14, 3)
+  lineTotalTtc Decimal  @db.Decimal(14, 3)
+  sortOrder    Int      @default(0)
+}
+
+model Quote {
+  id               String      @id @default(cuid())
+  organizationId   String
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  clientId         String
+  client           Client      @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  number           String?
+  quoteYear        Int?
+  sequenceNumber   Int?
+  issueDate        DateTime
+  validUntil       DateTime?
+  status           QuoteStatus @default(DRAFT)
+  currency         String      @default("EUR")
+  applyVat         Boolean     @default(true)
+  applyFiscalStamp Boolean     @default(false)
+  fiscalStamp      Decimal     @default(1.000) @db.Decimal(14, 3)
+  discountEnabled  Boolean     @default(false)
+  discountRate     Decimal     @default(0) @db.Decimal(5, 2)
+  showCurrencyOnLines Boolean  @default(true)
+  documentLanguage DocumentLanguage @default(FR)
+  notes            String?
+  subtotalHt       Decimal     @db.Decimal(14, 3)
+  vatTotal         Decimal     @db.Decimal(14, 3)
+  totalTtc         Decimal     @db.Decimal(14, 3)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  lines            QuoteLine[]
+  convertedInvoice Invoice?    @relation("QuoteToInvoice")
+
+  @@unique([organizationId, number])
+  @@index([organizationId])
+  @@index([organizationId, status])
+}
+
+model QuoteLine {
+  id           String   @id @default(cuid())
+  quoteId      String
+  quote        Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  productId    String?
+  product      Product? @relation(fields: [productId], references: [id])
+  description  String
+  quantity     Decimal  @db.Decimal(12, 3)
+  unitPriceHt  Decimal  @db.Decimal(12, 3)
+  taxRate      Decimal  @db.Decimal(5, 2)
+  lineTotalHt  Decimal  @db.Decimal(14, 3)
+  lineVat      Decimal  @db.Decimal(14, 3)
+  lineTotalTtc Decimal  @db.Decimal(14, 3)
+  sortOrder    Int      @default(0)
+}
+
+model CustomTax {
+  id             String   @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  type           String   @default("PERCENTAGE") // PERCENTAGE or FIXED
+  value          Decimal  @db.Decimal(10, 2)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organizationId])
+}
+
+/** Chaîne cryptographique d'audit — Loi Anti-Fraude TVA Art. 88 */
+model InvoiceAuditLog {
+  id              String       @id @default(cuid())
+  invoiceId       String       @unique
+  invoice         Invoice      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  /** Numéro de facture au moment de la validation */
+  invoiceNumber   String
+  /** Hash SHA-256 : number + issueDate + totalTtc + clientId + validatedAt */
+  hash            String
+  /** Hash de la facture validée précédente dans la séquence (null = première) */
+  previousHash    String?
+  /** Timestamp ISO de la validation */
+  validatedAt     DateTime
+  /** Montant TTC au moment de la validation */
+  totalTtc        String
+  /** ID du client au moment de la validation */
+  clientId        String
+
+  @@index([organizationId])
+  @@index([organizationId, validatedAt])
+}
