@@ -22,9 +22,9 @@ const PLAN_TO_SLUG: Record<SubscriptionPlan, BillingPlanSlug> = {
  * Prix avant TPS mensuels — identiques à `src/lib/pricing-plans.ts` PLAN_PRICES_HT_CAD (page /tarifs).
  */
 export const PLAN_PRICE_HT_CAD: Record<SubscriptionPlan, number> = {
-  STARTER: 10.9,
-  PRO: 17.9,
-  BUSINESS: 24.9,
+  STARTER: 19.9,
+  PRO: 34.9,
+  BUSINESS: 59.9,
 };
 
 /** @deprecated Utiliser PLAN_PRICE_HT_CAD */

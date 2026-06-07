@@ -5,9 +5,9 @@ export const HIGHLIGHTED_PLAN_ID: PlanId = 'pro';
 
 /** Prix avant taxes affichés sur /tarifs — garder synchronisé avec backend/src/lib/billing/plans.ts */
 export const PLAN_PRICES_HT_CAD: Record<PlanId, number> = {
-  starter: 10.9,
-  pro: 17.9,
-  business: 24.9,
+  starter: 19.9,
+  pro: 34.9,
+  business: 59.9,
 };
 
 /** @deprecated Utiliser PLAN_PRICES_HT_CAD */
@@ -51,16 +51,16 @@ export function formatEur(amount: number): string {
 
 /** Keys for plan card bullet highlights (i18n: pricing.plans.{id}.highlights.{key}) */
 export const PLAN_HIGHLIGHT_KEYS: Record<PlanId, string[]> = {
-  starter: ['users', 'quotes', 'invoices', 'clients', 'pdf', 'support'],
-  pro: ['users', 'quotes', 'invoices', 'reminders', 'payments', 'recurring', 'stock', 'accountant'],
+  starter: ['users', 'clients', 'invoices', 'pdf', 'taxes', 'support'],
+  pro: ['everything', 'users', 'payments', 'interac', 'reminders', 'recurring', 'stock', 'accountant'],
   business: [
+    'everything',
     'users',
-    'quotes',
-    'invoices',
-    'companies',
+    'stockAdvanced',
     'signature',
     'api',
-    'stockAdvanced',
+    'multiCompany',
+    'auditLog',
     'support',
   ],
 };

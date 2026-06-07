@@ -204,6 +204,8 @@ router.post('/', async (req, res) => {
     ttc = ttc.add(l.lineTotalTtc);
   }
   if (applyFiscalStamp) ttc = ttc.add(fiscalStamp);
+  const tps = applyVat ? sub.mul(new Prisma.Decimal('0.05')).toDecimalPlaces(3, Prisma.Decimal.ROUND_HALF_UP) : new Prisma.Decimal(0);
+  const tvq = applyVat ? sub.mul(new Prisma.Decimal('0.09975')).toDecimalPlaces(3, Prisma.Decimal.ROUND_HALF_UP) : new Prisma.Decimal(0);
 
   const kind = input.kind ?? 'STANDARD';
   let advanceDeduction = new Prisma.Decimal(0);
@@ -241,7 +243,7 @@ router.post('/', async (req, res) => {
       issueDate: input.issueDate,
       dueDate: input.dueDate ?? undefined,
       notes: input.notes ?? undefined,
-      currency: input.currency ?? 'EUR',
+      currency: input.currency ?? 'CAD',
       applyVat,
       applyFiscalStamp,
       fiscalStamp,
@@ -252,6 +254,8 @@ router.post('/', async (req, res) => {
       status: 'DRAFT',
       subtotalHt: sub,
       vatTotal: vat,
+      tpsAmount: tps,
+      tvqAmount: tvq,
       totalTtc: ttc,
       ...einvoiceDataFromInput(input),
       lines: { create: lineCreates },
@@ -639,6 +643,8 @@ router.patch('/:id', async (req, res) => {
       ttc = ttc.add(l.lineTotalTtc);
     }
     if (applyFiscalStamp) ttc = ttc.add(fiscalStamp);
+    const tpsUpd = applyVat ? sub.mul(new Prisma.Decimal('0.05')).toDecimalPlaces(3, Prisma.Decimal.ROUND_HALF_UP) : new Prisma.Decimal(0);
+    const tvqUpd = applyVat ? sub.mul(new Prisma.Decimal('0.09975')).toDecimalPlaces(3, Prisma.Decimal.ROUND_HALF_UP) : new Prisma.Decimal(0);
 
     if (
       appliedDepositId === undefined &&
@@ -660,6 +666,8 @@ router.patch('/:id', async (req, res) => {
         ...metaData,
         subtotalHt: sub,
         vatTotal: vat,
+        tpsAmount: tpsUpd,
+        tvqAmount: tvqUpd,
         totalTtc: ttc,
         netToPay,
         advanceDeduction,

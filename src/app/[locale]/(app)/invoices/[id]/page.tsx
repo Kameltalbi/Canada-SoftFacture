@@ -399,9 +399,15 @@ export default function InvoiceDetailPage() {
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-s-muted">{t('vat')}</span>
+              <span className="text-s-muted">TPS (5%)</span>
               <span>
-                {Number(inv.vatTotal).toFixed(3)} {inv.currency}
+                {(Number(inv.subtotalHt) * 0.05).toFixed(3)} {inv.currency}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-s-muted">TVQ (9,975%)</span>
+              <span>
+                {(Number(inv.subtotalHt) * 0.09975).toFixed(3)} {inv.currency}
               </span>
             </div>
             <div className="flex justify-between text-base font-semibold">

@@ -155,26 +155,39 @@
     "footerBrandNote": "SoftFacture Canada est une marque de Nexiora Inc."
   },
   "pricing": {
-    "title": "Des tarifs simples pour gérer vos devis, factures et paiements",
-    "subtitle": "Trois offres pensées pour les indépendants, TPE, artisans, commerçants et PME.",
-    "noCrmNote": "Devis et factures illimités sur tous les plans. Gestion de stock intégrée dès Pro, sans module supplémentaire.",
+    "title": "Choisissez le plan adapté à votre entreprise",
+    "subtitle": "Tous les plans incluent les mises à jour, l'hébergement sécurisé au Canada et le support.",
+    "noCrmNote": "",
     "perMonth": "/mois",
     "perYear": "/an",
     "billedYearly": "Facturé annuellement — 2 mois offerts",
     "billingToggle": {
       "monthly": "Mensuel",
       "yearly": "Annuel",
-      "yearlyBadge": "Économisez 2 mois avec l'abonnement annuel",
-      "yearlyNote": "Le prix annuel correspond à 10 mois payés pour 12 mois d'utilisation."
+      "yearlyBadge": "2 mois offerts sur tous les plans",
+      "yearlyNote": "Abonnement annuel : payez 10 mois et profitez de 12 mois d'accès complet."
     },
-    "trialBadge": "1 mois gratuit à l'inscription",
+    "trialBadge": "1 mois d'essai gratuit inclus",
     "popularBadge": "Le plus populaire",
-    "cta": "Essayer 1 mois gratuit",
-    "footnote": "Prix avant taxes (en CAD). TPS 5 % et TVQ 9,975 % (Québec) en sus. Abonnement mensuel sans engagement.",
+    "cta": "Commencer gratuitement",
+    "ctaStarter": "Commencer gratuitement",
+    "ctaPro": "Essayer gratuitement",
+    "ctaBusiness": "Demander une démonstration",
+    "interacTooltip": "Interac e-Transfert est le moyen de paiement préféré des PME canadiennes — rapide, sans frais de carte.",
+    "footnote": "Prix avant taxes (en CAD). TPS 5 % et TVQ 9,975 % (Québec) en sus. Abonnement sans engagement.",
     "currentPlan": "Offre actuelle",
     "currentPlanCta": "Offre active",
     "choosePlan": "Choisir cette offre",
+    "trust": {
+      "trial": "Essai gratuit 30 jours",
+      "noCommitment": "Sans engagement",
+      "frenchSupport": "Support francophone",
+      "securePayment": "Paiement sécurisé",
+      "canadaHosting": "Données hébergées au Canada"
+    },
     "compare": {
+      "title": "Comparez les fonctionnalités en détail",
+      "subtitle": "Voyez exactement ce que comprend chaque plan avant de vous décider.",
       "feature": "Fonctionnalité",
       "yes": "Oui",
       "no": "Non",
@@ -209,77 +222,109 @@
           "pdfTemplates": "Logo et couleurs",
           "dashboard": "—",
           "multiCompany": "1 société",
-          "support": "Email 48h"
+          "support": "Courriel 48h"
         },
         "pro": {
           "users": "3",
           "quotes": "Illimités",
           "invoices": "Illimitées",
           "reminders": "3 niveaux automatiques",
-          "payments": "Paiement en ligne + rapprochement bancaire",
+          "payments": "Stripe + Interac e-Transfert",
           "accountingExport": "Avancé, tous formats",
-          "stock": "Entrées/sorties, alertes, inventaire, bons fournisseurs",
-          "pdfTemplates": "Templates multiples + CGV",
+          "stock": "Entrées/sorties, alertes, inventaire",
+          "pdfTemplates": "Modèles multiples + CGV",
           "dashboard": "CA, impayés, prévisionnel",
           "multiCompany": "1 société",
-          "support": "Email prioritaire 24h"
+          "support": "Courriel prioritaire 24h"
         },
         "business": {
-          "users": "Illimités",
+          "users": "10",
           "quotes": "Illimités",
           "invoices": "Illimitées",
           "reminders": "Personnalisées par client et échéance",
-          "payments": "Paiement en ligne + rapprochement bancaire",
+          "payments": "Stripe + Interac + rapprochement bancaire",
           "accountingExport": "Avancé + API",
-          "stock": "FIFO/CMUP, inventaire complet, multi-dépôts",
+          "stock": "FIFO/CMUP, inventaire complet, multi-entrepôts",
           "pdfTemplates": "Personnalisation avancée",
           "dashboard": "Rentabilité client et projet",
-          "multiCompany": "Jusqu'à 2 sociétés",
-          "support": "Chat + téléphone 4h"
+          "multiCompany": "Multi-sociétés",
+          "support": "Téléphone + chat réponse 4h"
         }
       }
     },
     "plans": {
       "starter": {
         "name": "Essentiel",
-        "audience": "Auto-entrepreneurs, freelances et indépendants",
+        "audience": "Pour travailleurs autonomes et petites entreprises",
         "highlights": {
           "users": "1 utilisateur",
-          "quotes": "Devis illimités",
-          "invoices": "Factures illimitées",
-          "clients": "Clients et catalogue articles inclus",
-          "pdf": "PDF personnalisés avec logo et couleurs",
-          "support": "Support email 48h"
+          "clients": "Clients illimités",
+          "invoices": "Factures et devis illimités",
+          "pdf": "PDF professionnels avec logo",
+          "taxes": "TPS / TVH / TVP incluses",
+          "support": "Support par courriel"
         }
       },
       "pro": {
         "name": "Pro",
-        "audience": "TPE, artisans et commerçants",
+        "audience": "Pour PME en croissance",
         "highlights": {
+          "everything": "Tout Essentiel inclus",
           "users": "3 utilisateurs",
-          "quotes": "Devis illimités avec transformation en facture",
-          "invoices": "Factures, acomptes et avoirs illimités",
-          "reminders": "Relances automatiques 3 niveaux",
-          "payments": "Paiement en ligne et rapprochement bancaire",
-          "recurring": "Factures récurrentes automatiques",
-          "stock": "Stock intégré avec alertes et bons fournisseurs",
+          "payments": "Paiement en ligne Stripe",
+          "interac": "Interac e-Transfert",
+          "reminders": "Relances automatiques",
+          "recurring": "Factures récurrentes",
+          "stock": "Gestion des stocks",
           "accountant": "Accès expert-comptable"
         }
       },
       "business": {
         "name": "Expert",
-        "audience": "PME et structures avec équipe",
+        "audience": "Pour entreprises structurées",
         "highlights": {
-          "users": "Utilisateurs illimités",
-          "quotes": "Cycle devis complet pour plusieurs équipes",
-          "invoices": "Facturation avancée pour volumes élevés",
-          "companies": "Jusqu'à 2 sociétés",
-          "signature": "Signature électronique des devis",
+          "everything": "Tout Pro inclus",
+          "users": "10 utilisateurs",
+          "stockAdvanced": "Gestion de stock avancée + multi-entrepôts",
+          "signature": "Signature électronique",
           "api": "API ouverte",
-          "stockAdvanced": "Stock avancé FIFO/CMUP et multi-dépôts",
-          "support": "Chat et téléphone réponse 4h"
+          "multiCompany": "Multi-sociétés",
+          "auditLog": "Audit des opérations",
+          "support": "Support téléphonique prioritaire"
         }
       }
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "cancel": {
+        "q": "Puis-je annuler à tout moment ?",
+        "a": "Oui, sans frais ni pénalité. Vous pouvez annuler votre abonnement à tout moment depuis votre tableau de bord. Votre accès reste actif jusqu'à la fin de la période en cours."
+      },
+      "hidden": {
+        "q": "Y a-t-il des frais cachés ?",
+        "a": "Non. Le prix affiché est le seul montant facturé, auquel s'ajoutent les taxes applicables (TPS 5 % + TVQ 9,975 % au Québec). Aucun frais de mise en place, ni de module obligatoire."
+      },
+      "hosting": {
+        "q": "Mes données sont-elles hébergées au Canada ?",
+        "a": "Oui. L'ensemble de votre infrastructure — bases de données, sauvegardes et serveurs — est hébergé physiquement au Québec, Canada, conformément aux exigences de la Loi 25."
+      },
+      "taxes": {
+        "q": "Les taxes TPS / TVH / TVP sont-elles gérées ?",
+        "a": "Oui. Softfacture calcule et applique automatiquement la TPS fédérale (5 %), la TVQ du Québec (9,975 %), la TVH et les autres taxes provinciales selon le profil de votre entreprise et de vos clients."
+      },
+      "import": {
+        "q": "Puis-je importer mes clients existants ?",
+        "a": "Oui. Vous pouvez importer votre liste de clients via un fichier CSV depuis votre tableau de bord, ou utiliser notre API (plan Expert) pour une intégration automatisée."
+      },
+      "upgrade": {
+        "q": "Puis-je changer de plan à tout moment ?",
+        "a": "Oui. Vous pouvez passer à un plan supérieur ou inférieur à tout moment. La différence de prix est calculée au prorata de la période restante."
+      }
+    },
+    "finalCta": {
+      "title": "Prêt à simplifier votre facturation ?",
+      "subtitle": "Rejoignez des milliers d'entrepreneurs canadiens. Essai gratuit 30 jours, sans carte de crédit.",
+      "cta": "Commencer gratuitement"
     }
   },
   "auth": {

@@ -130,6 +130,8 @@ router.post('/', async (req, res) => {
     ttc = ttc.add(l.lineTotalTtc);
   }
   if (applyFiscalStamp) ttc = ttc.add(fiscalStamp);
+  const tps = applyVat ? sub.mul(new Prisma.Decimal('0.05')).toDecimalPlaces(3, Prisma.Decimal.ROUND_HALF_UP) : new Prisma.Decimal(0);
+  const tvq = applyVat ? sub.mul(new Prisma.Decimal('0.09975')).toDecimalPlaces(3, Prisma.Decimal.ROUND_HALF_UP) : new Prisma.Decimal(0);
 
   const q = await prisma.quote.create({
     data: {
@@ -139,7 +141,7 @@ router.post('/', async (req, res) => {
       issueDate: input.issueDate,
       validUntil: input.validUntil ?? undefined,
       notes: input.notes ?? undefined,
-      currency: input.currency ?? 'EUR',
+      currency: input.currency ?? 'CAD',
       applyVat,
       applyFiscalStamp,
       fiscalStamp,
@@ -150,6 +152,8 @@ router.post('/', async (req, res) => {
       status: 'DRAFT',
       subtotalHt: sub,
       vatTotal: vat,
+      tpsAmount: tps,
+      tvqAmount: tvq,
       totalTtc: ttc,
       lines: { create: lineCreates },
     },
@@ -355,6 +359,9 @@ router.patch('/:id', async (req, res) => {
       vat = vat.add(l.lineVat);
       ttc = ttc.add(l.lineTotalTtc);
     }
+    const resolvedApplyVat = meta.applyVat !== undefined ? meta.applyVat : existing.applyVat;
+    const tpsUpd = resolvedApplyVat ? sub.mul(new Prisma.Decimal('0.05')).toDecimalPlaces(3, Prisma.Decimal.ROUND_HALF_UP) : new Prisma.Decimal(0);
+    const tvqUpd = resolvedApplyVat ? sub.mul(new Prisma.Decimal('0.09975')).toDecimalPlaces(3, Prisma.Decimal.ROUND_HALF_UP) : new Prisma.Decimal(0);
     await prisma.quoteLine.deleteMany({ where: { quoteId: id } });
     const q = await prisma.quote.update({
       where: { id },
@@ -362,6 +369,8 @@ router.patch('/:id', async (req, res) => {
         ...metaData,
         subtotalHt: sub,
         vatTotal: vat,
+        tpsAmount: tpsUpd,
+        tvqAmount: tvqUpd,
         totalTtc: ttc,
         lines: { create: lineCreates },
       },

@@ -451,6 +451,8 @@ model Invoice {
   deliveryCountry String?
   subtotalHt     Decimal       @db.Decimal(14, 3)
   vatTotal       Decimal       @db.Decimal(14, 3)
+  tpsAmount      Decimal       @default(0) @db.Decimal(14, 3)
+  tvqAmount      Decimal       @default(0) @db.Decimal(14, 3)
   totalTtc       Decimal       @db.Decimal(14, 3)
   quoteId        String?       @unique
   sourceQuote    Quote?        @relation("QuoteToInvoice", fields: [quoteId], references: [id], onDelete: SetNull)
@@ -638,6 +640,8 @@ model Quote {
   notes            String?
   subtotalHt       Decimal     @db.Decimal(14, 3)
   vatTotal         Decimal     @db.Decimal(14, 3)
+  tpsAmount        Decimal     @default(0) @db.Decimal(14, 3)
+  tvqAmount        Decimal     @default(0) @db.Decimal(14, 3)
   totalTtc         Decimal     @db.Decimal(14, 3)
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt

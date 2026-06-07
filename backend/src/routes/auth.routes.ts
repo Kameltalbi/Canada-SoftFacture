@@ -50,8 +50,8 @@ router.post(
           name: organizationName.trim(),
           billingLegalName: organizationName.trim(),
           billingEmail: normalizedEmail,
-          country: 'FR',
-          defaultCurrency: 'EUR',
+          country: 'CA',
+          defaultCurrency: 'CAD',
         },
       });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

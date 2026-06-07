@@ -103,7 +103,7 @@ type CustomTax = {
   updatedAt: string;
 };
 
-const CURRENCIES = ['CAD', 'USD', 'EUR', 'GBP', 'CHF'] as const;
+const CURRENCIES = ['CAD', 'USD', 'EUR', 'GBP', 'CHF'] as const; 
 
 function SettingsPageContent() {
   const t = useTranslations('settings');
@@ -262,13 +262,6 @@ function SettingsPageContent() {
           documentFooterText: form.documentFooterText.trim()
             ? form.documentFooterText.trim()
             : null,
-          isMicroEntrepreneur: form.isMicroEntrepreneur,
-          legalForm: form.legalForm.trim() || null,
-          shareCapital: form.shareCapital.trim() || null,
-          rcsCity: form.rcsCity.trim() || null,
-          legalAddress: form.legalAddress.trim() || null,
-          legalPostalCode: form.legalPostalCode.trim() || null,
-          legalCity: form.legalCity.trim() || null,
         }),
       });
       setCompany(updated);
@@ -305,6 +298,7 @@ function SettingsPageContent() {
         body: JSON.stringify({ defaultCurrency: form.defaultCurrency }),
       });
       setCompany(updated);
+      await refreshMe();
       toast.push(tc('save') + ' ✓');
     } catch (e: unknown) {
       toast.push(e instanceof Error ? e.message : 'Erreur', 'error');
@@ -670,127 +664,8 @@ function SettingsPageContent() {
             description={t('footer_hint')}
           />
           <div className="space-y-6">
-            {/* Toggle Micro-entrepreneur */}
-            <div className="flex items-start justify-between gap-4 rounded-lg border border-s-border bg-slate-50 p-4">
-              <div>
-                <p className="text-sm font-medium text-s-navy">
-                  {t('microEntrepreneur_title') || 'Micro-entrepreneur / Franchise TVA'}
-                </p>
-                <p className="mt-1 text-xs text-s-muted">
-                  {t('microEntrepreneur_hint') ||
-                    'Active la mention automatique art. 293 B du CGI (TVA non applicable)'}
-                </p>
-              </div>
-              <Switch
-                checked={form.isMicroEntrepreneur}
-                disabled={readOnly}
-                onCheckedChange={(checked) =>
-                  setForm((f) => ({ ...f, isMicroEntrepreneur: checked }))
-                }
-              />
-            </div>
-
-            {/* Mentions légales structurées */}
-            <div className="space-y-3">
-              <p className="text-sm font-semibold text-s-navy">
-                {t('legalMentions_title') || 'Mentions légales structurées'}
-              </p>
-              <p className="text-xs text-s-muted">
-                {t('legalMentions_hint') ||
-                  'Ces informations permettent de générer automatiquement le pied de page conforme aux obligations légales.'}
-              </p>
-
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-s-muted">
-                    {t('legalForm') || 'Forme juridique'}
-                  </label>
-                  <Input
-                    value={form.legalForm}
-                    disabled={readOnly}
-                    placeholder="SARL, SAS, EI..."
-                    onChange={(e) => setForm((f) => ({ ...f, legalForm: e.target.value }))}
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-s-muted">
-                    {t('shareCapital') || 'Capital social'}
-                  </label>
-                  <Input
-                    value={form.shareCapital}
-                    disabled={readOnly}
-                    placeholder="10 000 €"
-                    onChange={(e) => setForm((f) => ({ ...f, shareCapital: e.target.value }))}
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-s-muted">
-                    {t('rcsCity') || 'RCS (ville)'}
-                  </label>
-                  <Input
-                    value={form.rcsCity}
-                    disabled={readOnly}
-                    placeholder="Paris"
-                    onChange={(e) => setForm((f) => ({ ...f, rcsCity: e.target.value }))}
-                  />
-                </div>
-              </div>
-
-              <p className="text-xs font-medium text-s-muted pt-2">
-                {t('legalAddress_title') || "Siège social (si différent de l'adresse principale)"}
-              </p>
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                <Input
-                  value={form.legalAddress}
-                  disabled={readOnly}
-                  placeholder="10 rue de la Paix"
-                  onChange={(e) => setForm((f) => ({ ...f, legalAddress: e.target.value }))}
-                />
-                <div className="flex gap-2">
-                  <Input
-                    value={form.legalPostalCode}
-                    disabled={readOnly}
-                    placeholder="75001"
-                    onChange={(e) => setForm((f) => ({ ...f, legalPostalCode: e.target.value }))}
-                  />
-                  <Input
-                    value={form.legalCity}
-                    disabled={readOnly}
-                    placeholder="Paris"
-                    onChange={(e) => setForm((f) => ({ ...f, legalCity: e.target.value }))}
-                  />
-                </div>
-              </div>
-
-              {/* Bouton Générer */}
-              <div className="flex items-center gap-3 pt-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  disabled={readOnly}
-                  onClick={async () => {
-                    try {
-                      const res = await apiFetch<{ suggestion: string; message: string | null }>(
-                        '/organizations/legal-footer-suggestion'
-                      );
-                      if (res.suggestion) {
-                        setForm((f) => ({ ...f, documentFooterText: res.suggestion }));
-                        toast.push(t('footerGenerated') || 'Pied de page généré ✓');
-                      } else if (res.message) {
-                        toast.push(res.message, 'success');
-                      }
-                    } catch (e: unknown) {
-                      toast.push(e instanceof Error ? e.message : 'Erreur', 'error');
-                    }
-                  }}
-                >
-                  {t('footerGenerate') || 'Générer le pied de page'}
-                </Button>
-              </div>
-            </div>
-
             {/* Footer personnalisé */}
-            <div className="space-y-2 pt-4 border-t border-s-border">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="block text-xs font-medium text-s-muted">
                   {t('footer_title')}
@@ -804,7 +679,7 @@ function SettingsPageContent() {
                 disabled={readOnly}
                 rows={4}
                 onChange={(e) => setForm((f) => ({ ...f, documentFooterText: e.target.value }))}
-                placeholder="Ex. SARL au capital de 10 000 € — RCS Paris 123 456 789 — TVA FR12345678900 — Siège : 10 rue de la Paix, 75001 Paris"
+                placeholder="Ex. Numéro TPS : 123456789 RT0001 — Numéro TVQ : 1234567890 TQ0001"
                 className="w-full max-w-xl rounded-xl border border-s-border bg-white px-4 py-2.5 text-sm text-s-navy shadow-sm transition placeholder:text-s-muted focus:border-s-accent focus:outline-none focus:ring-2 focus:ring-s-accent/20"
               />
               <p className="text-[10px] text-s-muted">{t('footer_hint')}</p>
@@ -844,46 +719,59 @@ function SettingsPageContent() {
               />
               <p className="mt-1 text-[10px] text-s-muted">{t('defaultVatRateHint')}</p>
             </div>
-            {FEATURES.einvoiceUi ? (
-              <div className="flex items-start justify-between gap-4 rounded-lg border border-s-border bg-slate-50 p-4">
-                <div>
-                  <p className="text-sm font-medium text-s-navy">{t('vatOnDebitsEnabled')}</p>
-                  <p className="mt-1 text-xs text-s-muted">{t('vatOnDebitsEnabledHint')}</p>
-                </div>
-                <Switch
-                  checked={form.vatOnDebitsEnabled}
-                  disabled={readOnly}
-                  onCheckedChange={(checked) =>
-                    setForm((f) => ({ ...f, vatOnDebitsEnabled: checked }))
-                  }
-                />
-              </div>
-            ) : null}
             <div className="rounded-lg border border-s-border bg-slate-50 p-4">
-              <h3 className="mb-2 text-sm font-medium text-s-navy">{t('taxRatesTitle')}</h3>
+              <h3 className="mb-2 text-sm font-medium text-s-navy">Taux de taxes canadiens</h3>
               <div className="space-y-2 text-sm text-s-muted">
-                <div className="flex justify-between">
-                  <span>TVA standard</span>
-                  <span className="font-medium text-s-navy">20%</span>
+                <div className="flex justify-between border-b border-s-border/50 pb-2">
+                  <span className="font-medium text-s-navy">Taxe fédérale</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>TVA intermédiaire</span>
-                  <span className="font-medium text-s-navy">10%</span>
+                  <span>TPS — Taxe sur les produits et services</span>
+                  <span className="font-medium text-s-navy">5%</span>
+                </div>
+                <div className="flex justify-between border-b border-s-border/50 pb-2 pt-2">
+                  <span className="font-medium text-s-navy">Taxe provinciale / TVH</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>TVA réduite</span>
-                  <span className="font-medium text-s-navy">5,5%</span>
+                  <span>TVQ — Québec</span>
+                  <span className="font-medium text-s-navy">9,975%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>TVA super-réduite</span>
-                  <span className="font-medium text-s-navy">2,1%</span>
+                  <span>TVH — Ontario</span>
+                  <span className="font-medium text-s-navy">13%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Exonéré</span>
+                  <span>TVH — Nouvelle-Écosse</span>
+                  <span className="font-medium text-s-navy">15%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>TVH — Nouveau-Brunswick</span>
+                  <span className="font-medium text-s-navy">15%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>TVH — Île-du-Prince-Édouard</span>
+                  <span className="font-medium text-s-navy">15%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>TVH — Terre-Neuve-et-Labrador</span>
+                  <span className="font-medium text-s-navy">15%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>TPV — Colombie-Britannique</span>
+                  <span className="font-medium text-s-navy">7%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>TPS seulement — Alberta, Yukon, TNO, Nunavut</span>
+                  <span className="font-medium text-s-navy">5%</span>
+                </div>
+                <div className="flex justify-between border-t border-s-border/50 pt-2">
+                  <span>Exonéré / Hors taxe</span>
                   <span className="font-medium text-s-navy">0%</span>
                 </div>
               </div>
-              <p className="mt-3 text-[10px] text-s-muted">{t('taxRatesHint')}</p>
+              <p className="mt-3 text-[10px] text-s-muted">
+                Le taux par défaut s&apos;applique aux nouvelles lignes. Vous pouvez modifier le taux sur chaque ligne de facture. TPS + TVQ combinées au Québec = 14,975%.
+              </p>
             </div>
 
             {/* Custom taxes */}

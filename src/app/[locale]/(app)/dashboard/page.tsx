@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { TrendingUp, Banknote, Receipt, Percent, ChevronDown } from 'lucide-react';
 import { apiFetch } from '@/lib/api-client';
 import { useAuth } from '@/contexts/auth-context';
-import { formatEuro } from '@/lib/format-money';
+import { formatCurrency } from '@/lib/format-money';
 import {
   ChartCard,
   DonutChart,
@@ -68,6 +68,7 @@ export default function DashboardPage() {
   const tc = useTranslations('common');
   const tn = useTranslations('nav');
   const { token, user } = useAuth();
+  const currency = user?.organization?.defaultCurrency ?? 'CAD';
   const [year, setYear] = useState(new Date().getFullYear());
   const [taxMode, setTaxMode] = useState<RevenueTaxMode>('ht');
   const [data, setData] = useState<ActivityData | null>(null);
@@ -176,19 +177,19 @@ export default function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard
           label={isTtc ? t('kpiRevenueTtc') : t('kpiRevenueHt')}
-          value={formatEuro(revenue)}
+          value={formatCurrency(revenue, currency)}
           icon={<TrendingUp className="h-5 w-5 text-blue-500" />}
           accent="blue"
         />
         <KpiCard
           label={t('kpiCollected')}
-          value={formatEuro(data.kpis.collected)}
+          value={formatCurrency(data.kpis.collected, currency)}
           icon={<Banknote className="h-5 w-5 text-emerald-500" />}
           accent="green"
         />
         <KpiCard
           label={t('kpiVat')}
-          value={formatEuro(data.kpis.vatCollected)}
+          value={formatCurrency(data.kpis.vatCollected, currency)}
           icon={<Receipt className="h-5 w-5 text-violet-500" />}
           accent="violet"
         />
@@ -220,6 +221,7 @@ export default function DashboardPage() {
               },
             ]}
             height={220}
+            currency={currency}
           />
         </ChartCard>
 
@@ -237,6 +239,7 @@ export default function DashboardPage() {
                     pct: catTotal > 0 ? (amount / catTotal) * 100 : 0,
                   };
                 })}
+                currency={currency}
               />
               {data.revenueByCategory.length === 0 ? (
                 <p className="text-sm text-s-muted">{tc('empty')}</p>
@@ -273,6 +276,7 @@ export default function DashboardPage() {
                 { label: t('local'), value: local, color: '#3b82f6', pct: localPct },
                 { label: t('export'), value: exportAmt, color: '#10b981', pct: exportPct },
               ]}
+              currency={currency}
             />
           </div>
           <p className="mt-3 text-xs text-s-muted">

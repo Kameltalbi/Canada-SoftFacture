@@ -130,26 +130,39 @@
     "finalCtaDesc": "Join entrepreneurs who want to spend less time on admin."
   },
   "pricing": {
-    "title": "Simple pricing to manage quotes, invoices and payments",
-    "subtitle": "Three plans built for independents, small businesses, retailers and SMEs.",
-    "noCrmNote": "Unlimited quotes and invoices on every plan. Stock management included from Pro, with no add-on module.",
+    "title": "Choose the plan that fits your business",
+    "subtitle": "All plans include updates, secure Canadian hosting and support.",
+    "noCrmNote": "",
     "perMonth": "/mo",
     "perYear": "/yr",
-    "billedYearly": "Billed yearly — 2 months free",
+    "billedYearly": "Billed annually — 2 months free",
     "billingToggle": {
       "monthly": "Monthly",
-      "yearly": "Yearly",
-      "yearlyBadge": "Save 2 months with annual billing",
-      "yearlyNote": "The yearly price equals 10 paid months for 12 months of use."
+      "yearly": "Annual",
+      "yearlyBadge": "2 months free on all plans",
+      "yearlyNote": "Annual plan: pay for 10 months and get 12 months of full access."
     },
-    "trialBadge": "1 free month on signup",
+    "trialBadge": "30-day free trial included",
     "popularBadge": "Most popular",
-    "cta": "Start 1-month free trial",
-    "footnote": "Prices excl. tax (CAD). GST 5% and QST 9.975% (Quebec) apply. Monthly subscription with no commitment.",
+    "cta": "Start for free",
+    "ctaStarter": "Start for free",
+    "ctaPro": "Try for free",
+    "ctaBusiness": "Request a demo",
+    "interacTooltip": "Interac e-Transfer is the preferred payment method for Canadian SMEs — fast and fee-free.",
+    "footnote": "Prices excl. tax (CAD). GST 5% and QST 9.975% (Quebec) apply. No commitment.",
     "currentPlan": "Current plan",
     "currentPlanCta": "Active plan",
     "choosePlan": "Choose this plan",
+    "trust": {
+      "trial": "30-day free trial",
+      "noCommitment": "No commitment",
+      "frenchSupport": "French-speaking support",
+      "securePayment": "Secure payment",
+      "canadaHosting": "Data hosted in Canada"
+    },
     "compare": {
+      "title": "Compare features in detail",
+      "subtitle": "See exactly what each plan includes before you decide.",
       "feature": "Feature",
       "yes": "Yes",
       "no": "No",
@@ -191,70 +204,102 @@
           "quotes": "Unlimited",
           "invoices": "Unlimited",
           "reminders": "3 automatic levels",
-          "payments": "Online payment + bank reconciliation",
+          "payments": "Stripe + Interac e-Transfer",
           "accountingExport": "Advanced, all formats",
-          "stock": "In/out, alerts, inventory, supplier orders",
+          "stock": "In/out, alerts, inventory",
           "pdfTemplates": "Multiple templates + terms",
           "dashboard": "Revenue, overdue, forecast",
           "multiCompany": "1 company",
           "support": "Priority email 24h"
         },
         "business": {
-          "users": "Unlimited",
+          "users": "10",
           "quotes": "Unlimited",
           "invoices": "Unlimited",
           "reminders": "Personalized by client and due date",
-          "payments": "Online payment + bank reconciliation",
+          "payments": "Stripe + Interac + bank reconciliation",
           "accountingExport": "Advanced + API",
-          "stock": "FIFO/weighted average, full inventory, multi-warehouse",
+          "stock": "FIFO/weighted avg, full inventory, multi-warehouse",
           "pdfTemplates": "Advanced customization",
           "dashboard": "Client and project profitability",
-          "multiCompany": "Up to 2 companies",
-          "support": "Chat + phone 4h"
+          "multiCompany": "Multi-company",
+          "support": "Phone + chat 4h response"
         }
       }
     },
     "plans": {
       "starter": {
         "name": "Essential",
-        "audience": "Sole traders, freelancers and independents",
+        "audience": "For freelancers and small businesses",
         "highlights": {
           "users": "1 user",
-          "quotes": "Unlimited quotes",
-          "invoices": "Unlimited invoices",
-          "clients": "Clients and item catalog included",
-          "pdf": "Custom PDFs with logo and colors",
-          "support": "Email support 48h"
+          "clients": "Unlimited clients",
+          "invoices": "Unlimited invoices and quotes",
+          "pdf": "Professional PDFs with logo",
+          "taxes": "GST / HST / PST included",
+          "support": "Email support"
         }
       },
       "pro": {
         "name": "Pro",
-        "audience": "Small businesses, artisans and retailers",
+        "audience": "For growing SMEs",
         "highlights": {
+          "everything": "Everything in Essential",
           "users": "3 users",
-          "quotes": "Unlimited quotes with invoice conversion",
-          "invoices": "Unlimited invoices, deposits and credit notes",
-          "reminders": "3-level automatic reminders",
-          "payments": "Online payment and bank reconciliation",
-          "recurring": "Automatic recurring invoices",
-          "stock": "Stock with alerts and supplier orders",
+          "payments": "Online payment via Stripe",
+          "interac": "Interac e-Transfer",
+          "reminders": "Automatic reminders",
+          "recurring": "Recurring invoices",
+          "stock": "Stock management",
           "accountant": "Accountant access"
         }
       },
       "business": {
         "name": "Expert",
-        "audience": "SMEs and team-based organizations",
+        "audience": "For structured organizations",
         "highlights": {
-          "users": "Unlimited users",
-          "quotes": "Full quote workflow for multiple teams",
-          "invoices": "Advanced invoicing for higher volumes",
-          "companies": "Up to 2 companies",
-          "signature": "Electronic quote signature",
+          "everything": "Everything in Pro",
+          "users": "10 users",
+          "stockAdvanced": "Advanced stock + multi-warehouse",
+          "signature": "Electronic signature",
           "api": "Open API",
-          "stockAdvanced": "Advanced FIFO/weighted average and multi-warehouse stock",
-          "support": "Chat and phone response within 4h"
+          "multiCompany": "Multi-company",
+          "auditLog": "Operations audit log",
+          "support": "Priority phone support"
         }
       }
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "cancel": {
+        "q": "Can I cancel at any time?",
+        "a": "Yes, with no fees or penalties. You can cancel your subscription at any time from your dashboard. Your access remains active until the end of the current billing period."
+      },
+      "hidden": {
+        "q": "Are there any hidden fees?",
+        "a": "No. The displayed price is the only amount charged, plus applicable taxes (GST 5% + QST 9.975% in Quebec). No setup fees or mandatory add-ons."
+      },
+      "hosting": {
+        "q": "Is my data hosted in Canada?",
+        "a": "Yes. All your infrastructure — databases, backups and servers — is physically hosted in Quebec, Canada, in compliance with Law 25 requirements."
+      },
+      "taxes": {
+        "q": "Are GST / HST / PST taxes handled?",
+        "a": "Yes. Softfacture automatically calculates and applies federal GST (5%), Quebec QST (9.975%), HST and other provincial taxes based on your business and client profiles."
+      },
+      "import": {
+        "q": "Can I import my existing clients?",
+        "a": "Yes. You can import your client list via a CSV file from your dashboard, or use our API (Expert plan) for automated integration."
+      },
+      "upgrade": {
+        "q": "Can I switch plans at any time?",
+        "a": "Yes. You can upgrade or downgrade at any time. The price difference is calculated pro-rata for the remaining period."
+      }
+    },
+    "finalCta": {
+      "title": "Ready to simplify your invoicing?",
+      "subtitle": "Join thousands of Canadian entrepreneurs. 30-day free trial, no credit card required.",
+      "cta": "Start for free"
     }
   },
   "auth": {

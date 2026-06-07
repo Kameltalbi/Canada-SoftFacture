@@ -90,7 +90,7 @@ router.post('/', async (req, res) => {
       nextRunDate,
       autoValidate: input.autoValidate ?? true,
       dueDaysAfter: input.dueDaysAfter ?? 30,
-      currency: input.currency ?? 'EUR',
+      currency: input.currency ?? 'CAD',
       applyVat: input.applyVat ?? true,
       applyFiscalStamp: input.applyFiscalStamp ?? false,
       fiscalStamp: new Prisma.Decimal(input.fiscalStamp ?? 1),

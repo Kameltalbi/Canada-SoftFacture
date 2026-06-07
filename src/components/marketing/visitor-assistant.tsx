@@ -54,7 +54,7 @@ export function VisitorAssistant() {
         <div className="fixed bottom-24 right-6 z-50 w-[380px] animate-in slide-in-from-bottom-4 fade-in duration-300">
           <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-900/5">
             {/* Header violet avec onglets */}
-            <div className="bg-gradient-to-br from-violet-600 to-indigo-600 px-4 py-4">
+            <div className="px-4 py-4" style={{ background: 'linear-gradient(135deg, #0B1F52 0%, #1e3a8a 100%)' }}>
               {/* Onglets */}
               <div className="mb-4 flex items-center gap-1 rounded-full bg-white/10 p-1">
                 <button className="flex-1 rounded-full bg-white/20 px-3 py-1.5 text-xs font-medium text-white">
@@ -90,7 +90,7 @@ export function VisitorAssistant() {
                 onClick={() => localStorage.setItem(STORAGE_KEY, 'true')}
                 className="mb-2 flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm transition-all hover:shadow-md hover:translate-x-1"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-100 text-violet-600">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ background: '#EEF2FF', color: '#0B1F52' }}>
                   <Sparkles className="h-5 w-5" />
                 </div>
                 <div className="flex-1">
@@ -142,7 +142,8 @@ export function VisitorAssistant() {
         {/* Bouton fermer (X) en bas à droite */}
         <button
           onClick={handleDismiss}
-          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-violet-600 text-white shadow-xl transition-all hover:scale-110 hover:bg-violet-700"
+          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-xl transition-all hover:scale-110"
+          style={{ background: '#0B1F52' }}
         >
           <X className="h-6 w-6" />
         </button>
@@ -156,9 +157,10 @@ export function VisitorAssistant() {
       onClick={toggleOpen}
       className={cn(
         'fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-all duration-300',
-        'bg-violet-600 text-white hover:bg-violet-700 hover:scale-110 hover:shadow-2xl',
+        'text-white hover:scale-110 hover:shadow-2xl',
         hasAnimated && 'animate-in slide-in-from-bottom-4 fade-in bounce'
       )}
+      style={{ background: '#0B1F52' }}
     >
       <MessageCircle className="h-7 w-7" />
     </button>

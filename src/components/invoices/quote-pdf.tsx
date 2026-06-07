@@ -250,6 +250,8 @@ export type QuotePdfData = {
   }[];
   subtotalHt: number;
   vatTotal: number;
+  tpsTotal: number;
+  tvqTotal: number;
   timbreFiscal: number;
   totalTtc: number;
   currency: string;
@@ -331,9 +333,15 @@ export function QuoteDoc({ data }: { data: QuotePdfData }) {
               </Text>
             </View>
             <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>TVA</Text>
+              <Text style={styles.totalLabel}>TPS (5%)</Text>
               <Text style={styles.totalValue}>
-                {data.vatTotal.toFixed(3)} {data.currency}
+                {data.tpsTotal.toFixed(3)} {data.currency}
+              </Text>
+            </View>
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>TVQ (9,975%)</Text>
+              <Text style={styles.totalValue}>
+                {data.tvqTotal.toFixed(3)} {data.currency}
               </Text>
             </View>
             {data.timbreFiscal > 0 && (
@@ -446,7 +454,9 @@ export function mapQuoteToPdfData(quote: {
     currency: quote.currency,
     subtotalHt: toNumber(quote.subtotalHt),
     vatTotal: toNumber(quote.vatTotal),
-    timbreFiscal: 0.5,
+    tpsTotal: toNumber(quote.subtotalHt) * 0.05,
+    tvqTotal: toNumber(quote.subtotalHt) * 0.09975,
+    timbreFiscal: 0,
     totalTtc: toNumber(quote.totalTtc),
     paymentTerms: 'Paiement à réception de facture',
     lines: quote.lines.map((l) => ({

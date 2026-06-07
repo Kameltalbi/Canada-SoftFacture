@@ -1,4 +1,5 @@
 import { Link } from '@/i18n/navigation';
+import { CookiePreferencesButton } from '@/components/marketing/cookie-preferences-button';
 import { BrandLogo } from '@/components/brand/brand-logo';
 import { LocaleSwitcher } from '@/components/locale-switcher';
 import { Button } from '@/components/ui/button';
@@ -74,6 +75,7 @@ export async function MarketingShell({
             <Link href="/politique-de-confidentialite" className="hover:text-slate-800">
               {t('footerPrivacy')}
             </Link>
+            <CookiePreferencesButton label={t('footerCookies')} />
             <Link href="/login" className="hover:text-slate-800">
               {navT('login')}
             </Link>

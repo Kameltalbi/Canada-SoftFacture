@@ -19,7 +19,7 @@ const SAMPLE_EMAIL = 'contact@monentreprise.fr';
 const SAMPLE_WEBSITE = 'www.monentreprise.fr';
 
 export function buildSampleQuotePreview(org: OrgPreviewFields): QuotePreviewData {
-  const currency = org.defaultCurrency ?? 'EUR';
+  const currency = org.defaultCurrency ?? 'CAD';
   const today = new Date().toISOString().slice(0, 10);
   const valid = new Date();
   valid.setDate(valid.getDate() + 30);
@@ -61,9 +61,11 @@ export function buildSampleQuotePreview(org: OrgPreviewFields): QuotePreviewData
       },
     ],
     subtotalHt: 2448,
-    vatTotal: 489.6,
-    totalTtc: 2937.6,
-    netToPay: 2937.6,
+    vatTotal: 366.18,
+    tpsTotal: 122.4,
+    tvqTotal: 243.78,
+    totalTtc: 2814.18,
+    netToPay: 2814.18,
     labels: {
       client: 'Client',
       designation: 'Désignation',
@@ -72,7 +74,7 @@ export function buildSampleQuotePreview(org: OrgPreviewFields): QuotePreviewData
       unitPrice: 'Prix U. HT',
       totalHt: 'Total HT',
       subtotalHt: 'Total HT',
-      vat: 'TVA',
+      vat: 'Taxes',
       totalTtc: 'Total TTC',
       netToPay: 'Net à payer',
       issueDate: 'Date',
@@ -82,7 +84,7 @@ export function buildSampleQuotePreview(org: OrgPreviewFields): QuotePreviewData
 }
 
 export function buildSampleInvoicePreview(org: OrgPreviewFields): InvoicePreviewData {
-  const currency = org.defaultCurrency ?? 'EUR';
+  const currency = org.defaultCurrency ?? 'CAD';
   const today = new Date().toISOString().slice(0, 10);
   const due = new Date();
   due.setDate(due.getDate() + 30);
@@ -125,9 +127,11 @@ export function buildSampleInvoicePreview(org: OrgPreviewFields): InvoicePreview
       },
     ],
     subtotalHt: 2448,
-    vatTotal: 489.6,
-    totalTtc: 2937.6,
-    netToPay: 2937.6,
+    vatTotal: 366.18,
+    tpsTotal: 122.4,
+    tvqTotal: 243.78,
+    totalTtc: 2814.18,
+    netToPay: 2814.18,
     labels: {
       client: 'Client',
       designation: 'Désignation',
@@ -136,7 +140,7 @@ export function buildSampleInvoicePreview(org: OrgPreviewFields): InvoicePreview
       unitPrice: 'Prix U. HT',
       totalHt: 'Total HT',
       subtotalHt: 'Total HT',
-      vat: 'TVA',
+      vat: 'Taxes',
       totalTtc: 'Total TTC',
       advanceDeduction: 'Acompte déduit',
       netToPay: 'Net à payer',

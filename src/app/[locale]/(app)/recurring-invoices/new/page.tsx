@@ -77,7 +77,7 @@ export default function NewRecurringInvoicePage() {
   const [activePanel, setActivePanel] = useState<InvoiceEditorPanel>(null);
   const [settings, setSettings] = useState<DocumentSettings>(() => ({
     documentLanguage: 'fr',
-    currency: user?.organization?.defaultCurrency ?? 'EUR',
+    currency: user?.organization?.defaultCurrency ?? 'CAD',
     applyVat: true,
     applyFiscalStamp: false,
     fiscalStamp: 0,

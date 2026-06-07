@@ -251,6 +251,8 @@ export type InvoicePdfData = {
   }[];
   subtotalHt: number;
   vatTotal: number;
+  tpsTotal: number;
+  tvqTotal: number;
   timbreFiscal: number;
   totalTtc: number;
   currency: string;
@@ -330,9 +332,15 @@ export function InvoiceDoc({ data }: { data: InvoicePdfData }) {
               </Text>
             </View>
             <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>TVA</Text>
+              <Text style={styles.totalLabel}>TPS (5%)</Text>
               <Text style={styles.totalValue}>
-                {data.vatTotal.toFixed(3)} {data.currency}
+                {data.tpsTotal.toFixed(3)} {data.currency}
+              </Text>
+            </View>
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>TVQ (9,975%)</Text>
+              <Text style={styles.totalValue}>
+                {data.tvqTotal.toFixed(3)} {data.currency}
               </Text>
             </View>
             {data.timbreFiscal > 0 && (
@@ -445,7 +453,9 @@ export function mapInvoiceToPdfData(invoice: {
     currency: invoice.currency,
     subtotalHt: toNumber(invoice.subtotalHt),
     vatTotal: toNumber(invoice.vatTotal),
-    timbreFiscal: 0.5,
+    tpsTotal: toNumber(invoice.subtotalHt) * 0.05,
+    tvqTotal: toNumber(invoice.subtotalHt) * 0.09975,
+    timbreFiscal: 0,
     totalTtc: toNumber(invoice.totalTtc),
     paymentTerms: 'Paiement à réception de facture',
     lines: invoice.lines.map((l) => ({

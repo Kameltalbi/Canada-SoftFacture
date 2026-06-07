@@ -217,9 +217,15 @@ export default function QuoteDetailPage() {
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-s-muted">{t('vat')}</span>
+              <span className="text-s-muted">TPS (5%)</span>
               <span>
-                {Number(q.vatTotal).toFixed(3)} {q.currency}
+                {(Number(q.subtotalHt) * 0.05).toFixed(3)} {q.currency}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-s-muted">TVQ (9,975%)</span>
+              <span>
+                {(Number(q.subtotalHt) * 0.09975).toFixed(3)} {q.currency}
               </span>
             </div>
             <div className="flex justify-between text-base font-semibold">

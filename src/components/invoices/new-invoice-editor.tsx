@@ -78,7 +78,8 @@ function emptyLine(defaultVat: number): Line {
 
 function TotalsPanel({
   ht,
-  vat,
+  tps,
+  tvq,
   ttc,
   netPay,
   advanceDeduction,
@@ -87,7 +88,8 @@ function TotalsPanel({
   showVat,
 }: {
   ht: number;
-  vat: number;
+  tps: number;
+  tvq: number;
   ttc: number;
   netPay: number;
   advanceDeduction: number;
@@ -108,10 +110,16 @@ function TotalsPanel({
         <span className="font-medium text-s-navy">{formatMoney(ht, currency)}</span>
       </div>
       {showVat ? (
-        <div className="flex items-center justify-between border-b border-s-border/80 px-4 py-3">
-          <span className="text-s-muted">{labels.vat}</span>
-          <span className="font-medium text-s-navy">{formatMoney(vat, currency)}</span>
-        </div>
+        <>
+          <div className="flex items-center justify-between border-b border-s-border/80 px-4 py-3">
+            <span className="text-s-muted">TPS (5%)</span>
+            <span className="font-medium text-s-navy">{formatMoney(tps, currency)}</span>
+          </div>
+          <div className="flex items-center justify-between border-b border-s-border/80 px-4 py-3">
+            <span className="text-s-muted">TVQ (9,975%)</span>
+            <span className="font-medium text-s-navy">{formatMoney(tvq, currency)}</span>
+          </div>
+        </>
       ) : null}
       <div className="flex items-center justify-between border-b border-s-border px-4 py-3">
         <span className="font-bold text-s-navy">{labels.totalTtc}</span>
@@ -169,7 +177,7 @@ export function NewInvoiceEditor({ invoiceKind = 'STANDARD' }: NewInvoiceEditorP
   const defaultVat = toNumber(user?.organization?.defaultVatRate ?? 20);
   const [settings, setSettings] = useState<DocumentSettings>(() => ({
     documentLanguage: 'fr',
-    currency: user?.organization?.defaultCurrency ?? 'EUR',
+    currency: user?.organization?.defaultCurrency ?? 'CAD',
     applyVat: true,
     applyFiscalStamp: false,
     fiscalStamp: 0,
@@ -268,8 +276,10 @@ export function NewInvoiceEditor({ invoiceKind = 'STANDARD' }: NewInvoiceEditorP
       ttc += toNumber(calc.lineTotalTtc) * lineFactor * globalFactor;
     }
     if (settings.applyFiscalStamp) ttc += settings.fiscalStamp || 0;
+    const tps = settings.applyVat ? Math.round(ht * 0.05 * 1000) / 1000 : 0;
+    const tvq = settings.applyVat ? Math.round(ht * 0.09975 * 1000) / 1000 : 0;
     const netPay = Math.max(0, ttc - advanceDeduction);
-    return { ht, vat, ttc, netPay };
+    return { ht, vat, tps, tvq, ttc, netPay };
   }, [lines, settings, advanceDeduction]);
 
   function addLine() {
@@ -482,6 +492,8 @@ export function NewInvoiceEditor({ invoiceKind = 'STANDARD' }: NewInvoiceEditorP
       lines: previewLines,
       subtotalHt: totals.ht,
       vatTotal: totals.vat,
+      tpsTotal: totals.tps,
+      tvqTotal: totals.tvq,
       totalTtc: totals.ttc,
       advanceDeduction,
       netToPay: totals.netPay,
@@ -538,6 +550,8 @@ export function NewInvoiceEditor({ invoiceKind = 'STANDARD' }: NewInvoiceEditorP
       currency,
       subtotalHt: totals.ht,
       vatTotal: totals.vat,
+      tpsTotal: totals.tps,
+      tvqTotal: totals.tvq,
       timbreFiscal: settings.applyFiscalStamp ? settings.fiscalStamp : 0,
       totalTtc: totals.ttc,
       paymentTerms: notes.trim() || undefined,
@@ -888,7 +902,8 @@ export function NewInvoiceEditor({ invoiceKind = 'STANDARD' }: NewInvoiceEditorP
             <div className="flex justify-end">
               <TotalsPanel
                 ht={totals.ht}
-                vat={totals.vat}
+                tps={totals.tps}
+                tvq={totals.tvq}
                 ttc={totals.ttc}
                 netPay={totals.netPay}
                 advanceDeduction={advanceDeduction}

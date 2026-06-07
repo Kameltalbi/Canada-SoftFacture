@@ -1,215 +1,112 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Globe, Settings } from 'lucide-react';
+import { X } from 'lucide-react';
 import Link from 'next/link';
 
-type CookieCategory = 'performance' | 'targeting' | 'functional' | 'unclassified';
-
 const STORAGE_KEY = 'softfacture_cookie_consent';
+const CONSENT_MAX_AGE_MS = 13 * 30 * 24 * 60 * 60 * 1000; // 13 mois (Loi 25)
 
-interface ConsentState {
+interface StoredConsent {
   decided: boolean;
-  performance: boolean;
-  targeting: boolean;
-  functional: boolean;
-  unclassified: boolean;
+  decidedAt: number;
+  essential: true;
 }
 
-const defaultConsent: ConsentState = {
-  decided: false,
-  performance: false,
-  targeting: false,
-  functional: false,
-  unclassified: false,
-};
+function isConsentValid(stored: StoredConsent): boolean {
+  if (!stored.decided) return false;
+  const age = Date.now() - (stored.decidedAt ?? 0);
+  return age < CONSENT_MAX_AGE_MS;
+}
 
 export function CookieBanner() {
   const [visible, setVisible] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
-  const [consent, setConsent] = useState<ConsentState>(defaultConsent);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed: ConsentState = JSON.parse(stored);
-        if (parsed.decided) return;
-      }
-    } catch {}
-    setVisible(true);
+    function check() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed: StoredConsent = JSON.parse(raw);
+          if (isConsentValid(parsed)) return;
+        }
+      } catch {}
+      setVisible(true);
+    }
+
+    check();
+
+    // Écouter l'event de réouverture depuis le footer
+    window.addEventListener('softfacture:reopen-cookies', () => setVisible(true));
+    return () => window.removeEventListener('softfacture:reopen-cookies', () => setVisible(true));
   }, []);
 
-  function save(state: ConsentState) {
+  function save(accepted: boolean) {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, decided: true }));
+      const consent: StoredConsent = { decided: true, decidedAt: Date.now(), essential: true };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...consent, accepted }));
     } catch {}
     setVisible(false);
   }
 
-  function acceptAll() {
-    save({
-      decided: true,
-      performance: true,
-      targeting: true,
-      functional: true,
-      unclassified: true,
-    });
-  }
-
-  function rejectAll() {
-    save({
-      decided: true,
-      performance: false,
-      targeting: false,
-      functional: false,
-      unclassified: false,
-    });
-  }
-
-  function saveCustom() {
-    save({ ...consent, decided: true });
-  }
-
-  function toggle(cat: CookieCategory) {
-    setConsent((prev) => ({ ...prev, [cat]: !prev[cat] }));
-  }
-
   if (!visible) return null;
-
-  const categories: { id: CookieCategory; label: string }[] = [
-    { id: 'performance', label: 'Performance' },
-    { id: 'targeting', label: 'Ciblage' },
-    { id: 'functional', label: 'Fonctionnalité' },
-    { id: 'unclassified', label: 'Non classifiés' },
-  ];
 
   return (
     <div
       role="dialog"
+      aria-modal="true"
       aria-label="Consentement aux cookies"
-      className="fixed inset-x-0 bottom-0 z-[9999] border-t border-slate-700 bg-slate-900 text-white shadow-2xl"
+      className="fixed bottom-5 left-5 z-[9999] w-[320px] rounded-xl bg-white text-slate-800"
+      style={{ boxShadow: '0 8px 40px rgba(15,23,42,.18)', border: '1px solid #E2E8F0' }}
     >
-      <div className="mx-auto max-w-7xl px-4 py-4 md:px-8">
-        {/* Row principale */}
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-8">
-          {/* Icône globe */}
-          <div className="hidden shrink-0 lg:flex">
-            <Globe className="mt-1 h-5 w-5 text-slate-400" />
-          </div>
+      {/* Croix — équivaut à Refuser (Loi 25 : pas de consentement implicite) */}
+      <button
+        type="button"
+        onClick={() => save(false)}
+        aria-label="Fermer sans accepter"
+        className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+      >
+        <X className="h-4 w-4" />
+      </button>
 
-          {/* Texte */}
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-white">Ce site Web utilise des cookies</p>
-            <p className="mt-1 text-xs leading-relaxed text-slate-300">
-              Notre site Web utilise des cookies pour améliorer l&apos;expérience utilisateur. En
-              utilisant notre site Web, vous acceptez tous les cookies conformément à notre
-              Politique relative aux cookies.{' '}
-              <Link
-                href="/politique-de-confidentialite"
-                className="text-emerald-400 hover:underline"
-              >
-                En savoir plus
-              </Link>
-            </p>
+      {/* Contenu */}
+      <div className="p-5 pr-10">
+        <p className="mb-1 text-xs font-bold uppercase tracking-wide text-[#0B1F52]">
+          Vos préférences de confidentialité
+        </p>
+        <p className="text-sm leading-relaxed text-slate-600">
+          Ce site utilise uniquement des cookies essentiels au fonctionnement du service
+          (authentification, session). Aucun cookie publicitaire ou de traçage tiers n&apos;est
+          utilisé. Pour en savoir plus, consultez notre{' '}
+          <Link
+            href="/politique-de-confidentialite"
+            className="font-medium text-[#0B1F52] underline decoration-slate-300 hover:decoration-[#0B1F52]"
+          >
+            politique de confidentialité
+          </Link>
+          .
+        </p>
+        <p className="mt-2 text-xs text-slate-400">
+          Votre choix est mémorisé pendant 13 mois, conformément à la Loi 25 (Québec).
+        </p>
 
-            {/* Catégories */}
-            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
-              {/* Strictement nécessaires — toujours coché */}
-              <label className="flex cursor-not-allowed items-center gap-1.5 text-xs font-semibold text-slate-200">
-                <input
-                  type="checkbox"
-                  checked
-                  disabled
-                  className="h-3.5 w-3.5 accent-emerald-500"
-                />
-                Strictement nécessaires
-              </label>
-
-              {categories.map((cat) => (
-                <label
-                  key={cat.id}
-                  className="flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-slate-200"
-                >
-                  <input
-                    type="checkbox"
-                    checked={consent[cat.id]}
-                    onChange={() => toggle(cat.id)}
-                    className="h-3.5 w-3.5 accent-emerald-500"
-                  />
-                  {cat.label}
-                </label>
-              ))}
-            </div>
-
-            {/* Afficher les détails */}
-            <button
-              onClick={() => setShowDetails((v) => !v)}
-              className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-white"
-            >
-              <Settings className="h-3.5 w-3.5" />
-              {showDetails ? 'Masquer les détails' : 'Afficher les détails'}
-            </button>
-
-            {/* Détails expandables */}
-            {showDetails && (
-              <div className="mt-3 rounded-lg border border-slate-700 bg-slate-800 p-4 text-xs text-slate-300 space-y-2">
-                <p>
-                  <span className="font-semibold text-white">Strictement nécessaires :</span> Ces
-                  cookies sont indispensables au fonctionnement du site et ne peuvent pas être
-                  désactivés.
-                </p>
-                <p>
-                  <span className="font-semibold text-white">Performance :</span> Ces cookies nous
-                  permettent de mesurer le trafic et les performances du site afin d&apos;améliorer
-                  votre expérience.
-                </p>
-                <p>
-                  <span className="font-semibold text-white">Ciblage :</span> Ces cookies peuvent
-                  être utilisés par nos partenaires publicitaires pour vous proposer des contenus
-                  personnalisés.
-                </p>
-                <p>
-                  <span className="font-semibold text-white">Fonctionnalité :</span> Ces cookies
-                  permettent au site de fournir des fonctionnalités avancées et de mémoriser vos
-                  préférences.
-                </p>
-                <p>
-                  <span className="font-semibold text-white">Non classifiés :</span> Cookies en
-                  cours de classification.
-                </p>
-                <button
-                  onClick={saveCustom}
-                  className="mt-2 rounded bg-slate-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-600"
-                >
-                  Enregistrer mes préférences
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Boutons d'action */}
-          <div className="flex shrink-0 items-center gap-3 self-start lg:self-center">
-            <button
-              onClick={acceptAll}
-              className="rounded bg-emerald-600 px-5 py-2 text-sm font-bold text-white shadow hover:bg-emerald-500 whitespace-nowrap"
-            >
-              ACCEPTER TOUT
-            </button>
-            <button
-              onClick={rejectAll}
-              className="rounded border border-slate-500 bg-transparent px-5 py-2 text-sm font-bold text-white hover:border-slate-300 whitespace-nowrap"
-            >
-              REFUSER TOUT
-            </button>
-            <button
-              onClick={rejectAll}
-              aria-label="Fermer"
-              className="ml-1 text-slate-400 hover:text-white"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
+        {/* Boutons */}
+        <div className="mt-4 flex gap-2">
+          <button
+            type="button"
+            onClick={() => save(true)}
+            className="flex-1 rounded-lg py-2.5 text-xs font-bold text-white transition-opacity hover:opacity-90"
+            style={{ background: '#10B981' }}
+          >
+            Accepter
+          </button>
+          <button
+            type="button"
+            onClick={() => save(false)}
+            className="flex-1 rounded-lg border border-slate-200 py-2.5 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50"
+          >
+            Refuser
+          </button>
         </div>
       </div>
     </div>

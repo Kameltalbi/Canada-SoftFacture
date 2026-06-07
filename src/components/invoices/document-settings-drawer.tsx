@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { DOCUMENT_LANGUAGES, type DocumentLanguageCode } from '@/lib/document-languages';
 
-const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF', 'CAD'] as const;
+const CURRENCIES = ['CAD', 'USD', 'EUR', 'GBP', 'CHF'] as const;
 const TRANSITION_MS = 300;
 
 export type AvailableDeposit = {

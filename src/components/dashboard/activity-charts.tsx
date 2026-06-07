@@ -1,6 +1,6 @@
 'use client';
 
-import { formatEuro, formatEuroShort } from '@/lib/format-money';
+import { formatCurrency, formatCurrencyShort } from '@/lib/format-money';
 import { cn } from '@/lib/utils';
 
 const CHART_COLORS = [
@@ -78,10 +78,12 @@ export function GroupedBarChart({
   labels,
   series,
   height = 200,
+  currency = 'CAD',
 }: {
   labels: string[];
   series: { name: string; values: number[]; color: string }[];
   height?: number;
+  currency?: string;
 }) {
   const all = series.flatMap((s) => s.values);
   const max = Math.max(...all, 1);
@@ -109,7 +111,7 @@ export function GroupedBarChart({
                     minHeight: s.values[i] > 0 ? 4 : 0,
                     background: s.color,
                   }}
-                  title={`${s.name}: ${formatEuro(s.values[i])}`}
+                  title={`${s.name}: ${formatCurrency(s.values[i], currency)}`}
                 />
               ))}
             </div>
@@ -241,8 +243,10 @@ export function ChartCard({
 
 export function LegendAmounts({
   items,
+  currency = 'CAD',
 }: {
   items: { label: string; value: number; color: string; pct?: number }[];
+  currency?: string;
 }) {
   return (
     <ul className="space-y-2 text-sm">
@@ -256,7 +260,7 @@ export function LegendAmounts({
             <span className="truncate text-s-muted">{item.label}</span>
           </span>
           <span className="shrink-0 font-medium text-s-navy">
-            {formatEuroShort(item.value)}
+            {formatCurrencyShort(item.value, currency)}
             {item.pct != null ? (
               <span className="ms-1 text-xs text-s-muted">({item.pct.toFixed(1)} %)</span>
             ) : null}

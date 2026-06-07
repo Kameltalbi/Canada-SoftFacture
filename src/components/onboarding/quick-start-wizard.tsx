@@ -11,8 +11,6 @@ import {
   User,
   Package,
   FileText,
-  Building2,
-  UserCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,7 +20,7 @@ import { cn } from '@/lib/utils';
 
 const STORAGE_KEY = 'sf-quick-wizard-dismissed';
 
-type Step = 'clientType' | 'client' | 'product' | 'invoice' | 'done';
+type Step = 'client' | 'product' | 'invoice' | 'done';
 
 export function QuickStartWizard() {
   const t = useTranslations('quickWizard');
@@ -34,11 +32,10 @@ export function QuickStartWizard() {
     return localStorage.getItem(STORAGE_KEY) !== 'true';
   });
 
-  const [step, setStep] = useState<Step>('clientType');
+  const [step, setStep] = useState<Step>('client');
   const [loading, setLoading] = useState(false);
 
   // Form states
-  const [isMicroEntrepreneur, setIsMicroEntrepreneur] = useState<boolean | null>(null);
   const [clientId, setClientId] = useState<string | null>(null);
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
@@ -51,25 +48,6 @@ export function QuickStartWizard() {
   const handleDismiss = () => {
     localStorage.setItem(STORAGE_KEY, 'true');
     setOpen(false);
-  };
-
-  const handleSetMicroEntrepreneur = async (isMicro: boolean) => {
-    setIsMicroEntrepreneur(isMicro);
-    setLoading(true);
-    try {
-      // Mettre à jour l'organisation
-      await apiFetch('/organizations', {
-        method: 'PATCH',
-        body: JSON.stringify({
-          isMicroEntrepreneur: isMicro,
-        }),
-      });
-      setStep('client');
-    } catch (e: unknown) {
-      toast.push(e instanceof Error ? e.message : 'Erreur', 'error');
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleCreateClient = async () => {
@@ -138,7 +116,6 @@ export function QuickStartWizard() {
   };
 
   const steps = [
-    { id: 'clientType', icon: Building2, label: t('steps.clientType') },
     { id: 'client', icon: User, label: t('steps.client') },
     { id: 'product', icon: Package, label: t('steps.product') },
     { id: 'invoice', icon: FileText, label: t('steps.invoice') },
@@ -202,47 +179,6 @@ export function QuickStartWizard() {
 
           {/* Content */}
           <div className="p-6">
-            {step === 'clientType' && (
-              <div className="space-y-4">
-                <p className="text-sm text-slate-600">{t('clientTypeDesc')}</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => void handleSetMicroEntrepreneur(true)}
-                    disabled={loading}
-                    className={cn(
-                      'flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all',
-                      isMicroEntrepreneur === true
-                        ? 'border-green-500 bg-green-50'
-                        : 'border-slate-200 hover:border-green-300 hover:bg-slate-50'
-                    )}
-                  >
-                    <UserCircle className="h-8 w-8 text-green-600" />
-                    <span className="text-sm font-medium text-slate-700">
-                      {t('microEntrepreneur')}
-                    </span>
-                  </button>
-                  <button
-                    onClick={() => void handleSetMicroEntrepreneur(false)}
-                    disabled={loading}
-                    className={cn(
-                      'flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all',
-                      isMicroEntrepreneur === false
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-slate-200 hover:border-blue-300 hover:bg-slate-50'
-                    )}
-                  >
-                    <Building2 className="h-8 w-8 text-blue-600" />
-                    <span className="text-sm font-medium text-slate-700">{t('entreprise')}</span>
-                  </button>
-                </div>
-                <div className="flex gap-2 pt-2">
-                  <Button variant="ghost" onClick={handleDismiss} className="flex-1">
-                    {tc('cancel')}
-                  </Button>
-                </div>
-              </div>
-            )}
-
             {step === 'client' && (
               <div className="space-y-4">
                 <p className="text-sm text-slate-600">{t('clientDesc')}</p>

@@ -53,6 +53,8 @@ export type InvoicePreviewData = {
   lines: InvoicePreviewLine[];
   subtotalHt: number;
   vatTotal: number;
+  tpsTotal: number;
+  tvqTotal: number;
   totalTtc: number;
   advanceDeduction?: number;
   netToPay: number;
@@ -219,12 +221,20 @@ export function InvoicePreviewDocument({
             </span>
           </div>
           {data.applyVat ? (
-            <div className="flex justify-between py-2" style={previewTotalsRowStyle(colors)}>
-              <span className="text-slate-500">{data.labels.vat}</span>
-              <span className="font-medium text-slate-800">
-                {formatMoney(data.vatTotal, data.currency)}
-              </span>
-            </div>
+            <>
+              <div className="flex justify-between py-2" style={previewTotalsRowStyle(colors)}>
+                <span className="text-slate-500">TPS (5%)</span>
+                <span className="font-medium text-slate-800">
+                  {formatMoney(data.tpsTotal, data.currency)}
+                </span>
+              </div>
+              <div className="flex justify-between py-2" style={previewTotalsRowStyle(colors)}>
+                <span className="text-slate-500">TVQ (9,975%)</span>
+                <span className="font-medium text-slate-800">
+                  {formatMoney(data.tvqTotal, data.currency)}
+                </span>
+              </div>
+            </>
           ) : null}
           <div
             className="flex justify-between py-2.5 font-bold text-slate-900"
