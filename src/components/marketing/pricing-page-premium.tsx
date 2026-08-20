@@ -1,7 +1,26 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Check, X, ChevronDown, Star, Users, FileText, CreditCard, RefreshCw, Bell, BarChart3, Package, UserCheck, Shield, Globe, Zap, Building2, Lock, Phone } from 'lucide-react';
+import {
+  Check,
+  X,
+  ChevronDown,
+  Star,
+  Users,
+  FileText,
+  CreditCard,
+  RefreshCw,
+  Bell,
+  BarChart3,
+  Package,
+  UserCheck,
+  Shield,
+  Globe,
+  Zap,
+  Building2,
+  Lock,
+  Phone,
+} from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import type { PlanId } from '@/lib/pricing-plans';
 import { COMPARISON_BOOLEAN, COMPARISON_ROWS } from '@/lib/pricing-plans';
@@ -23,14 +42,29 @@ interface Labels {
   perYear: string;
   billedYearly: string;
   trialBadge: string;
+  forever: string;
   popularBadge: string;
   ctaStarter: string;
   ctaPro: string;
   ctaBusiness: string;
   interacTooltip: string;
   footnote: string;
-  trust: { trial: string; noCommitment: string; frenchSupport: string; securePayment: string; canadaHosting: string };
-  compare: { title: string; subtitle: string; feature: string; yes: string; no: string; rows: Record<string, string>; cells: Record<string, Record<string, string>> };
+  trust: {
+    trial: string;
+    noCommitment: string;
+    frenchSupport: string;
+    securePayment: string;
+    canadaHosting: string;
+  };
+  compare: {
+    title: string;
+    subtitle: string;
+    feature: string;
+    yes: string;
+    no: string;
+    rows: Record<string, string>;
+    cells: Record<string, Record<string, string>>;
+  };
   plans: Record<PlanId, PlanLabels>;
   faqTitle: string;
   faq: { [key: string]: { q: string; a: string } };
@@ -50,6 +84,10 @@ const HIGHLIGHT_ICONS: Record<string, React.ReactNode> = {
   pdf: <FileText className="h-4 w-4" />,
   taxes: <CreditCard className="h-4 w-4" />,
   support: <Phone className="h-4 w-4" />,
+  dashboard: <BarChart3 className="h-4 w-4" />,
+  deposits: <CreditCard className="h-4 w-4" />,
+  creditNotes: <FileText className="h-4 w-4" />,
+  expenses: <CreditCard className="h-4 w-4" />,
   everything: <Check className="h-4 w-4" />,
   payments: <CreditCard className="h-4 w-4" />,
   interac: <Zap className="h-4 w-4" />,
@@ -71,14 +109,30 @@ function useFadeIn() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const obs = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold: 0.08 });
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.08 }
+    );
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
   return { ref, visible };
 }
 
-function FadeIn({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
+function FadeIn({
+  children,
+  delay = 0,
+  className = '',
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
   const { ref, visible } = useFadeIn();
   return (
     <div
@@ -122,7 +176,15 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 }
 
 /* ─── Compare Cell ─── */
-function CompareCell({ value, yesLabel, noLabel }: { value: boolean; yesLabel: string; noLabel: string }) {
+function CompareCell({
+  value,
+  yesLabel,
+  noLabel,
+}: {
+  value: boolean;
+  yesLabel: string;
+  noLabel: string;
+}) {
   return value ? (
     <span className="inline-flex items-center justify-center">
       <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-50">
@@ -141,24 +203,44 @@ function CompareCell({ value, yesLabel, noLabel }: { value: boolean; yesLabel: s
 }
 
 /* ─── Price display: $19⁹⁰ style ─── */
-function PriceDisplay({ amount, period, light = false }: { amount: number; period: string; light?: boolean }) {
+function PriceDisplay({
+  amount,
+  period,
+  light = false,
+}: {
+  amount: number;
+  period: string;
+  light?: boolean;
+}) {
   const [dollars, cents] = amount.toFixed(2).split('.');
   const textColor = light ? 'text-white' : 'text-[#0F172A]';
   const subColor = light ? 'text-blue-200' : 'text-[#64748B]';
   return (
     <div className="flex items-start gap-0.5">
       <span className={`mt-3 text-2xl font-bold ${textColor}`}>$</span>
-      <span className={`text-6xl font-extrabold leading-none tracking-tight ${textColor}`}>{dollars}</span>
+      <span className={`text-6xl font-extrabold leading-none tracking-tight ${textColor}`}>
+        {dollars}
+      </span>
       <div className="ml-0.5 flex flex-col justify-start pt-2">
         <span className={`text-xl font-bold leading-none ${textColor}`}>{cents}</span>
-        <span className={`mt-1 whitespace-nowrap text-xs font-medium ${subColor}`}>CAD{period}</span>
+        <span className={`mt-1 whitespace-nowrap text-xs font-medium ${subColor}`}>
+          CAD{period}
+        </span>
       </div>
     </div>
   );
 }
 
 /* ─── Plan highlights list ─── */
-function HighlightList({ highlights, light = false, interacTooltip = '' }: { highlights: Record<string, string>; light?: boolean; interacTooltip?: string }) {
+function HighlightList({
+  highlights,
+  light = false,
+  interacTooltip = '',
+}: {
+  highlights: Record<string, string>;
+  light?: boolean;
+  interacTooltip?: string;
+}) {
   const textColor = light ? 'text-blue-100' : 'text-[#0F172A]';
   const iconBg = light ? 'bg-white/10' : 'bg-slate-100';
   const iconColor = light ? 'text-[#10B981]' : 'text-[#0B1F52]';
@@ -166,7 +248,9 @@ function HighlightList({ highlights, light = false, interacTooltip = '' }: { hig
     <ul className="flex-1 space-y-2.5">
       {Object.entries(highlights).map(([key, val]) => (
         <li key={key} className={`flex items-start gap-3 text-sm ${textColor}`}>
-          <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${iconBg} ${iconColor}`}>
+          <span
+            className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${iconBg} ${iconColor}`}
+          >
             {HIGHLIGHT_ICONS[key] ?? <Check className="h-3 w-3" />}
           </span>
           <span>
@@ -190,7 +274,11 @@ function HighlightList({ highlights, light = false, interacTooltip = '' }: { hig
 export function PricingPagePremium({ planPrices, labels }: Props) {
   const [yearly, setYearly] = useState(false);
 
-  const monthly = { starter: planPrices.starter, pro: planPrices.pro, business: planPrices.business };
+  const monthly = {
+    starter: planPrices.starter,
+    pro: planPrices.pro,
+    business: planPrices.business,
+  };
   const annual = {
     starter: Math.round(planPrices.starter * 10 * 100) / 100,
     pro: Math.round(planPrices.pro * 10 * 100) / 100,
@@ -201,20 +289,23 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
 
   return (
     <div style={{ background: '#F8FAFC' }}>
-
       {/* ── HERO ── */}
       <section className="mx-auto max-w-5xl px-4 pb-10 pt-24 text-center md:px-8">
         <FadeIn>
           <h1 className="text-4xl font-extrabold tracking-tight text-[#0F172A] md:text-5xl">
             {labels.title}
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-[#64748B]">
-            {labels.subtitle}
-          </p>
+          <p className="mx-auto mt-4 max-w-xl text-lg text-[#64748B]">{labels.subtitle}</p>
           <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-medium text-[#64748B]">
-            {[labels.trust.trial, labels.trust.noCommitment, labels.trust.frenchSupport, labels.trust.canadaHosting].map((label) => (
+            {[
+              labels.trust.trial,
+              labels.trust.noCommitment,
+              labels.trust.frenchSupport,
+              labels.trust.canadaHosting,
+            ].map((label) => (
               <span key={label} className="flex items-center gap-1.5">
-                <Check className="h-4 w-4 text-[#10B981]" />{label}
+                <Check className="h-4 w-4 text-[#10B981]" />
+                {label}
               </span>
             ))}
           </div>
@@ -267,8 +358,7 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
       {/* ── PLAN CARDS — 3 cartes style FreshBooks ── */}
       <section className="mx-auto max-w-5xl px-4 pb-20 md:px-8">
         <div className="grid items-stretch gap-5 lg:grid-cols-3">
-
-          {/* ESSENTIEL */}
+          {/* GRATUIT */}
           <FadeIn delay={0}>
             <div
               className="flex flex-col rounded-2xl bg-white p-7 transition-all duration-300 hover:-translate-y-0.5"
@@ -277,10 +367,9 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
               <p className="text-lg font-bold text-[#0F172A]">{labels.plans.starter.name}</p>
               <p className="mt-0.5 text-sm text-[#64748B]">{labels.plans.starter.audience}</p>
               <div className="mt-5">
-                <PriceDisplay amount={prices.starter} period={period} />
+                <PriceDisplay amount={0} period="" />
               </div>
-              <p className="mt-2 text-xs font-semibold text-[#10B981]">{labels.trialBadge}</p>
-              {yearly && <p className="text-xs text-[#64748B]">{labels.billedYearly}</p>}
+              <p className="mt-2 text-xs font-semibold text-[#10B981]">{labels.forever}</p>
               <hr className="my-5 border-slate-100" />
               <HighlightList highlights={labels.plans.starter.highlights} />
               <div className="mt-6 space-y-2">
@@ -293,9 +382,9 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
                     {labels.ctaStarter}
                   </button>
                 </Link>
-                <Link href="/register?plan=starter" className="block text-center text-xs font-medium text-[#64748B] hover:underline">
-                  ou Essai gratuit 30 jours
-                </Link>
+                <p className="text-center text-xs font-medium text-[#64748B]">
+                  {labels.forever} — {labels.trust.noCommitment}
+                </p>
               </div>
             </div>
           </FadeIn>
@@ -319,7 +408,11 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
               <p className="mt-2 text-xs font-semibold text-emerald-300">{labels.trialBadge}</p>
               {yearly && <p className="text-xs text-blue-200">{labels.billedYearly}</p>}
               <hr className="my-5 border-white/10" />
-              <HighlightList highlights={labels.plans.pro.highlights} light interacTooltip={labels.interacTooltip} />
+              <HighlightList
+                highlights={labels.plans.pro.highlights}
+                light
+                interacTooltip={labels.interacTooltip}
+              />
               <div className="mt-6 space-y-2">
                 <Link href="/register?plan=pro" className="block">
                   <button
@@ -330,7 +423,10 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
                     {labels.ctaPro}
                   </button>
                 </Link>
-                <Link href="/register?plan=pro" className="block text-center text-xs font-medium text-emerald-300 hover:underline">
+                <Link
+                  href="/register?plan=pro"
+                  className="block text-center text-xs font-medium text-emerald-300 hover:underline"
+                >
                   ou Essai gratuit 30 jours
                 </Link>
               </div>
@@ -362,13 +458,15 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
                     {labels.ctaBusiness}
                   </button>
                 </Link>
-                <Link href="/register?plan=business" className="block text-center text-xs font-medium text-[#64748B] hover:underline">
+                <Link
+                  href="/register?plan=business"
+                  className="block text-center text-xs font-medium text-[#64748B] hover:underline"
+                >
                   ou Essai gratuit 30 jours
                 </Link>
               </div>
             </div>
           </FadeIn>
-
         </div>
         <p className="mt-6 text-center text-xs text-[#64748B]">{labels.footnote}</p>
       </section>
@@ -377,7 +475,9 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
       <section className="bg-white py-20">
         <div className="mx-auto max-w-5xl px-4 md:px-8">
           <FadeIn>
-            <h2 className="text-center text-3xl font-bold text-[#0F172A]">{labels.compare.title}</h2>
+            <h2 className="text-center text-3xl font-bold text-[#0F172A]">
+              {labels.compare.title}
+            </h2>
             <p className="mt-2 text-center text-sm text-[#64748B]">{labels.compare.subtitle}</p>
           </FadeIn>
           <FadeIn delay={100} className="mt-10 overflow-x-auto">
@@ -388,15 +488,22 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
               <table className="w-full min-w-[560px] text-sm">
                 <thead>
                   <tr style={{ borderBottom: '2px solid #E2E8F0', background: '#F8FAFC' }}>
-                    <th className="rounded-tl-2xl px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#64748B]">{labels.compare.feature}</th>
+                    <th className="rounded-tl-2xl px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#64748B]">
+                      {labels.compare.feature}
+                    </th>
                     {(['starter', 'pro', 'business'] as PlanId[]).map((p, i) => (
                       <th
                         key={p}
                         className={`px-4 py-4 text-center text-sm font-bold ${i === 2 ? 'rounded-tr-2xl' : ''}`}
-                        style={{ color: p === 'pro' ? '#0B1F52' : '#0F172A', background: p === 'pro' ? '#EEF2FF' : 'transparent' }}
+                        style={{
+                          color: p === 'pro' ? '#0B1F52' : '#0F172A',
+                          background: p === 'pro' ? '#EEF2FF' : 'transparent',
+                        }}
                       >
                         {labels.plans[p].name}
-                        {p === 'pro' && <Star className="ml-1 inline h-3.5 w-3.5 fill-amber-400 text-amber-400" />}
+                        {p === 'pro' && (
+                          <Star className="ml-1 inline h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                        )}
                       </th>
                     ))}
                   </tr>
@@ -406,9 +513,13 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
                     <tr
                       key={row.key}
                       className="transition-colors hover:bg-slate-50"
-                      style={{ borderBottom: i < COMPARISON_ROWS.length - 1 ? '1px solid #F1F5F9' : 'none' }}
+                      style={{
+                        borderBottom: i < COMPARISON_ROWS.length - 1 ? '1px solid #F1F5F9' : 'none',
+                      }}
                     >
-                      <td className="px-6 py-3 font-medium text-[#0F172A]">{labels.compare.rows[row.key]}</td>
+                      <td className="px-6 py-3 font-medium text-[#0F172A]">
+                        {labels.compare.rows[row.key]}
+                      </td>
                       {(['starter', 'pro', 'business'] as PlanId[]).map((p) => (
                         <td
                           key={p}
@@ -422,7 +533,7 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
                               noLabel={labels.compare.no}
                             />
                           ) : (
-                            labels.compare.cells[p]?.[row.key] ?? '—'
+                            (labels.compare.cells[p]?.[row.key] ?? '—')
                           )}
                         </td>
                       ))}
@@ -441,14 +552,30 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
           <FadeIn>
             <h2 className="text-3xl font-bold text-[#0F172A]">Conçu pour les PME canadiennes</h2>
             <p className="mx-auto mt-3 max-w-xl text-[#64748B]">
-              Des consultants, agences, travailleurs autonomes et entreprises utilisent SoftFacture pour gérer leurs devis, factures et paiements.
+              Des consultants, agences, travailleurs autonomes et entreprises utilisent SoftFacture
+              pour gérer leurs devis, factures et paiements.
             </p>
           </FadeIn>
           <FadeIn delay={100} className="mt-10 grid gap-5 md:grid-cols-3">
             {[
-              { quote: "Enfin un logiciel qui gère la TPS et la TVQ sans configuration compliquée. Je gagne des heures chaque semaine.", author: "Marie-Ève T.", role: "Consultante RH, Montréal" },
-              { quote: "L'intégration Interac e-Transfert est parfaite. Nos paiements sont reçus 3 fois plus vite qu'avant.", author: "Jean-François L.", role: "Agence web, Québec" },
-              { quote: "Migration depuis QuickBooks en 30 minutes. Le support francophone était là à chaque étape.", author: "Sarah B.", role: "Architecte, Ottawa" },
+              {
+                quote:
+                  'Enfin un logiciel qui gère la TPS et la TVQ sans configuration compliquée. Je gagne des heures chaque semaine.',
+                author: 'Marie-Ève T.',
+                role: 'Consultante RH, Montréal',
+              },
+              {
+                quote:
+                  "L'intégration Interac e-Transfert est parfaite. Nos paiements sont reçus 3 fois plus vite qu'avant.",
+                author: 'Jean-François L.',
+                role: 'Agence web, Québec',
+              },
+              {
+                quote:
+                  'Migration depuis QuickBooks en 30 minutes. Le support francophone était là à chaque étape.',
+                author: 'Sarah B.',
+                role: 'Architecte, Ottawa',
+              },
             ].map(({ quote, author, role }) => (
               <div
                 key={author}
@@ -479,10 +606,15 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
             <h2 className="text-center text-3xl font-bold text-[#0F172A]">{labels.faqTitle}</h2>
           </FadeIn>
           <FadeIn delay={100}>
-            <div className="mt-8 divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white" style={{ boxShadow: '0 2px 12px rgba(15,23,42,.05)' }}>
-              {(['cancel', 'hidden', 'hosting', 'taxes', 'import', 'upgrade'] as const).map((key) => (
-                <FaqItem key={key} q={labels.faq[key].q} a={labels.faq[key].a} />
-              ))}
+            <div
+              className="mt-8 divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white"
+              style={{ boxShadow: '0 2px 12px rgba(15,23,42,.05)' }}
+            >
+              {(['free', 'cancel', 'hidden', 'hosting', 'taxes', 'import', 'upgrade'] as const).map(
+                (key) => (
+                  <FaqItem key={key} q={labels.faq[key].q} a={labels.faq[key].a} />
+                )
+              )}
             </div>
           </FadeIn>
         </div>
@@ -493,10 +625,15 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
         <FadeIn>
           <div
             className="mx-4 overflow-hidden rounded-3xl md:mx-auto md:max-w-4xl"
-            style={{ background: 'linear-gradient(135deg, #0B1F52 0%, #1e3a8a 100%)', boxShadow: '0 20px 60px rgba(11,31,82,.25)' }}
+            style={{
+              background: 'linear-gradient(135deg, #0B1F52 0%, #1e3a8a 100%)',
+              boxShadow: '0 20px 60px rgba(11,31,82,.25)',
+            }}
           >
             <div className="px-8 py-16 text-center">
-              <h2 className="text-3xl font-extrabold text-white md:text-4xl">{labels.finalCta.title}</h2>
+              <h2 className="text-3xl font-extrabold text-white md:text-4xl">
+                {labels.finalCta.title}
+              </h2>
               <p className="mx-auto mt-3 max-w-lg text-blue-200">{labels.finalCta.subtitle}</p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link href="/register">
@@ -521,7 +658,6 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
           </div>
         </FadeIn>
       </section>
-
     </div>
   );
 }

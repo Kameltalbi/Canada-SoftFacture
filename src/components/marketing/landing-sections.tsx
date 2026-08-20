@@ -239,7 +239,7 @@ export async function LandingFinalCta() {
             size="lg"
             className="h-12 bg-white px-8 text-base font-semibold text-emerald-800 shadow-xl hover:bg-emerald-50"
           >
-            {t('ctaPrimary')}
+            {t('finalCtaButton')}
             <ArrowRight className="ms-2 h-5 w-5" />
           </Button>
         </Link>

@@ -5,33 +5,39 @@ import {
   PLAN_STRIPE_LABELS,
   stripeLineItemAmountCents,
   stripePriceIdForPlan,
+  yearlyPriceHtCad,
+  type BillingInterval,
 } from './plans.js';
 
 /**
  * Ligne d'abonnement Checkout : Price ID Dashboard optionnel,
- * sinon montant HT de la page /tarifs via price_data (+ TVA Stripe Tax).
+ * sinon montant HT CAD de la page /tarifs via price_data (+ taxes Stripe Tax).
  */
 export function buildSubscriptionLineItem(
-  plan: SubscriptionPlan
+  plan: SubscriptionPlan,
+  interval: BillingInterval = 'month'
 ): Stripe.Checkout.SessionCreateParams.LineItem {
-  const priceId = stripePriceIdForPlan(plan);
+  const priceId = stripePriceIdForPlan(plan, interval);
   if (priceId) {
     return { price: priceId, quantity: 1 };
   }
 
-  const ht = PLAN_PRICE_HT_CAD[plan];
-  const unitAmount = stripeLineItemAmountCents(plan);
+  const monthlyHt = PLAN_PRICE_HT_CAD[plan];
+  const ht = interval === 'year' ? yearlyPriceHtCad(monthlyHt) : monthlyHt;
+  const unitAmount = stripeLineItemAmountCents(plan, interval);
+  const periodLabel = interval === 'year' ? 'an' : 'mois';
 
   return {
     quantity: 1,
     price_data: {
       currency: 'cad',
       unit_amount: unitAmount,
+      tax_behavior: 'exclusive',
       product_data: {
         name: PLAN_STRIPE_LABELS[plan],
-        description: `$${ht.toFixed(2)} CAD/mois avant TPS (comme sur la page Tarifs). TPS en sus.`,
+        description: `$${ht.toFixed(2)} CAD/${periodLabel} avant taxes (page Tarifs). TPS/TVQ en sus via Stripe Tax.`,
       },
-      recurring: { interval: 'month' },
+      recurring: { interval },
     },
   };
 }

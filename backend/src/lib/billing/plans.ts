@@ -20,9 +20,10 @@ const PLAN_TO_SLUG: Record<SubscriptionPlan, BillingPlanSlug> = {
 
 /**
  * Prix avant TPS mensuels — identiques à `src/lib/pricing-plans.ts` PLAN_PRICES_HT_CAD (page /tarifs).
+ * STARTER = plan Gratuit illimité (0 $).
  */
 export const PLAN_PRICE_HT_CAD: Record<SubscriptionPlan, number> = {
-  STARTER: 19.9,
+  STARTER: 0,
   PRO: 34.9,
   BUSINESS: 59.9,
 };
@@ -34,10 +35,23 @@ export const PLAN_PRICE_TTC_EUR = PLAN_PRICE_HT_CAD;
 
 /** Libellés produit Stripe (marché canadien). */
 export const PLAN_STRIPE_LABELS: Record<SubscriptionPlan, string> = {
-  STARTER: `${APP_BRAND} Starter`,
-  PRO: `${APP_BRAND} Pro`,
+  STARTER: `${APP_BRAND} Gratuit`,
+  PRO: `${APP_BRAND} Essentiel`,
   BUSINESS: `${APP_BRAND} Business`,
 };
+
+export function isPaidSubscriptionPlan(plan: SubscriptionPlan): boolean {
+  return PLAN_PRICE_HT_CAD[plan] > 0;
+}
+
+export type BillingInterval = 'month' | 'year';
+
+/** Annuel : 10 mois facturés, 2 mois offerts — identique à l'affichage /tarifs. */
+export const YEARLY_MONTHS_CHARGED = 10;
+
+export function yearlyPriceHtCad(monthlyHt: number): number {
+  return Math.round(monthlyHt * YEARLY_MONTHS_CHARGED * 100) / 100;
+}
 
 /** TPS fédérale canadienne sur abonnements SaaS (5 %). */
 export const SUBSCRIPTION_VAT_RATE_PERCENT = 5;
@@ -71,21 +85,33 @@ export function priceTtcToCents(ttc: number): number {
   return Math.round(ttc * 100);
 }
 
-export function stripePriceIdForPlan(plan: SubscriptionPlan): string | undefined {
+export function stripePriceIdForPlan(
+  plan: SubscriptionPlan,
+  interval: BillingInterval = 'month'
+): string | undefined {
+  if (plan === 'STARTER') return undefined;
   const key =
-    plan === 'STARTER'
-      ? 'STRIPE_PRICE_STARTER'
-      : plan === 'PRO'
-        ? 'STRIPE_PRICE_PRO'
+    plan === 'PRO'
+      ? interval === 'year'
+        ? 'STRIPE_PRICE_PRO_YEARLY'
+        : 'STRIPE_PRICE_PRO'
+      : interval === 'year'
+        ? 'STRIPE_PRICE_BUSINESS_YEARLY'
         : 'STRIPE_PRICE_BUSINESS';
   const id = process.env[key]?.trim();
   return id || undefined;
 }
 
 export function planFromStripePriceId(priceId: string): SubscriptionPlan | null {
-  if (priceId === process.env.STRIPE_PRICE_STARTER?.trim()) return 'STARTER';
-  if (priceId === process.env.STRIPE_PRICE_PRO?.trim()) return 'PRO';
-  if (priceId === process.env.STRIPE_PRICE_BUSINESS?.trim()) return 'BUSINESS';
+  const map: Array<[string | undefined, SubscriptionPlan]> = [
+    [process.env.STRIPE_PRICE_PRO?.trim(), 'PRO'],
+    [process.env.STRIPE_PRICE_PRO_YEARLY?.trim(), 'PRO'],
+    [process.env.STRIPE_PRICE_BUSINESS?.trim(), 'BUSINESS'],
+    [process.env.STRIPE_PRICE_BUSINESS_YEARLY?.trim(), 'BUSINESS'],
+  ];
+  for (const [id, plan] of map) {
+    if (id && id === priceId) return plan;
+  }
   return null;
 }
 
@@ -94,9 +120,14 @@ export function isStripeCheckoutReady(): boolean {
   return isStripeEnabled();
 }
 
-/** Montant unitaire Stripe en centimes (toujours avant TPS — TPS via Stripe Tax si activé). */
-export function stripeLineItemAmountCents(plan: SubscriptionPlan): number {
-  return priceHtToCents(PLAN_PRICE_HT_CAD[plan]);
+/** Montant unitaire Stripe en centimes (avant taxes — TPS/TVQ via Stripe Tax si activé). */
+export function stripeLineItemAmountCents(
+  plan: SubscriptionPlan,
+  interval: BillingInterval = 'month'
+): number {
+  const monthly = PLAN_PRICE_HT_CAD[plan];
+  const ht = interval === 'year' ? yearlyPriceHtCad(monthly) : monthly;
+  return priceHtToCents(ht);
 }
 
 export function isStripeAutomaticTaxEnabled(): boolean {

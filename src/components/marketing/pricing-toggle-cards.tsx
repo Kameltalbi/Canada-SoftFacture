@@ -4,7 +4,13 @@ import { useState } from 'react';
 import { Check, Info } from 'lucide-react';
 import { PricingCta } from '@/components/marketing/pricing-cta';
 import { cn } from '@/lib/utils';
-import { formatCad, HIGHLIGHTED_PLAN_ID, PLAN_HIGHLIGHT_KEYS, PLAN_IDS } from '@/lib/pricing-plans';
+import {
+  formatCad,
+  HIGHLIGHTED_PLAN_ID,
+  isFreePlan,
+  PLAN_HIGHLIGHT_KEYS,
+  PLAN_IDS,
+} from '@/lib/pricing-plans';
 import type { PlanId } from '@/lib/pricing-plans';
 
 type BillingCycle = 'monthly' | 'yearly';
@@ -23,6 +29,7 @@ export function PricingToggleCards({
     perYear: string;
     billedYearly: string;
     trialBadge: string;
+    forever: string;
     popularBadge: string;
     cta: string;
     ctaByPlan?: Partial<Record<PlanId, string>>;
@@ -64,6 +71,7 @@ export function PricingToggleCards({
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
         {PLAN_IDS.map((planId) => {
           const highlighted = planId === HIGHLIGHTED_PLAN_ID;
+          const free = isFreePlan(planId);
           const monthlyPrice = planPrices[planId];
           const yearlyPrice = Math.round(monthlyPrice * 10 * 100) / 100;
           const displayedPrice = yearly ? yearlyPrice : monthlyPrice;
@@ -84,14 +92,23 @@ export function PricingToggleCards({
               )}
               <h3 className="text-xl font-bold">{labels.plans[planId].name}</h3>
               <p className="mt-1 text-sm text-slate-600">{labels.plans[planId].audience}</p>
-              <p className="mt-4 flex items-baseline gap-1">
-                <span className="text-3xl font-bold">{priceFormatted}</span>
-                <span className="text-lg font-semibold text-slate-500">CAD</span>
-                <span className="text-base font-normal text-slate-500">
-                  {yearly ? labels.perYear : labels.perMonth}
-                </span>
-              </p>
-              {yearly ? (
+              {free ? (
+                <p className="mt-4 flex items-baseline gap-1">
+                  <span className="text-3xl font-bold">$0</span>
+                  <span className="text-lg font-semibold text-slate-500">CAD</span>
+                </p>
+              ) : (
+                <p className="mt-4 flex items-baseline gap-1">
+                  <span className="text-3xl font-bold">{priceFormatted}</span>
+                  <span className="text-lg font-semibold text-slate-500">CAD</span>
+                  <span className="text-base font-normal text-slate-500">
+                    {yearly ? labels.perYear : labels.perMonth}
+                  </span>
+                </p>
+              )}
+              {free ? (
+                <p className="mt-2 text-xs font-medium text-emerald-700">{labels.forever}</p>
+              ) : yearly ? (
                 <p className="mt-2 text-xs font-medium text-emerald-700">{labels.billedYearly}</p>
               ) : (
                 <p className="mt-2 text-xs font-medium text-emerald-700">{labels.trialBadge}</p>
@@ -103,10 +120,7 @@ export function PricingToggleCards({
                     <span className="flex items-center gap-1">
                       {labels.plans[planId].highlights[key]}
                       {key === 'interac' && (
-                        <span
-                          className="group relative cursor-help"
-                          title={labels.interacTooltip}
-                        >
+                        <span className="group relative cursor-help" title={labels.interacTooltip}>
                           <Info className="h-3.5 w-3.5 text-slate-400 group-hover:text-emerald-600" />
                         </span>
                       )}

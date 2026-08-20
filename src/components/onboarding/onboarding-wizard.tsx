@@ -10,8 +10,10 @@ import { useAuth } from '@/contexts/auth-context';
 import { completeOnboarding } from '@/lib/onboarding-api';
 import { usePublicBillingPlans } from '@/hooks/use-public-billing-plans';
 import {
-  formatEur,
+  formatCad,
+  FREE_PLAN_ID,
   HIGHLIGHTED_PLAN_ID,
+  isFreePlan,
   PLAN_IDS,
   TRIAL_DAYS,
   type PlanId,
@@ -37,7 +39,7 @@ export function OnboardingWizard() {
   const [postalCode, setPostalCode] = useState('');
   const [city, setCity] = useState('');
   const [vatNumber, setVatNumber] = useState('');
-  const [plan, setPlan] = useState<PlanId>(HIGHLIGHTED_PLAN_ID);
+  const [plan, setPlan] = useState<PlanId>(FREE_PLAN_ID);
 
   useEffect(() => {
     if (!user || hydratedRef.current) return;
@@ -317,10 +319,21 @@ export function OnboardingWizard() {
                           {tp(`plans.${planId}.audience`)}
                         </p>
                         <p className="mt-2 text-sm font-bold text-slate-900">
-                          {formatEur(planPrices[planId])} € HT{tp('perMonth')}
-                          <span className="ms-2 text-xs font-medium text-emerald-700">
-                            — {tp('trialBadge')}
-                          </span>
+                          {isFreePlan(planId) ? (
+                            <>
+                              {formatCad(0)} CAD
+                              <span className="ms-2 text-xs font-medium text-emerald-700">
+                                — {tp('forever')}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              {formatCad(planPrices[planId])} CAD{tp('perMonth')}
+                              <span className="ms-2 text-xs font-medium text-emerald-700">
+                                — {tp('trialBadge')}
+                              </span>
+                            </>
+                          )}
                         </p>
                       </div>
                     </div>

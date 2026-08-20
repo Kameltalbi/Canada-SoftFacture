@@ -36,7 +36,7 @@ export async function LandingHeader() {
           <MobileLandingMenu
             links={links}
             loginLabel={navT('login')}
-            registerLabel={navT('register')}
+            registerLabel={t('ctaPrimary')}
           />
           <Link href="/login" className="hidden sm:inline">
             <Button className="bg-brand-blue text-white shadow-md shadow-brand-blue/20 hover:bg-brand-blue-hover">
@@ -45,7 +45,7 @@ export async function LandingHeader() {
           </Link>
           <Link href="/register" className="hidden sm:inline">
             <Button className="bg-brand text-white shadow-md shadow-brand/20 hover:bg-brand-hover">
-              {navT('register')}
+              {t('ctaPrimary')}
             </Button>
           </Link>
         </div>

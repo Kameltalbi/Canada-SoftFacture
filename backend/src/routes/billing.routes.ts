@@ -14,14 +14,17 @@ import {
   subscriptionPlanToSlug,
   PLAN_PRICE_HT_CAD,
   SUBSCRIPTION_VAT_RATE_PERCENT,
+  yearlyPriceHtCad,
 } from '../lib/billing/index.js';
 import { isValidEmail, normalizeSiret, normalizeVatNumber } from '../lib/billing/validation.js';
-import { getStripe } from '../lib/billing/stripeClient.js';
+import { getStripe, getStripePublishableKey } from '../lib/billing/stripeClient.js';
 import { retrieveCheckoutSessionForOrg } from '../lib/billing/stripeWebhook.js';
 export const billingPublicRouter = Router();
 
 const checkoutBodySchema = z.object({
-  plan: z.enum(['starter', 'pro', 'business']),
+  plan: z.enum(['pro', 'business']),
+  cycle: z.enum(['monthly', 'yearly']).optional().default('monthly'),
+  locale: z.enum(['fr', 'en']).optional(),
   billingLegalName: z.string().min(2).max(200),
   billingEmail: z.string().email().max(200),
   billingSiret: z.string().max(20).optional().nullable(),
@@ -40,6 +43,8 @@ billingPublicRouter.get('/plans', (_req, res) => {
       plan: apiPlan,
       priceHtCad: priceHt,
       priceTtcCad: priceTtc,
+      priceHtEur: priceHt,
+      priceTtcEur: priceTtc,
       vatRatePercent: SUBSCRIPTION_VAT_RATE_PERCENT,
       trialDays: TRIAL_DAYS,
       currency: 'CAD',
@@ -52,6 +57,7 @@ billingPublicRouter.get('/plans', (_req, res) => {
     vatRatePercent: SUBSCRIPTION_VAT_RATE_PERCENT,
     trialDays: TRIAL_DAYS,
     paymentProviderConfigured: isStripeCheckoutReady(),
+    stripePublishableKey: getStripePublishableKey() ?? null,
     plans,
   });
 });
@@ -95,10 +101,11 @@ billingProtectedRouter.get('/subscription', async (req, res) => {
       : null,
     paymentProviderConfigured: isStripeCheckoutReady(),
     canManageBilling: Boolean(org.stripeCustomerId) && isStripeCheckoutReady(),
+    stripePublishableKey: getStripePublishableKey() ?? null,
   });
 });
 
-/** Crée une session de paiement (Stripe ou mode attente). */
+/** Crée une session Stripe Checkout (formulaire embarqué sur /checkout). */
 billingProtectedRouter.post('/checkout', requireRoles('ADMIN'), async (req, res) => {
   const parsed = checkoutBodySchema.safeParse(req.body);
   if (!parsed.success) {
@@ -108,6 +115,11 @@ billingProtectedRouter.post('/checkout', requireRoles('ADMIN'), async (req, res)
   const orgId = req.user!.organizationId!;
   const plan = slugToSubscriptionPlan(parsed.data.plan);
   if (!plan) return res.status(400).json({ error: 'Offre invalide' });
+  if (PLAN_PRICE_HT_CAD[plan] <= 0) {
+    return res.status(400).json({ error: 'Le plan Gratuit ne nécessite pas de paiement' });
+  }
+
+  const billingInterval = parsed.data.cycle === 'yearly' ? 'year' : 'month';
 
   const billingEmail = parsed.data.billingEmail.trim().toLowerCase();
   if (!isValidEmail(billingEmail)) {
@@ -127,11 +139,12 @@ billingProtectedRouter.post('/checkout', requireRoles('ADMIN'), async (req, res)
   const org = await prisma.organization.findUnique({ where: { id: orgId } });
   if (!org) return res.status(404).json({ error: 'Organisation introuvable' });
 
-  const priceHt = PLAN_PRICE_HT_CAD[plan];
+  const monthlyHt = PLAN_PRICE_HT_CAD[plan];
+  const priceHt = billingInterval === 'year' ? yearlyPriceHtCad(monthlyHt) : monthlyHt;
   const amountTtcCents = priceTtcToCents(priceHtToTtcCad(priceHt));
   const baseUrl = getFrontendBaseUrl();
   const successUrl = `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
-  const cancelUrl = `${baseUrl}/checkout/cancel?plan=${parsed.data.plan}`;
+  const cancelUrl = `${baseUrl}/checkout/cancel?plan=${parsed.data.plan}&cycle=${parsed.data.cycle}`;
 
   const provider = getBillingProvider();
   const checkoutSession = await prisma.billingCheckoutSession.create({
@@ -164,6 +177,8 @@ billingProtectedRouter.post('/checkout', requireRoles('ADMIN'), async (req, res)
   const result = await provider.createCheckoutSession({
     organizationId: orgId,
     plan,
+    billingInterval,
+    locale: parsed.data.locale,
     billingCheckoutSessionId: checkoutSession.id,
     stripeCustomerId: org.stripeCustomerId,
     customerEmail: billingEmail,
@@ -176,6 +191,23 @@ billingProtectedRouter.post('/checkout', requireRoles('ADMIN'), async (req, res)
     currency: 'CAD',
     trialDays: TRIAL_DAYS,
   });
+
+  if (result.mode === 'embedded') {
+    await prisma.billingCheckoutSession.update({
+      where: { id: checkoutSession.id },
+      data: {
+        provider: result.provider,
+        providerSessionId: result.providerSessionId,
+      },
+    });
+    return res.json({
+      sessionId: checkoutSession.id,
+      mode: 'embedded',
+      clientSecret: result.clientSecret,
+      publishableKey: result.publishableKey,
+      stripeSessionId: result.providerSessionId,
+    });
+  }
 
   if (result.mode === 'redirect') {
     await prisma.billingCheckoutSession.update({
@@ -192,32 +224,24 @@ billingProtectedRouter.post('/checkout', requireRoles('ADMIN'), async (req, res)
     });
   }
 
-  const trialEndsAt = new Date();
-  trialEndsAt.setDate(trialEndsAt.getDate() + TRIAL_DAYS);
+  return res.status(422).json({ error: result.message });
+});
 
-  await prisma.$transaction([
-    prisma.billingCheckoutSession.update({
-      where: { id: checkoutSession.id },
-      data: { status: 'PENDING' },
-    }),
-    prisma.organization.update({
-      where: { id: orgId },
-      data: {
-        subscriptionPlan: plan,
-        pendingSubscriptionPlan: null,
-        billingStatus: 'TRIAL',
-        trialEndsAt,
-      },
-    }),
-  ]);
-
-  return res.json({
-    sessionId: checkoutSession.id,
-    mode: 'pending',
-    message: result.message,
-    trialEndsAt: trialEndsAt.toISOString(),
-    plan: parsed.data.plan,
-  });
+/** Confirme une session Stripe Checkout après paiement (success page). */
+billingProtectedRouter.get('/checkout/stripe/confirm', async (req, res) => {
+  const orgId = req.user!.organizationId!;
+  const stripeSessionId =
+    typeof req.query.stripe_session_id === 'string' ? req.query.stripe_session_id : null;
+  if (!stripeSessionId?.startsWith('cs_')) {
+    return res.status(400).json({ error: 'session_id invalide' });
+  }
+  try {
+    const result = await retrieveCheckoutSessionForOrg(stripeSessionId, orgId);
+    return res.json(result);
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'Erreur';
+    return res.status(400).json({ error: msg });
+  }
 });
 
 billingProtectedRouter.get('/checkout/:sessionId', async (req, res) => {
@@ -234,23 +258,6 @@ billingProtectedRouter.get('/checkout/:sessionId', async (req, res) => {
     currency: session.currency,
     createdAt: session.createdAt,
   });
-});
-
-/** Confirme une session Stripe Checkout après redirection (success page). */
-billingProtectedRouter.get('/checkout/stripe/confirm', async (req, res) => {
-  const orgId = req.user!.organizationId!;
-  const stripeSessionId =
-    typeof req.query.stripe_session_id === 'string' ? req.query.stripe_session_id : null;
-  if (!stripeSessionId?.startsWith('cs_')) {
-    return res.status(400).json({ error: 'session_id invalide' });
-  }
-  try {
-    const result = await retrieveCheckoutSessionForOrg(stripeSessionId, orgId);
-    return res.json(result);
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : 'Erreur';
-    return res.status(400).json({ error: msg });
-  }
 });
 
 /** Portail client Stripe (factures, moyen de paiement, résiliation). */

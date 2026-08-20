@@ -121,6 +121,10 @@ export async function retrieveCheckoutSessionForOrg(
     throw new Error('Session non autorisée');
   }
 
+  if (session.status === 'complete') {
+    await handleCheckoutSessionCompleted(session);
+  }
+
   const sub =
     typeof session.subscription === 'object' && session.subscription ? session.subscription : null;
 

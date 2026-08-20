@@ -10,7 +10,7 @@ import { PLAN_PRICES_HT_CAD, TRIAL_DAYS } from '@/lib/pricing-plans';
 
 export function CgvContent() {
   const L = LEGAL_SITE;
-  const prices = `Essentiel $${PLAN_PRICES_HT_CAD.starter.toFixed(2)} CAD/mois, Pro $${PLAN_PRICES_HT_CAD.pro.toFixed(2)} CAD/mois, Expert $${PLAN_PRICES_HT_CAD.business.toFixed(2)} CAD/mois (avant TPS/TVQ)`;
+  const prices = `Gratuit 0 $ CAD (illimité), Essentiel $${PLAN_PRICES_HT_CAD.pro.toFixed(2)} CAD/mois, Business $${PLAN_PRICES_HT_CAD.business.toFixed(2)} CAD/mois (avant TPS/TVQ)`;
 
   return (
     <>
@@ -37,7 +37,8 @@ export function CgvContent() {
             <strong>Utilisateur</strong> : personne physique ou morale titulaire d&apos;un compte.
           </li>
           <li>
-            <strong>Abonnement</strong> : formule payante mensuelle (Essentiel, Pro, Expert).
+            <strong>Abonnement</strong> : formule payante mensuelle (Essentiel, Business). Le plan
+            Gratuit est illimité et sans frais.
           </li>
           <li>
             <strong>Période d&apos;essai</strong> : {TRIAL_DAYS} jours gratuits à
@@ -83,9 +84,10 @@ export function CgvContent() {
       <LegalSection id="essai" title="5. Période d'essai">
         <p>
           Sauf indication contraire, un essai gratuit de {TRIAL_DAYS} jours est offert à la première
-          souscription. L&apos;Utilisateur peut annuler sans frais avant la fin de cette période. À
-          l&apos;issue de l&apos;essai, l&apos;abonnement est reconduit automatiquement au tarif de
-          l&apos;offre choisie, sauf annulation préalable.
+          souscription d&apos;un plan payant (Essentiel ou Business). Le plan Gratuit est accessible
+          sans essai ni carte de crédit. L&apos;Utilisateur peut annuler sans frais avant la fin de
+          la période d&apos;essai. À l&apos;issue de l&apos;essai, l&apos;abonnement est reconduit
+          automatiquement au tarif de l&apos;offre choisie, sauf annulation préalable.
         </p>
       </LegalSection>
 

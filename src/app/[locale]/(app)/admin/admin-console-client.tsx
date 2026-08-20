@@ -84,7 +84,7 @@ type OrgDetail = Omit<OrgRow, '_count'> & {
 const plans: SubscriptionPlan[] = ['STARTER', 'PRO', 'BUSINESS'];
 const statuses: BillingStatus[] = ['NONE', 'TRIAL', 'ACTIVE', 'PAST_DUE', 'CANCELED', 'INCOMPLETE'];
 const roles: UserRole[] = ['SUPERADMIN', 'ADMIN', 'USER'];
-const planMrrHt: Record<SubscriptionPlan, number> = { STARTER: 7.9, PRO: 12.9, BUSINESS: 17.9 };
+const planMrrHt: Record<SubscriptionPlan, number> = { STARTER: 0, PRO: 34.9, BUSINESS: 59.9 };
 
 function formatDate(value: string | null) {
   if (!value) return '—';

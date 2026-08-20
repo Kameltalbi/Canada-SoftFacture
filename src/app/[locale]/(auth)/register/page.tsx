@@ -4,7 +4,7 @@ import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
-import { isPlanId } from '@/lib/pricing-plans';
+import { isPaidPlan, isPlanId } from '@/lib/pricing-plans';
 import { useAuth } from '@/contexts/auth-context';
 import { Card, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -61,7 +61,7 @@ function RegisterContent() {
 
       const plan = searchParams.get('plan');
 
-      if (isPlanId(plan)) {
+      if (isPlanId(plan) && isPaidPlan(plan)) {
         router.replace(`/checkout?plan=${plan}`);
       } else {
         router.replace('/dashboard');

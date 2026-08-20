@@ -4,7 +4,13 @@ import { useTranslations } from 'next-intl';
 import { Check } from 'lucide-react';
 import { PricingPlanActions } from '@/components/marketing/pricing-plan-actions';
 import { cn } from '@/lib/utils';
-import { formatEur, HIGHLIGHTED_PLAN_ID, PLAN_HIGHLIGHT_KEYS, PLAN_IDS } from '@/lib/pricing-plans';
+import {
+  formatCad,
+  HIGHLIGHTED_PLAN_ID,
+  isFreePlan,
+  PLAN_HIGHLIGHT_KEYS,
+  PLAN_IDS,
+} from '@/lib/pricing-plans';
 import type { PlanId } from '@/lib/pricing-plans';
 import type { BillingPlansResponse } from '@/lib/billing-api';
 import { usePublicBillingPlans } from '@/hooks/use-public-billing-plans';
@@ -28,7 +34,7 @@ export function PricingPlanCards({
       {PLAN_IDS.map((planId) => {
         const highlighted = planId === HIGHLIGHTED_PLAN_ID;
         const isCurrent = currentPlanId === planId;
-        const priceFormatted = formatEur(planPrices[planId]);
+        const priceFormatted = formatCad(planPrices[planId]);
 
         return (
           <div
@@ -54,8 +60,17 @@ export function PricingPlanCards({
             )}
             <h3 className="text-lg font-bold">{t(`plans.${planId}.name`)}</h3>
             <p className="mt-4 text-2xl font-bold">
-              {priceFormatted} € <span className="text-sm font-semibold text-slate-600">HT</span>
-              <span className="text-sm font-normal text-slate-500">{t('perMonth')}</span>
+              {isFreePlan(planId) ? (
+                <>
+                  $0 <span className="text-sm font-semibold text-slate-600">CAD</span>
+                  <span className="text-sm font-normal text-emerald-700"> {t('forever')}</span>
+                </>
+              ) : (
+                <>
+                  {priceFormatted} <span className="text-sm font-semibold text-slate-600">CAD</span>
+                  <span className="text-sm font-normal text-slate-500">{t('perMonth')}</span>
+                </>
+              )}
             </p>
             <ul className="mt-4 space-y-2 text-sm text-slate-600">
               {PLAN_HIGHLIGHT_KEYS[planId].slice(0, 4).map((key) => (

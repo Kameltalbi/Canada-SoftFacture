@@ -12,4 +12,4 @@ export function getBillingProvider(): BillingProviderAdapter {
 
 export * from './plans.js';
 export * from './types.js';
-export { isStripeEnabled } from './stripeClient.js';
+export { isStripeEnabled, getStripePublishableKey } from './stripeClient.js';

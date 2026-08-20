@@ -22,7 +22,12 @@ import {
   SeatLimitError,
 } from '../lib/planLimits.js';
 import { generateInviteToken, inviteExpiresAt } from '../lib/inviteToken.js';
-import { getFrontendBaseUrl, slugToSubscriptionPlan, TRIAL_DAYS } from '../lib/billing/plans.js';
+import {
+  getFrontendBaseUrl,
+  PLAN_PRICE_HT_CAD,
+  slugToSubscriptionPlan,
+  TRIAL_DAYS,
+} from '../lib/billing/plans.js';
 import { normalizeSiret, normalizeVatNumber, isValidEmail } from '../lib/billing/validation.js';
 import { requireOnboardingComplete } from '../middleware/onboarding.js';
 import { APP_BRAND } from '../lib/appBrand.js';
@@ -143,6 +148,7 @@ router.post('/onboarding/complete', requireRoles('ADMIN'), async (req, res) => {
   const plan = slugToSubscriptionPlan(parsed.data.plan);
   if (!plan) return res.status(400).json({ error: 'Offre invalide' });
 
+  const paid = PLAN_PRICE_HT_CAD[plan] > 0;
   const trialEndsAt = new Date();
   trialEndsAt.setDate(trialEndsAt.getDate() + TRIAL_DAYS);
   const companyName = parsed.data.companyName.trim();
@@ -163,8 +169,8 @@ router.post('/onboarding/complete', requireRoles('ADMIN'), async (req, res) => {
           city: parsed.data.city.trim(),
           country: parsed.data.country.toUpperCase(),
           subscriptionPlan: plan,
-          billingStatus: 'TRIAL',
-          trialEndsAt,
+          billingStatus: paid ? 'TRIAL' : 'ACTIVE',
+          trialEndsAt: paid ? trialEndsAt : null,
           onboardingCompletedAt: new Date(),
         },
       }),

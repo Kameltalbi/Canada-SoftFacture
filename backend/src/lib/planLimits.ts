@@ -4,8 +4,8 @@ import { prisma } from './db.js';
 /** Nombre max d'utilisateurs actifs + invitations en attente par plan. */
 export const PLAN_MAX_USERS: Record<SubscriptionPlan, number> = {
   STARTER: 1,
-  PRO: 3,
-  BUSINESS: 5,
+  PRO: 5,
+  BUSINESS: 10,
 };
 
 export function maxUsersForPlan(plan: SubscriptionPlan): number {

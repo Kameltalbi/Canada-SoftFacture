@@ -7,13 +7,14 @@ import { XCircle } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
 type Props = {
-  searchParams: Promise<{ plan?: string }>;
+  searchParams: Promise<{ plan?: string; cycle?: string }>;
 };
 
 export default async function CheckoutCancelPage({ searchParams }: Props) {
   const params = await searchParams;
   const t = await getTranslations('checkout');
   const plan = isPlanId(params.plan) ? params.plan : 'pro';
+  const cycle = params.cycle === 'yearly' ? 'yearly' : 'monthly';
 
   return (
     <MarketingShell activeNav="pricing">
@@ -23,7 +24,7 @@ export default async function CheckoutCancelPage({ searchParams }: Props) {
           <h1 className="mt-4 text-2xl font-bold text-s-navy">{t('cancelTitle')}</h1>
           <p className="mt-3 text-sm text-s-muted">{t('cancelBody')}</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link href={`/checkout?plan=${plan}`}>
+            <Link href={`/checkout?plan=${plan}&cycle=${cycle}`}>
               <Button variant="primary">{t('retryCheckout')}</Button>
             </Link>
             <Link href="/tarifs">

@@ -6,7 +6,15 @@ import { Check, X, ShieldCheck, Clock, Globe, CreditCard } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
-function CompareCell({ value, yesLabel, noLabel }: { value: boolean; yesLabel: string; noLabel: string }) {
+function CompareCell({
+  value,
+  yesLabel,
+  noLabel,
+}: {
+  value: boolean;
+  yesLabel: string;
+  noLabel: string;
+}) {
   return value ? (
     <span className="inline-flex items-center gap-1 text-emerald-700">
       <Check className="h-4 w-4 shrink-0" aria-hidden />
@@ -34,10 +42,11 @@ export async function PricingSection({
   return (
     <section id="pricing" className={cn('py-14 md:py-16', className)}>
       <div className="mx-auto max-w-7xl px-4 md:px-8">
-
         {/* Header */}
         <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">{t('title')}</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+            {t('title')}
+          </h2>
           <p className="mx-auto mt-3 max-w-2xl text-slate-600">{t('subtitle')}</p>
         </div>
 
@@ -77,6 +86,7 @@ export async function PricingSection({
             perYear: t('perYear'),
             billedYearly: t('billedYearly'),
             trialBadge: t('trialBadge'),
+            forever: t('forever'),
             popularBadge: t('popularBadge'),
             cta: t('cta'),
             ctaByPlan: {
@@ -90,12 +100,13 @@ export async function PricingSection({
                 name: t('plans.starter.name'),
                 audience: t('plans.starter.audience'),
                 highlights: {
-                  users: t('plans.starter.highlights.users'),
                   clients: t('plans.starter.highlights.clients'),
                   invoices: t('plans.starter.highlights.invoices'),
+                  dashboard: t('plans.starter.highlights.dashboard'),
+                  payments: t('plans.starter.highlights.payments'),
+                  reminders: t('plans.starter.highlights.reminders'),
                   pdf: t('plans.starter.highlights.pdf'),
-                  taxes: t('plans.starter.highlights.taxes'),
-                  support: t('plans.starter.highlights.support'),
+                  users: t('plans.starter.highlights.users'),
                 },
               },
               pro: {
@@ -103,13 +114,13 @@ export async function PricingSection({
                 audience: t('plans.pro.audience'),
                 highlights: {
                   everything: t('plans.pro.highlights.everything'),
-                  users: t('plans.pro.highlights.users'),
-                  payments: t('plans.pro.highlights.payments'),
-                  interac: t('plans.pro.highlights.interac'),
-                  reminders: t('plans.pro.highlights.reminders'),
                   recurring: t('plans.pro.highlights.recurring'),
-                  stock: t('plans.pro.highlights.stock'),
+                  deposits: t('plans.pro.highlights.deposits'),
+                  creditNotes: t('plans.pro.highlights.creditNotes'),
+                  payments: t('plans.pro.highlights.payments'),
+                  reminders: t('plans.pro.highlights.reminders'),
                   accountant: t('plans.pro.highlights.accountant'),
+                  users: t('plans.pro.highlights.users'),
                 },
               },
               business: {
@@ -117,12 +128,11 @@ export async function PricingSection({
                 audience: t('plans.business.audience'),
                 highlights: {
                   everything: t('plans.business.highlights.everything'),
-                  users: t('plans.business.highlights.users'),
+                  stock: t('plans.business.highlights.stock'),
                   stockAdvanced: t('plans.business.highlights.stockAdvanced'),
-                  signature: t('plans.business.highlights.signature'),
-                  api: t('plans.business.highlights.api'),
+                  expenses: t('plans.business.highlights.expenses'),
+                  users: t('plans.business.highlights.users'),
                   multiCompany: t('plans.business.highlights.multiCompany'),
-                  auditLog: t('plans.business.highlights.auditLog'),
                   support: t('plans.business.highlights.support'),
                 },
               },
@@ -161,8 +171,13 @@ export async function PricingSection({
               </thead>
               <tbody>
                 {COMPARISON_ROWS.map((row) => (
-                  <tr key={row.key} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-                    <td className="px-4 py-3 font-medium text-slate-700">{t(`compare.rows.${row.key}`)}</td>
+                  <tr
+                    key={row.key}
+                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                  >
+                    <td className="px-4 py-3 font-medium text-slate-700">
+                      {t(`compare.rows.${row.key}`)}
+                    </td>
                     {PLAN_IDS.map((planId) => (
                       <td key={planId} className="px-4 py-3 text-slate-600">
                         {row.type === 'boolean' ? (
@@ -189,15 +204,19 @@ export async function PricingSection({
         <div className="mt-20">
           <h3 className="text-center text-2xl font-bold text-slate-900">{t('faq.title')}</h3>
           <div className="mt-8 mx-auto max-w-3xl divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
-            {(['cancel', 'hidden', 'hosting', 'taxes', 'import', 'upgrade'] as const).map((key) => (
-              <details key={key} className="group px-6 py-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between font-semibold text-slate-800">
-                  {t(`faq.${key}.q`)}
-                  <span className="ml-4 shrink-0 text-emerald-600 transition group-open:rotate-45">+</span>
-                </summary>
-                <p className="mt-3 text-sm leading-relaxed text-slate-600">{t(`faq.${key}.a`)}</p>
-              </details>
-            ))}
+            {(['free', 'cancel', 'hidden', 'hosting', 'taxes', 'import', 'upgrade'] as const).map(
+              (key) => (
+                <details key={key} className="group px-6 py-5">
+                  <summary className="flex cursor-pointer list-none items-center justify-between font-semibold text-slate-800">
+                    {t(`faq.${key}.q`)}
+                    <span className="ml-4 shrink-0 text-emerald-600 transition group-open:rotate-45">
+                      +
+                    </span>
+                  </summary>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{t(`faq.${key}.a`)}</p>
+                </details>
+              )
+            )}
           </div>
         </div>
 
@@ -213,7 +232,6 @@ export async function PricingSection({
             {t('finalCta.cta')}
           </Link>
         </div>
-
       </div>
     </section>
   );

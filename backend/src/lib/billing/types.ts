@@ -1,8 +1,11 @@
 import type { SubscriptionPlan } from '../../generated/prisma/index.js';
+import type { BillingInterval } from './plans.js';
 
 export type CreateCheckoutInput = {
   organizationId: string;
   plan: SubscriptionPlan;
+  billingInterval?: BillingInterval;
+  locale?: 'fr' | 'en';
   billingCheckoutSessionId: string;
   stripeCustomerId?: string | null;
   customerEmail: string;
@@ -18,13 +21,20 @@ export type CreateCheckoutInput = {
 
 export type CheckoutSessionResult =
   | {
+      mode: 'embedded';
+      clientSecret: string;
+      publishableKey: string;
+      providerSessionId: string;
+      provider: 'STRIPE';
+    }
+  | {
       mode: 'redirect';
       checkoutUrl: string;
       providerSessionId: string;
       provider: 'STRIPE';
     }
   | {
-      mode: 'pending';
+      mode: 'error';
       message: string;
       provider: 'NONE';
     };

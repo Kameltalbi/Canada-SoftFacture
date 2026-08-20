@@ -1,11 +1,20 @@
 export const PLAN_IDS = ['starter', 'pro', 'business'] as const;
 export type PlanId = (typeof PLAN_IDS)[number];
 
+/** Plan Gratuit illimité (slug technique `starter`, comme SoftFacture v2). */
+export const FREE_PLAN_ID: PlanId = 'starter';
+
+/** Plan payant mis en avant — Essentiel. */
 export const HIGHLIGHTED_PLAN_ID: PlanId = 'pro';
+
+export const PAID_PLAN_IDS = ['pro', 'business'] as const satisfies readonly PlanId[];
+
+/** Annuel : 10 mois facturés, 2 mois offerts. */
+export const YEARLY_MONTHS_CHARGED = 10;
 
 /** Prix avant taxes affichés sur /tarifs — garder synchronisé avec backend/src/lib/billing/plans.ts */
 export const PLAN_PRICES_HT_CAD: Record<PlanId, number> = {
-  starter: 19.9,
+  starter: 0,
   pro: 34.9,
   business: 59.9,
 };
@@ -36,8 +45,26 @@ export function isPlanId(value: string | null | undefined): value is PlanId {
   return value === 'starter' || value === 'pro' || value === 'business';
 }
 
+export function isFreePlan(value: string | null | undefined): boolean {
+  return value === FREE_PLAN_ID;
+}
+
+export function isPaidPlan(value: string | null | undefined): boolean {
+  return isPlanId(value) && !isFreePlan(value);
+}
+
+/** Inscription (visiteur) ou checkout (connecté, plans payants). */
+export function planCtaHref(planId: PlanId, loggedIn = false): string {
+  if (!loggedIn) return `/register?plan=${planId}`;
+  return isFreePlan(planId) ? '/dashboard' : `/checkout?plan=${planId}`;
+}
+
 export function priceHtToTtc(htCad: number, vatRate = SUBSCRIPTION_VAT_RATE): number {
   return Math.round(htCad * (1 + vatRate / 100) * 100) / 100;
+}
+
+export function yearlyPriceHt(monthlyHt: number): number {
+  return Math.round(monthlyHt * YEARLY_MONTHS_CHARGED * 100) / 100;
 }
 
 export function formatCad(amount: number): string {
@@ -51,16 +78,24 @@ export function formatEur(amount: number): string {
 
 /** Keys for plan card bullet highlights (i18n: pricing.plans.{id}.highlights.{key}) */
 export const PLAN_HIGHLIGHT_KEYS: Record<PlanId, string[]> = {
-  starter: ['users', 'clients', 'invoices', 'pdf', 'taxes', 'support'],
-  pro: ['everything', 'users', 'payments', 'interac', 'reminders', 'recurring', 'stock', 'accountant'],
+  starter: ['clients', 'invoices', 'dashboard', 'payments', 'reminders', 'pdf', 'users'],
+  pro: [
+    'everything',
+    'recurring',
+    'deposits',
+    'creditNotes',
+    'payments',
+    'reminders',
+    'accountant',
+    'users',
+  ],
   business: [
     'everything',
-    'users',
+    'stock',
     'stockAdvanced',
-    'signature',
-    'api',
+    'expenses',
+    'users',
     'multiCompany',
-    'auditLog',
     'support',
   ],
 };
@@ -88,7 +123,7 @@ export const COMPARISON_ROWS: { key: string; type: ComparisonRowType }[] = [
 ];
 
 export const COMPARISON_BOOLEAN: Record<string, Record<PlanId, boolean>> = {
-  creditNotesDeposits: { starter: true, pro: true, business: true },
+  creditNotesDeposits: { starter: false, pro: true, business: true },
   recurring: { starter: false, pro: true, business: true },
   accountantAccess: { starter: false, pro: true, business: true },
   signature: { starter: false, pro: false, business: true },

@@ -14,6 +14,8 @@ export type BillingPlanPublic = {
   plan: 'STARTER' | 'PRO' | 'BUSINESS';
   priceTtcEur: number;
   priceHtEur: number;
+  priceHtCad?: number;
+  priceTtcCad?: number;
   vatRatePercent: number;
   trialDays: number;
   currency: string;
@@ -26,6 +28,7 @@ export type BillingPlansResponse = {
   vatRatePercent: number;
   trialDays: number;
   paymentProviderConfigured: boolean;
+  stripePublishableKey?: string | null;
   plans: BillingPlanPublic[];
 };
 
@@ -43,10 +46,13 @@ export type BillingSubscriptionResponse = {
   pendingPlan: PlanId | null;
   paymentProviderConfigured: boolean;
   canManageBilling?: boolean;
+  stripePublishableKey?: string | null;
 };
 
 export type CheckoutPayload = {
   plan: PlanId;
+  cycle?: 'monthly' | 'yearly';
+  locale?: 'fr' | 'en';
   billingLegalName: string;
   billingEmail: string;
   billingSiret?: string | null;
@@ -55,14 +61,14 @@ export type CheckoutPayload = {
 };
 
 export type CheckoutResponse =
-  | { sessionId: string; mode: 'redirect'; checkoutUrl: string }
   | {
       sessionId: string;
-      mode: 'pending';
-      message: string;
-      trialEndsAt: string;
-      plan: PlanId;
-    };
+      mode: 'embedded';
+      clientSecret: string;
+      publishableKey: string;
+      stripeSessionId: string;
+    }
+  | { sessionId: string; mode: 'redirect'; checkoutUrl: string };
 
 export function fetchBillingPlans() {
   return apiFetch<BillingPlansResponse>('/billing/plans', { skipAuth: true });
@@ -75,8 +81,8 @@ export function getStaticBillingPlans(): BillingPlansResponse {
 
 function staticBillingPlansResponse(): BillingPlansResponse {
   return {
-    country: 'FR',
-    currency: 'EUR',
+    country: 'CA',
+    currency: 'CAD',
     vatRatePercent: SUBSCRIPTION_VAT_RATE,
     trialDays: TRIAL_DAYS,
     paymentProviderConfigured: false,
@@ -85,10 +91,12 @@ function staticBillingPlansResponse(): BillingPlansResponse {
       plan: PLAN_TO_SUBSCRIPTION_API[slug],
       priceHtEur: PLAN_PRICES_HT_EUR[slug],
       priceTtcEur: priceHtToTtc(PLAN_PRICES_HT_EUR[slug]),
+      priceHtCad: PLAN_PRICES_HT_EUR[slug],
+      priceTtcCad: priceHtToTtc(PLAN_PRICES_HT_EUR[slug]),
       vatRatePercent: SUBSCRIPTION_VAT_RATE,
-      trialDays: TRIAL_DAYS,
-      currency: 'EUR',
-      country: 'FR',
+      trialDays: slug === 'starter' ? 0 : TRIAL_DAYS,
+      currency: 'CAD',
+      country: 'CA',
     })),
   };
 }
@@ -105,7 +113,7 @@ export async function getPublicBillingPlans(): Promise<BillingPlansResponse> {
 export function planPricesHtFromBilling(billing: BillingPlansResponse): Record<PlanId, number> {
   const prices = { ...PLAN_PRICES_HT_EUR };
   for (const plan of billing.plans) {
-    prices[plan.slug] = plan.priceHtEur;
+    prices[plan.slug] = plan.priceHtCad ?? plan.priceHtEur ?? PLAN_PRICES_HT_EUR[plan.slug];
   }
   return prices;
 }

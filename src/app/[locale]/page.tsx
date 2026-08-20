@@ -10,6 +10,7 @@ import {
   LandingHowSection,
   LandingProblemSection,
 } from '@/components/marketing/landing-sections';
+import { PricingSection } from '@/components/marketing/pricing-section';
 import { VisitorAssistant } from '@/components/marketing/visitor-assistant';
 
 export default function HomePage() {
@@ -22,6 +23,7 @@ export default function HomePage() {
       <LandingHowSection />
       <LandingAudienceSection />
       <LandingBenefitsSection />
+      <PricingSection showComparison={false} />
       <LandingFaqSection />
       <LandingFinalCta />
       <LandingFooter />

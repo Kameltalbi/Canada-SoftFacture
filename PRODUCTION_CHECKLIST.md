@@ -23,29 +23,31 @@
 
 Toutes les valeurs marquées ⚠️ sont **bloquantes** en production.
 
-| Variable                | Action requise                                                                                     |
-| ----------------------- | -------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`          | ⚠️ URL PostgreSQL de prod (SSL obligatoire : `?sslmode=require`)                                   |
-| `JWT_SECRET`            | ⚠️ Générer : `openssl rand -hex 64` (min 64 chars)                                                 |
-| `FIELD_ENCRYPTION_KEY`  | ⚠️ Générer : `openssl rand -hex 32` — **stocker dans un coffre-fort (Vault, AWS Secrets Manager)** |
-| `SEARCH_HASH_SALT`      | ⚠️ Générer : `openssl rand -hex 24` — ne jamais changer après la mise en prod                      |
-| `CORS_ORIGIN`           | ⚠️ Remplacer par l'URL de prod ex. `https://app.softfacture.ca`                                    |
-| `FRONTEND_URL`          | ⚠️ URL de prod ex. `https://app.softfacture.ca`                                                    |
-| `PORT`                  | `4000` ou adapter selon le reverse proxy                                                           |
-| `NODE_ENV`              | ⚠️ Définir à `production`                                                                          |
-| `SMTP_HOST`             | ⚠️ Serveur SMTP de prod (ex. Postmark, Mailgun, Amazon SES)                                        |
-| `SMTP_PORT`             | `587` (STARTTLS) ou `465` (SSL)                                                                    |
-| `SMTP_SECURE`           | `true` si port 465                                                                                 |
-| `SMTP_USER`             | Identifiant SMTP                                                                                   |
-| `SMTP_PASS`             | Mot de passe SMTP                                                                                  |
-| `SMTP_FROM`             | `SoftFacture Canada <no-reply@softfacture.ca>`                                                     |
-| `STRIPE_SECRET_KEY`     | ⚠️ Clé **live** Stripe (pas la clé test)                                                           |
-| `STRIPE_WEBHOOK_SECRET` | ⚠️ Secret du webhook Stripe live                                                                   |
-| `STRIPE_PRICE_STARTER`  | Price ID Stripe live — plan Starter CAD                                                            |
-| `STRIPE_PRICE_PRO`      | Price ID Stripe live — plan Pro CAD                                                                |
-| `STRIPE_PRICE_BUSINESS` | Price ID Stripe live — plan Business CAD                                                           |
-| `STRIPE_AUTOMATIC_TAX`  | `true` (TPS/TVQ calculées par Stripe Tax)                                                          |
-| `TUNTRUST_*`            | Optionnel — si signatures électroniques activées                                                   |
+| Variable                       | Action requise                                                                                     |
+| ------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                 | ⚠️ URL PostgreSQL de prod (SSL obligatoire : `?sslmode=require`)                                   |
+| `JWT_SECRET`                   | ⚠️ Générer : `openssl rand -hex 64` (min 64 chars)                                                 |
+| `FIELD_ENCRYPTION_KEY`         | ⚠️ Générer : `openssl rand -hex 32` — **stocker dans un coffre-fort (Vault, AWS Secrets Manager)** |
+| `SEARCH_HASH_SALT`             | ⚠️ Générer : `openssl rand -hex 24` — ne jamais changer après la mise en prod                      |
+| `CORS_ORIGIN`                  | ⚠️ Remplacer par l'URL de prod ex. `https://app.softfacture.ca`                                    |
+| `FRONTEND_URL`                 | ⚠️ URL de prod ex. `https://app.softfacture.ca`                                                    |
+| `PORT`                         | `4000` ou adapter selon le reverse proxy                                                           |
+| `NODE_ENV`                     | ⚠️ Définir à `production`                                                                          |
+| `SMTP_HOST`                    | ⚠️ Serveur SMTP de prod (ex. Postmark, Mailgun, Amazon SES)                                        |
+| `SMTP_PORT`                    | `587` (STARTTLS) ou `465` (SSL)                                                                    |
+| `SMTP_SECURE`                  | `true` si port 465                                                                                 |
+| `SMTP_USER`                    | Identifiant SMTP                                                                                   |
+| `SMTP_PASS`                    | Mot de passe SMTP                                                                                  |
+| `SMTP_FROM`                    | `SoftFacture Canada <no-reply@softfacture.ca>`                                                     |
+| `STRIPE_SECRET_KEY`            | ⚠️ Clé **live** Stripe (pas la clé test)                                                           |
+| `STRIPE_PUBLISHABLE_KEY`       | ⚠️ Clé publique live (`pk_live_…`) — formulaire embarqué sur `/checkout`                           |
+| `STRIPE_WEBHOOK_SECRET`        | ⚠️ Secret du webhook Stripe live                                                                   |
+| `STRIPE_PRICE_PRO`             | Price ID Stripe live — Essentiel mensuel CAD (optionnel si `price_data`)                           |
+| `STRIPE_PRICE_PRO_YEARLY`      | Price ID Stripe live — Essentiel annuel CAD                                                        |
+| `STRIPE_PRICE_BUSINESS`        | Price ID Stripe live — Business mensuel CAD                                                        |
+| `STRIPE_PRICE_BUSINESS_YEARLY` | Price ID Stripe live — Business annuel CAD                                                         |
+| `STRIPE_AUTOMATIC_TAX`         | `true` (TPS/TVQ/TVH calculées par Stripe Tax Canada)                                               |
+| `TUNTRUST_*`                   | Optionnel — si signatures électroniques activées                                                   |
 
 ---
 
