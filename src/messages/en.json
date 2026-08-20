@@ -143,12 +143,12 @@
     "noCrmNote": "",
     "perMonth": "/mo",
     "perYear": "/yr",
-    "billedYearly": "Billed annually — 2 months free",
+    "billedYearly": "Billed annually — pay 10 months, get 2 free",
     "billingToggle": {
       "monthly": "Monthly",
       "yearly": "Annual",
       "yearlyBadge": "2 months free on paid plans",
-      "yearlyNote": "Annual plan: pay for 10 months and get 12 months of full access."
+      "yearlyNote": "Annual plan: pay for 10 months (not 12) and get 12 months of full access."
     },
     "trialBadge": "30-day free trial included",
     "popularBadge": "Most popular",

@@ -10,6 +10,7 @@ import {
   isFreePlan,
   PLAN_HIGHLIGHT_KEYS,
   PLAN_IDS,
+  yearlyPriceHt,
 } from '@/lib/pricing-plans';
 import type { PlanId } from '@/lib/pricing-plans';
 
@@ -73,7 +74,8 @@ export function PricingToggleCards({
           const highlighted = planId === HIGHLIGHTED_PLAN_ID;
           const free = isFreePlan(planId);
           const monthlyPrice = planPrices[planId];
-          const yearlyPrice = Math.round(monthlyPrice * 10 * 100) / 100;
+          const yearlyPrice = yearlyPriceHt(monthlyPrice);
+          const yearlyFullPrice = Math.round(monthlyPrice * 12 * 100) / 100;
           const displayedPrice = yearly ? yearlyPrice : monthlyPrice;
           const priceFormatted = formatCad(displayedPrice);
 
@@ -98,13 +100,20 @@ export function PricingToggleCards({
                   <span className="text-lg font-semibold text-slate-500">CAD</span>
                 </p>
               ) : (
-                <p className="mt-4 flex items-baseline gap-1">
-                  <span className="text-3xl font-bold">{priceFormatted}</span>
-                  <span className="text-lg font-semibold text-slate-500">CAD</span>
-                  <span className="text-base font-normal text-slate-500">
-                    {yearly ? labels.perYear : labels.perMonth}
-                  </span>
-                </p>
+                <div className="mt-4">
+                  {yearly ? (
+                    <p className="mb-1 text-sm font-medium text-slate-400 line-through">
+                      {formatCad(yearlyFullPrice)} CAD {labels.perYear}
+                    </p>
+                  ) : null}
+                  <p className="flex items-baseline gap-1">
+                    <span className="text-3xl font-bold">{priceFormatted}</span>
+                    <span className="text-lg font-semibold text-slate-500">CAD</span>
+                    <span className="text-base font-normal text-slate-500">
+                      {yearly ? labels.perYear : labels.perMonth}
+                    </span>
+                  </p>
+                </div>
               )}
               {free ? (
                 <p className="mt-2 text-xs font-medium text-emerald-700">{labels.forever}</p>

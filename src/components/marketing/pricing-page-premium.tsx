@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import type { PlanId } from '@/lib/pricing-plans';
-import { COMPARISON_BOOLEAN, COMPARISON_ROWS } from '@/lib/pricing-plans';
+import { COMPARISON_BOOLEAN, COMPARISON_ROWS, formatCad, yearlyPriceHt } from '@/lib/pricing-plans';
 
 /* ─── Types ─── */
 interface PlanLabels {
@@ -207,25 +207,35 @@ function PriceDisplay({
   amount,
   period,
   light = false,
+  compareAt,
 }: {
   amount: number;
   period: string;
   light?: boolean;
+  /** Prix barré (ex. mensuel × 12) pour mettre en avant le × 10 annuel. */
+  compareAt?: number;
 }) {
   const [dollars, cents] = amount.toFixed(2).split('.');
   const textColor = light ? 'text-white' : 'text-[#0F172A]';
   const subColor = light ? 'text-blue-200' : 'text-[#64748B]';
   return (
-    <div className="flex items-start gap-0.5">
-      <span className={`mt-3 text-2xl font-bold ${textColor}`}>$</span>
-      <span className={`text-6xl font-extrabold leading-none tracking-tight ${textColor}`}>
-        {dollars}
-      </span>
-      <div className="ml-0.5 flex flex-col justify-start pt-2">
-        <span className={`text-xl font-bold leading-none ${textColor}`}>{cents}</span>
-        <span className={`mt-1 whitespace-nowrap text-xs font-medium ${subColor}`}>
-          CAD{period}
+    <div>
+      {compareAt != null && compareAt > amount ? (
+        <p className={`mb-1 text-sm font-medium line-through ${subColor}`}>
+          {formatCad(compareAt)} CAD{period}
+        </p>
+      ) : null}
+      <div className="flex items-start gap-0.5">
+        <span className={`mt-3 text-2xl font-bold ${textColor}`}>$</span>
+        <span className={`text-6xl font-extrabold leading-none tracking-tight ${textColor}`}>
+          {dollars}
         </span>
+        <div className="ml-0.5 flex flex-col justify-start pt-2">
+          <span className={`text-xl font-bold leading-none ${textColor}`}>{cents}</span>
+          <span className={`mt-1 whitespace-nowrap text-xs font-medium ${subColor}`}>
+            CAD{period}
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -279,13 +289,20 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
     pro: planPrices.pro,
     business: planPrices.business,
   };
+  /** Annuel = mensuel × 10 (2 mois offerts), jamais × 12. */
   const annual = {
-    starter: Math.round(planPrices.starter * 10 * 100) / 100,
-    pro: Math.round(planPrices.pro * 10 * 100) / 100,
-    business: Math.round(planPrices.business * 10 * 100) / 100,
+    starter: yearlyPriceHt(planPrices.starter),
+    pro: yearlyPriceHt(planPrices.pro),
+    business: yearlyPriceHt(planPrices.business),
+  };
+  const annualCompareAt = {
+    starter: Math.round(planPrices.starter * 12 * 100) / 100,
+    pro: Math.round(planPrices.pro * 12 * 100) / 100,
+    business: Math.round(planPrices.business * 12 * 100) / 100,
   };
   const prices = yearly ? annual : monthly;
   const period = yearly ? labels.perYear : labels.perMonth;
+  const cycleQuery = yearly ? '&cycle=yearly' : '';
 
   return (
     <div style={{ background: '#F8FAFC' }}>
@@ -403,7 +420,12 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
               <p className="text-lg font-bold text-white">{labels.plans.pro.name}</p>
               <p className="mt-0.5 text-sm text-blue-200">{labels.plans.pro.audience}</p>
               <div className="mt-5">
-                <PriceDisplay amount={prices.pro} period={period} light />
+                <PriceDisplay
+                  amount={prices.pro}
+                  period={period}
+                  light
+                  compareAt={yearly ? annualCompareAt.pro : undefined}
+                />
               </div>
               <p className="mt-2 text-xs font-semibold text-emerald-300">{labels.trialBadge}</p>
               {yearly && <p className="text-xs text-blue-200">{labels.billedYearly}</p>}
@@ -414,7 +436,7 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
                 interacTooltip={labels.interacTooltip}
               />
               <div className="mt-6 space-y-2">
-                <Link href="/register?plan=pro" className="block">
+                <Link href={`/register?plan=pro${cycleQuery}`} className="block">
                   <button
                     type="button"
                     className="w-full rounded-lg py-3 text-sm font-bold text-white transition-all duration-300 hover:opacity-90"
@@ -424,7 +446,7 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
                   </button>
                 </Link>
                 <Link
-                  href="/register?plan=pro"
+                  href={`/register?plan=pro${cycleQuery}`}
                   className="block text-center text-xs font-medium text-emerald-300 hover:underline"
                 >
                   ou Essai gratuit 30 jours
@@ -442,14 +464,18 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
               <p className="text-lg font-bold text-[#0F172A]">{labels.plans.business.name}</p>
               <p className="mt-0.5 text-sm text-[#64748B]">{labels.plans.business.audience}</p>
               <div className="mt-5">
-                <PriceDisplay amount={prices.business} period={period} />
+                <PriceDisplay
+                  amount={prices.business}
+                  period={period}
+                  compareAt={yearly ? annualCompareAt.business : undefined}
+                />
               </div>
               <p className="mt-2 text-xs font-semibold text-[#10B981]">{labels.trialBadge}</p>
               {yearly && <p className="text-xs text-[#64748B]">{labels.billedYearly}</p>}
               <hr className="my-5 border-slate-100" />
               <HighlightList highlights={labels.plans.business.highlights} />
               <div className="mt-6 space-y-2">
-                <Link href="/register?plan=business" className="block">
+                <Link href={`/register?plan=business${cycleQuery}`} className="block">
                   <button
                     type="button"
                     className="w-full rounded-lg py-3 text-sm font-bold text-white transition-all duration-300 hover:opacity-90"
@@ -459,7 +485,7 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
                   </button>
                 </Link>
                 <Link
-                  href="/register?plan=business"
+                  href={`/register?plan=business${cycleQuery}`}
                   className="block text-center text-xs font-medium text-[#64748B] hover:underline"
                 >
                   ou Essai gratuit 30 jours

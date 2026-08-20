@@ -165,12 +165,12 @@
     "noCrmNote": "",
     "perMonth": "/mois",
     "perYear": "/an",
-    "billedYearly": "Facturé annuellement — 2 mois offerts",
+    "billedYearly": "Facturé annuellement — 10 mois payés, 2 mois offerts",
     "billingToggle": {
       "monthly": "Mensuel",
       "yearly": "Annuel",
       "yearlyBadge": "2 mois offerts sur les plans payants",
-      "yearlyNote": "Abonnement annuel : payez 10 mois et profitez de 12 mois d'accès complet."
+      "yearlyNote": "Abonnement annuel : payez 10 mois (pas 12) et profitez de 12 mois d'accès complet."
     },
     "trialBadge": "1 mois d'essai gratuit inclus",
     "popularBadge": "Le plus populaire",
