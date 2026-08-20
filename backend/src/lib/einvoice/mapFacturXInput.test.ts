@@ -36,6 +36,8 @@ function baseInvoice() {
     deliveryCountry: null,
     subtotalHt: new Prisma.Decimal(100),
     vatTotal: new Prisma.Decimal(20),
+    tpsAmount: new Prisma.Decimal(0),
+    tvqAmount: new Prisma.Decimal(0),
     totalTtc: new Prisma.Decimal(120),
     quoteId: null,
     recurringInvoiceId: null,
