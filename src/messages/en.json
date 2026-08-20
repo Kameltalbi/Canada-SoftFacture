@@ -115,13 +115,13 @@
     "footerLegal": "Legal",
     "footerContact": "Contact",
     "pricingTeaserTitle": "Invoice for free, with no limits",
-    "pricingTeaserNote": "Free plan forever: unlimited clients, quotes and invoices, no credit card. Essential and Business: {days}-day trial.",
+    "pricingTeaserNote": "Free plan forever: unlimited clients, quotes and invoices, no credit card. Pro: {days}-day trial.",
     "pricingTeaserCta": "View pricing",
     "faqTitle": "Frequently asked questions",
     "faq1Q": "Is my data secure?",
     "faq1A": "Yes. Your data is hosted in Canada, accessible only to your authorized team, and processed in compliance with PIPEDA and Quebec's Law 25.",
     "faq2Q": "Is the Free plan really unlimited?",
-    "faq2A": "Yes. Clients, quotes and invoices are unlimited, forever, with no credit card. Essential and Business add advanced tools (reminders, recurring invoices, stock, and more).",
+    "faq2A": "Yes. Clients, quotes and invoices are unlimited, forever, with no credit card. Pro adds recurring invoices, up to 5 users and inventory.",
     "faq3Q": "Can I create quotes?",
     "faq3A": "Yes. Create personalized quotes and convert them to invoices in one click.",
     "faq4Q": "Can I track payments?",
@@ -137,27 +137,27 @@
     "finalCtaButton": "Create a free account"
   },
   "pricing": {
-    "title": "One unlimited free plan, and two paid plans to go further",
-    "subtitle": "Unlimited invoices, quotes and clients — free forever. Essential and Business: 30-day trial, no commitment.",
+    "title": "Simple Canadian invoicing — free to start",
+    "subtitle": "Unlimited clients, quotes and invoices at $0. Upgrade to Pro for recurring invoices and up to 5 users.",
     "forever": "Free forever",
     "noCrmNote": "",
     "perMonth": "/mo",
     "perYear": "/yr",
-    "billedYearly": "Billed annually — pay 10 months, get 2 free",
+    "billedYearly": "Billed annually — $99 (2 months free)",
     "billingToggle": {
       "monthly": "Monthly",
       "yearly": "Annual",
-      "yearlyBadge": "2 months free on paid plans",
-      "yearlyNote": "Annual plan: pay for 10 months (not 12) and get 12 months of full access."
+      "yearlyBadge": "2 months free on Pro",
+      "yearlyNote": "Pro annual plan: $99 CAD (equivalent to 10 months)."
     },
     "trialBadge": "30-day free trial included",
     "popularBadge": "Most popular",
     "cta": "Get started for free",
     "ctaStarter": "Get started for free",
-    "ctaPro": "Choose Essential",
-    "ctaBusiness": "Choose Business",
-    "interacTooltip": "Interac e-Transfer is the preferred payment method for Canadian SMEs — fast and fee-free.",
-    "footnote": "Prices excl. tax (CAD). GST 5% and QST 9.975% (Quebec) apply. No commitment.",
+    "ctaPro": "Choose Pro",
+    "ctaBusiness": "Choose Pro",
+    "interacTooltip": "Payment tracking in SoftFacture (paid / unpaid / partial).",
+    "footnote": "Prices before tax (CAD). GST 5% and QST 9.975% (Quebec) may apply. No commitment.",
     "currentPlan": "Current plan",
     "currentPlanCta": "Active plan",
     "choosePlan": "Choose this plan",
@@ -166,7 +166,7 @@
       "noCommitment": "No commitment",
       "frenchSupport": "French-speaking support",
       "securePayment": "Secure payment",
-      "canadaHosting": "Data hosted in Canada"
+      "canadaHosting": "Built for Canada"
     },
     "compare": {
       "title": "Compare features in detail",
@@ -198,81 +198,65 @@
           "users": "1",
           "quotes": "Unlimited",
           "invoices": "Unlimited",
-          "reminders": "Manual",
           "payments": "Manual tracking (paid / unpaid)",
-          "accountingExport": "Basic",
           "stock": "Item catalog",
           "pdfTemplates": "Logo and PDF export",
           "dashboard": "Dashboard",
-          "multiCompany": "1 company",
           "support": "Email"
         },
         "pro": {
           "users": "5",
           "quotes": "Unlimited",
           "invoices": "Unlimited",
-          "reminders": "Assisted reminders",
-          "payments": "Stripe + Interac e-Transfer",
-          "accountingExport": "Advanced, all formats",
-          "stock": "Item catalog",
+          "payments": "Payment tracking",
+          "stock": "Inventory (in / out)",
           "pdfTemplates": "Advanced customization",
-          "dashboard": "Revenue, overdue, forecast",
-          "multiCompany": "1 company",
-          "support": "Priority email 24h"
-        },
-        "business": {
-          "users": "10",
-          "quotes": "Unlimited",
-          "invoices": "Unlimited",
-          "reminders": "Personalized by client and due date",
-          "payments": "Stripe + Interac + bank reconciliation",
-          "accountingExport": "Advanced + API",
-          "stock": "In/out, alerts, inventory, multi-warehouse",
-          "pdfTemplates": "Advanced customization",
-          "dashboard": "Client and project profitability",
-          "multiCompany": "2 companies",
-          "support": "Phone + chat 4h response"
+          "dashboard": "Dashboard",
+          "support": "Priority email"
         }
       }
     },
     "plans": {
       "starter": {
         "name": "Free",
-        "audience": "Invoice for free, with no limits.",
+        "audience": "Invoice without limits, forever.",
         "highlights": {
           "clients": "Unlimited clients",
-          "invoices": "Unlimited quotes and invoices",
+          "quotes": "Unlimited quotes",
+          "invoices": "Unlimited invoices",
+          "products": "Products / services catalog",
+          "pdf": "PDF export and email",
+          "taxes": "GST / QST / HST",
+          "deposits": "Deposits",
+          "creditNotes": "Credit notes",
+          "payments": "Payment tracking",
           "dashboard": "Dashboard",
-          "payments": "Payment tracking (paid / unpaid)",
-          "reminders": "Manual reminders",
-          "pdf": "PDF export and email sending",
-          "users": "1 user · 1 company"
+          "export": "Data export",
+          "users": "1 user"
         }
       },
       "pro": {
-        "name": "Essential",
-        "audience": "Get paid faster: payments, reminders and recurring invoices.",
+        "name": "Pro",
+        "audience": "Automate and collaborate with your team.",
         "highlights": {
           "everything": "Everything in Free, plus:",
           "recurring": "Recurring invoices",
-          "deposits": "Deposit invoices",
-          "creditNotes": "Credit notes",
-          "payments": "Partial payments + Interac e-Transfer",
-          "reminders": "Automatic reminders",
-          "accountant": "Accountant access",
-          "users": "5 users · 1 company"
+          "users": "Up to 5 users",
+          "pdfAdvanced": "Custom PDFs",
+          "stock": "Stock inventory",
+          "support": "Priority support"
         }
       },
       "business": {
-        "name": "Business",
-        "audience": "Run stock, expenses and multiple companies.",
+        "name": "Pro",
+        "audience": "Merged into Pro.",
         "highlights": {
-          "everything": "Everything in Essential, plus:",
-          "stock": "Stock management",
-          "stockAdvanced": "Multi-warehouse",
-          "expenses": "Expense reports",
-          "users": "10 users per company",
-          "multiCompany": "2 companies",
+          "everything": "Everything in Free, plus:",
+          "stock": "Stock inventory",
+          "stockAdvanced": "Stock inventory",
+          "expenses": "Priority support",
+          "users": "Up to 5 users",
+          "multiCompany": "1 company",
           "support": "Priority support"
         }
       }
@@ -281,7 +265,7 @@
       "title": "Frequently asked questions",
       "free": {
         "q": "Is the Free plan really unlimited?",
-        "a": "Yes. Clients, quotes and invoices are unlimited, forever, with no credit card. Essential and Business add advanced tools (reminders, recurring invoices, stock, and more)."
+        "a": "Yes. Clients, quotes and invoices are unlimited, forever, with no credit card. Deposits and credit notes stay included. Recurring invoices and extra seats are on Pro."
       },
       "cancel": {
         "q": "Can I cancel at any time?",
@@ -292,25 +276,25 @@
         "a": "No. The displayed price is the only amount charged, plus applicable taxes (GST 5% + QST 9.975% in Quebec). No setup fees or mandatory add-ons."
       },
       "hosting": {
-        "q": "Is my data hosted in Canada?",
-        "a": "Yes. All your infrastructure — databases, backups and servers — is physically hosted in Quebec, Canada, in compliance with Law 25 requirements."
+        "q": "Is SoftFacture built for Canada?",
+        "a": "Yes. SoftFacture Canada is designed for Canadian SMB invoicing (CAD, GST/QST/HST) with a French and English interface."
       },
       "taxes": {
         "q": "Are GST / HST / PST taxes handled?",
         "a": "Yes. Softfacture automatically calculates and applies federal GST (5%), Quebec QST (9.975%), HST and other provincial taxes based on your business and client profiles."
       },
       "import": {
-        "q": "Can I import my existing clients?",
-        "a": "Yes. You can import your client list via a CSV file from your dashboard, or use our API (Business plan) for automated integration."
+        "q": "Can I import existing clients?",
+        "a": "Yes. You can import your client list via CSV from your dashboard."
       },
       "upgrade": {
-        "q": "Can I switch plans at any time?",
-        "a": "Yes. You can upgrade or downgrade at any time. The price difference is calculated pro-rata for the remaining period."
+        "q": "Can I upgrade to Pro anytime?",
+        "a": "Yes. Move from Free to Pro whenever you want. The 30-day trial applies to your first Pro subscription."
       }
     },
     "finalCta": {
-      "title": "Discover simpler business management",
-      "subtitle": "Structure your quotes, invoices and payments — whatever your line of work.",
+      "title": "Start free today",
+      "subtitle": "Create unlimited quotes and invoices — upgrade to Pro only when you need it.",
       "cta": "Create a free account"
     }
   },
@@ -357,7 +341,7 @@
     "prefilledFromRegister": "From your signup.",
     "contactFromRegister": "Administrator contact (signup)",
     "step3Title": "Choose your plan",
-    "step3Subtitle": "Free forever, or a {days}-day trial on Essential and Business — no commitment.",
+    "step3Subtitle": "Free forever, or a {days}-day trial on Pro — no commitment.",
     "country": "Country",
     "companyName": "Company / trading name",
     "companyNamePlaceholder": "Example Ltd or John Doe sole trader",
@@ -815,7 +799,7 @@
   "stock": {
     "title": "Inventory",
     "subtitle": "Overview of stockable products and availability.",
-    "rulesHint": "Stock decreases when invoices are validated; increases when credit notes are validated. Manual adjustments use initial stock or inventory (Business plan).",
+    "rulesHint": "Stock decreases when invoices are validated; increases when credit notes are validated. Manual adjustments use initial stock or inventory (Pro plan).",
     "alerts": "{count} product(s) below alert threshold",
     "product": "Product",
     "category": "Category",
@@ -847,8 +831,8 @@
     "clearFilter": "All history",
     "openDocument": "View document",
     "runInventory": "Run inventory",
-    "inventoryBusiness": "Inventory (Business)",
-    "inventoryUpgrade": "Physical inventory is included in the Business plan.",
+    "inventoryBusiness": "Inventory (Pro)",
+    "inventoryUpgrade": "Physical inventory is included in the Pro plan.",
     "inventoryTitle": "Physical inventory",
     "inventoryDesc": "Enter counted quantities. Differences will be recorded as adjustments.",
     "inventorySubmit": "Submit inventory",
@@ -990,7 +974,11 @@
     "methodVirement": "Bank transfer",
     "comingSoonBody": "This section will be available in a future update.",
     "vatOnDebitsEnabled": "Tax on debits",
-    "vatOnDebitsEnabledHint": "If enabled, you can tick this option on eligible invoices based on your tax regime."
+    "vatOnDebitsEnabledHint": "If enabled, you can tick this option on eligible invoices based on your tax regime.",
+    "moduleBillingDesc": "Manage your Free or Pro plan.",
+    "pdfPlan_pro": "Pro plan",
+    "pdfPlan_business": "Pro plan (legacy)",
+    "pdfColorsLocked": "Color customization is available from the Pro plan."
   },
   "profile": {
     "title": "Profile",
@@ -1007,8 +995,8 @@
     "stripeNotConfigured": "Online payment is unavailable right now. Try again later or contact support.",
     "plan": "Plan",
     "plan_starter": "Free",
-    "plan_pro": "Essential",
-    "plan_business": "Business",
+    "plan_pro": "Pro",
+    "plan_business": "Pro",
     "cycle": "Billing",
     "cycleMonthly": "Monthly",
     "cycleYearly": "Yearly",
@@ -1066,7 +1054,7 @@
   },
   "admin": {
     "title": "Administration",
-    "subtitle": "Platform overview (administrators).",
+    "subtitle": "Choose the Free or Pro plan that fits your volume.",
     "users": "Users",
     "stats": "Statistics"
   },
@@ -1137,7 +1125,10 @@
     "toastNoClientEmail": "No email on file for this client.",
     "paginationRows": "Rows {start} to {end} of {total}",
     "paginationPrev": "Previous",
-    "paginationNext": "Next"
+    "paginationNext": "Next",
+    "upgradeTitle": "Recurring invoices — Pro plan",
+    "upgradeBody": "Automate monthly or periodic invoices with Pro ($9.99/mo or $99/yr).",
+    "upgradeCta": "Upgrade to Pro"
   },
   "status": {
     "DRAFT": "Draft",

@@ -4,7 +4,9 @@ import { isStripeEnabled } from './stripeClient.js';
 
 export type BillingPlanSlug = 'starter' | 'pro' | 'business';
 
+/** Slugs exposés publiquement (Business fusionné dans Pro). */
 export const BILLING_PLAN_SLUGS: BillingPlanSlug[] = ['starter', 'pro', 'business'];
+export const PUBLIC_BILLING_PLAN_SLUGS: Array<'starter' | 'pro'> = ['starter', 'pro'];
 
 const SLUG_TO_PLAN: Record<BillingPlanSlug, SubscriptionPlan> = {
   starter: 'STARTER',
@@ -19,13 +21,19 @@ const PLAN_TO_SLUG: Record<SubscriptionPlan, BillingPlanSlug> = {
 };
 
 /**
- * Prix avant TPS mensuels — identiques à `src/lib/pricing-plans.ts` PLAN_PRICES_HT_CAD (page /tarifs).
- * STARTER = plan Gratuit illimité (0 $).
+ * Prix avant TPS mensuels — sync `src/lib/pricing-plans.ts`.
+ * BUSINESS = même tarif que PRO (fusion commerciale).
  */
 export const PLAN_PRICE_HT_CAD: Record<SubscriptionPlan, number> = {
   STARTER: 0,
-  PRO: 34.9,
-  BUSINESS: 59.9,
+  PRO: 9.99,
+  BUSINESS: 9.99,
+};
+
+export const PLAN_YEARLY_PRICE_HT_CAD: Record<SubscriptionPlan, number> = {
+  STARTER: 0,
+  PRO: 99,
+  BUSINESS: 99,
 };
 
 /** @deprecated Utiliser PLAN_PRICE_HT_CAD */
@@ -36,20 +44,28 @@ export const PLAN_PRICE_TTC_EUR = PLAN_PRICE_HT_CAD;
 /** Libellés produit Stripe (marché canadien). */
 export const PLAN_STRIPE_LABELS: Record<SubscriptionPlan, string> = {
   STARTER: `${APP_BRAND} Gratuit`,
-  PRO: `${APP_BRAND} Essentiel`,
-  BUSINESS: `${APP_BRAND} Business`,
+  PRO: `${APP_BRAND} Pro`,
+  BUSINESS: `${APP_BRAND} Pro`,
 };
 
 export function isPaidSubscriptionPlan(plan: SubscriptionPlan): boolean {
   return PLAN_PRICE_HT_CAD[plan] > 0;
 }
 
+/** Plans payants (Pro + legacy Business). */
+export function isProOrHigher(plan: SubscriptionPlan): boolean {
+  return plan === 'PRO' || plan === 'BUSINESS';
+}
+
 export type BillingInterval = 'month' | 'year';
 
-/** Annuel : 10 mois facturés, 2 mois offerts — identique à l'affichage /tarifs. */
+/** Annuel ≈ 10 mois facturés (Pro = 99 $ fixe). */
 export const YEARLY_MONTHS_CHARGED = 10;
 
-export function yearlyPriceHtCad(monthlyHt: number): number {
+export function yearlyPriceHtCad(monthlyHt: number, plan?: SubscriptionPlan): number {
+  if (plan) return PLAN_YEARLY_PRICE_HT_CAD[plan];
+  if (monthlyHt <= 0) return 0;
+  if (Math.abs(monthlyHt - 9.99) < 0.001) return 99;
   return Math.round(monthlyHt * YEARLY_MONTHS_CHARGED * 100) / 100;
 }
 
@@ -61,6 +77,13 @@ export function slugToSubscriptionPlan(slug: string): SubscriptionPlan | null {
   if (slug === 'starter' || slug === 'pro' || slug === 'business') {
     return SLUG_TO_PLAN[slug];
   }
+  return null;
+}
+
+/** Nouveau checkout : business → PRO. */
+export function slugToCheckoutPlan(slug: string): SubscriptionPlan | null {
+  if (slug === 'pro' || slug === 'business') return 'PRO';
+  if (slug === 'starter') return 'STARTER';
   return null;
 }
 
@@ -90,14 +113,8 @@ export function stripePriceIdForPlan(
   interval: BillingInterval = 'month'
 ): string | undefined {
   if (plan === 'STARTER') return undefined;
-  const key =
-    plan === 'PRO'
-      ? interval === 'year'
-        ? 'STRIPE_PRICE_PRO_YEARLY'
-        : 'STRIPE_PRICE_PRO'
-      : interval === 'year'
-        ? 'STRIPE_PRICE_BUSINESS_YEARLY'
-        : 'STRIPE_PRICE_BUSINESS';
+  // Business legacy utilise les Price IDs Pro.
+  const key = interval === 'year' ? 'STRIPE_PRICE_PRO_YEARLY' : 'STRIPE_PRICE_PRO';
   const id = process.env[key]?.trim();
   return id || undefined;
 }
@@ -106,8 +123,9 @@ export function planFromStripePriceId(priceId: string): SubscriptionPlan | null 
   const map: Array<[string | undefined, SubscriptionPlan]> = [
     [process.env.STRIPE_PRICE_PRO?.trim(), 'PRO'],
     [process.env.STRIPE_PRICE_PRO_YEARLY?.trim(), 'PRO'],
-    [process.env.STRIPE_PRICE_BUSINESS?.trim(), 'BUSINESS'],
-    [process.env.STRIPE_PRICE_BUSINESS_YEARLY?.trim(), 'BUSINESS'],
+    // Anciens Price IDs Business → traités comme Pro
+    [process.env.STRIPE_PRICE_BUSINESS?.trim(), 'PRO'],
+    [process.env.STRIPE_PRICE_BUSINESS_YEARLY?.trim(), 'PRO'],
   ];
   for (const [id, plan] of map) {
     if (id && id === priceId) return plan;
@@ -126,7 +144,7 @@ export function stripeLineItemAmountCents(
   interval: BillingInterval = 'month'
 ): number {
   const monthly = PLAN_PRICE_HT_CAD[plan];
-  const ht = interval === 'year' ? yearlyPriceHtCad(monthly) : monthly;
+  const ht = interval === 'year' ? yearlyPriceHtCad(monthly, plan) : monthly;
   return priceHtToCents(ht);
 }
 

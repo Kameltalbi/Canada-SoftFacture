@@ -14,7 +14,7 @@ import {
   FREE_PLAN_ID,
   HIGHLIGHTED_PLAN_ID,
   isFreePlan,
-  PLAN_IDS,
+  PUBLIC_PLAN_IDS,
   TRIAL_DAYS,
   type PlanId,
 } from '@/lib/pricing-plans';
@@ -278,7 +278,7 @@ export function OnboardingWizard() {
               {t('step3Subtitle', { days: TRIAL_DAYS })}
             </p>
             <div className="mt-6 space-y-3">
-              {PLAN_IDS.map((planId) => {
+              {PUBLIC_PLAN_IDS.map((planId) => {
                 const selected = plan === planId;
                 const highlighted = planId === HIGHLIGHTED_PLAN_ID;
                 return (

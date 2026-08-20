@@ -68,7 +68,7 @@ export function CheckoutForm({ initialPlan, initialCycle = 'monthly', initialBil
 
   const { billing, planPrices, trialDays } = usePublicBillingPlans(initialBilling);
   const monthlyHt = planPrices[plan];
-  const priceHt = cycle === 'yearly' ? yearlyPriceHt(monthlyHt) : monthlyHt;
+  const priceHt = cycle === 'yearly' ? yearlyPriceHt(monthlyHt, plan) : monthlyHt;
   const quote = planQuoteFromBilling(billing, plan);
   const vatRate = quote.vatRatePercent;
   const priceTtc = Math.round(priceHt * (1 + vatRate / 100) * 100) / 100;

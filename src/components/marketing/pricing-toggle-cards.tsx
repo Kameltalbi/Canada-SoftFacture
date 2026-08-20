@@ -9,7 +9,7 @@ import {
   HIGHLIGHTED_PLAN_ID,
   isFreePlan,
   PLAN_HIGHLIGHT_KEYS,
-  PLAN_IDS,
+  PUBLIC_PLAN_IDS,
   yearlyPriceHt,
 } from '@/lib/pricing-plans';
 import type { PlanId } from '@/lib/pricing-plans';
@@ -35,7 +35,10 @@ export function PricingToggleCards({
     cta: string;
     ctaByPlan?: Partial<Record<PlanId, string>>;
     interacTooltip: string;
-    plans: Record<PlanId, { name: string; audience: string; highlights: Record<string, string> }>;
+    plans: Record<
+      'starter' | 'pro',
+      { name: string; audience: string; highlights: Record<string, string> }
+    >;
   };
 }) {
   const [cycle, setCycle] = useState<BillingCycle>('monthly');
@@ -69,12 +72,12 @@ export function PricingToggleCards({
         <p className="text-sm font-medium text-emerald-700">{labels.yearlyBadge}</p>
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-3">
-        {PLAN_IDS.map((planId) => {
+      <div className="mt-8 grid gap-6 md:grid-cols-2">
+        {PUBLIC_PLAN_IDS.map((planId) => {
           const highlighted = planId === HIGHLIGHTED_PLAN_ID;
           const free = isFreePlan(planId);
           const monthlyPrice = planPrices[planId];
-          const yearlyPrice = yearlyPriceHt(monthlyPrice);
+          const yearlyPrice = yearlyPriceHt(monthlyPrice, planId);
           const yearlyFullPrice = Math.round(monthlyPrice * 12 * 100) / 100;
           const displayedPrice = yearly ? yearlyPrice : monthlyPrice;
           const priceFormatted = formatCad(displayedPrice);

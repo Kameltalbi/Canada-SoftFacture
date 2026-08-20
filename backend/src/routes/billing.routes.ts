@@ -3,13 +3,14 @@ import { z } from 'zod';
 import { prisma } from '../lib/db.js';
 import { requireRoles } from '../middleware/auth.js';
 import {
-  BILLING_PLAN_SLUGS,
+  PUBLIC_BILLING_PLAN_SLUGS,
   TRIAL_DAYS,
   getBillingProvider,
   getFrontendBaseUrl,
   isStripeCheckoutReady,
   priceHtToTtcCad,
   priceTtcToCents,
+  slugToCheckoutPlan,
   slugToSubscriptionPlan,
   subscriptionPlanToSlug,
   PLAN_PRICE_HT_CAD,
@@ -22,6 +23,7 @@ import { retrieveCheckoutSessionForOrg } from '../lib/billing/stripeWebhook.js';
 export const billingPublicRouter = Router();
 
 const checkoutBodySchema = z.object({
+  /** business accepté pour rétrocompat (redirigé vers Pro). */
   plan: z.enum(['pro', 'business']),
   cycle: z.enum(['monthly', 'yearly']).optional().default('monthly'),
   locale: z.enum(['fr', 'en']).optional(),
@@ -34,7 +36,7 @@ const checkoutBodySchema = z.object({
 
 /** Plans publics (tarifs Canada, avant TPS). */
 billingPublicRouter.get('/plans', (_req, res) => {
-  const plans = BILLING_PLAN_SLUGS.map((slug) => {
+  const plans = PUBLIC_BILLING_PLAN_SLUGS.map((slug) => {
     const apiPlan = slugToSubscriptionPlan(slug)!;
     const priceHt = PLAN_PRICE_HT_CAD[apiPlan];
     const priceTtc = priceHtToTtcCad(priceHt);
@@ -113,10 +115,9 @@ billingProtectedRouter.post('/checkout', requireRoles('ADMIN'), async (req, res)
   }
 
   const orgId = req.user!.organizationId!;
-  const plan = slugToSubscriptionPlan(parsed.data.plan);
-  if (!plan) return res.status(400).json({ error: 'Offre invalide' });
-  if (PLAN_PRICE_HT_CAD[plan] <= 0) {
-    return res.status(400).json({ error: 'Le plan Gratuit ne nécessite pas de paiement' });
+  const plan = slugToCheckoutPlan(parsed.data.plan);
+  if (!plan || PLAN_PRICE_HT_CAD[plan] <= 0) {
+    return res.status(400).json({ error: 'Offre invalide' });
   }
 
   const billingInterval = parsed.data.cycle === 'yearly' ? 'year' : 'month';
@@ -140,11 +141,11 @@ billingProtectedRouter.post('/checkout', requireRoles('ADMIN'), async (req, res)
   if (!org) return res.status(404).json({ error: 'Organisation introuvable' });
 
   const monthlyHt = PLAN_PRICE_HT_CAD[plan];
-  const priceHt = billingInterval === 'year' ? yearlyPriceHtCad(monthlyHt) : monthlyHt;
+  const priceHt = billingInterval === 'year' ? yearlyPriceHtCad(monthlyHt, plan) : monthlyHt;
   const amountTtcCents = priceTtcToCents(priceHtToTtcCad(priceHt));
   const baseUrl = getFrontendBaseUrl();
   const successUrl = `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
-  const cancelUrl = `${baseUrl}/checkout/cancel?plan=${parsed.data.plan}&cycle=${parsed.data.cycle}`;
+  const cancelUrl = `${baseUrl}/checkout/cancel?plan=pro&cycle=${parsed.data.cycle}`;
 
   const provider = getBillingProvider();
   const checkoutSession = await prisma.billingCheckoutSession.create({

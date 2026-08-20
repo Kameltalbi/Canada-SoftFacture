@@ -1,7 +1,8 @@
-import { Router } from 'express';
+import { Router, type Request, type Response } from 'express';
 import { z } from 'zod';
 import { Prisma } from '../generated/prisma/index.js';
 import { prisma } from '../lib/db.js';
+import { getOrganizationPlan, planHasRecurringInvoices } from '../lib/planFeatures.js';
 import { initialNextRunDate } from '../lib/recurringSchedule.js';
 import {
   generateRecurringInvoiceInTransaction,
@@ -10,7 +11,19 @@ import {
 import { documentLanguageSchema, toPrismaDocumentLanguage } from '../lib/documentLanguage.js';
 
 const router = Router();
-const orgId = (req: Express.Request) => req.user!.organizationId!;
+const orgId = (req: Request) => req.user!.organizationId!;
+
+async function requireRecurringPlan(req: Request, res: Response): Promise<boolean> {
+  const plan = await getOrganizationPlan(orgId(req));
+  if (planHasRecurringInvoices(plan)) return true;
+  res.status(403).json({
+    error: 'Les factures récurrentes sont réservées au plan Pro.',
+    code: 'PLAN_UPGRADE_REQUIRED',
+    feature: 'recurring',
+    requiredPlan: 'PRO',
+  });
+  return false;
+}
 
 const lineSchema = z.object({
   description: z.string().min(1),
@@ -59,11 +72,13 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/run-due', async (req, res) => {
+  if (!(await requireRecurringPlan(req, res))) return;
   const results = await prisma.$transaction((tx) => runDueRecurringInvoices(tx, orgId(req)));
   return res.json({ generated: results.filter((r) => r.invoiceId).length, results });
 });
 
 router.post('/', async (req, res) => {
+  if (!(await requireRecurringPlan(req, res))) return;
   const parsed = createSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: 'Données invalides', details: parsed.error.flatten() });
@@ -143,6 +158,7 @@ router.get('/:id', async (req, res) => {
 });
 
 router.patch('/:id', async (req, res) => {
+  if (!(await requireRecurringPlan(req, res))) return;
   const parsed = updateSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: 'Données invalides' });
   const id = req.params.id;
@@ -210,6 +226,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 router.post('/:id/generate', async (req, res) => {
+  if (!(await requireRecurringPlan(req, res))) return;
   const id = req.params.id;
   try {
     const result = await prisma.$transaction((tx) =>

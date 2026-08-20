@@ -62,7 +62,7 @@ function RegisterContent() {
       const plan = searchParams.get('plan');
 
       if (isPlanId(plan) && isPaidPlan(plan)) {
-        router.replace(`/checkout?plan=${plan}`);
+        router.replace(`/checkout?plan=pro`);
       } else {
         router.replace('/dashboard');
       }

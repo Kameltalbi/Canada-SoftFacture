@@ -25,6 +25,7 @@ import { generateInviteToken, inviteExpiresAt } from '../lib/inviteToken.js';
 import {
   getFrontendBaseUrl,
   PLAN_PRICE_HT_CAD,
+  slugToCheckoutPlan,
   slugToSubscriptionPlan,
   TRIAL_DAYS,
 } from '../lib/billing/plans.js';
@@ -145,7 +146,7 @@ router.post('/onboarding/complete', requireRoles('ADMIN'), async (req, res) => {
     return res.status(400).json({ error: 'N° de TVA intracommunautaire invalide' });
   }
 
-  const plan = slugToSubscriptionPlan(parsed.data.plan);
+  const plan = slugToCheckoutPlan(parsed.data.plan) ?? slugToSubscriptionPlan(parsed.data.plan);
   if (!plan) return res.status(400).json({ error: 'Offre invalide' });
 
   const paid = PLAN_PRICE_HT_CAD[plan] > 0;

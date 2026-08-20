@@ -23,7 +23,7 @@ export function buildSubscriptionLineItem(
   }
 
   const monthlyHt = PLAN_PRICE_HT_CAD[plan];
-  const ht = interval === 'year' ? yearlyPriceHtCad(monthlyHt) : monthlyHt;
+  const ht = interval === 'year' ? yearlyPriceHtCad(monthlyHt, plan) : monthlyHt;
   const unitAmount = stripeLineItemAmountCents(plan, interval);
   const periodLabel = interval === 'year' ? 'an' : 'mois';
 

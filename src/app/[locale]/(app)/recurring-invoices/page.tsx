@@ -158,7 +158,10 @@ export default function RecurringInvoicesPage() {
   const tc = useTranslations('common');
   const toast = useToast();
   const router = useRouter();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const canRecurring =
+    user?.organization?.subscriptionPlan === 'PRO' ||
+    user?.organization?.subscriptionPlan === 'BUSINESS';
   const [list, setList] = useState<RecurringRow[] | null>(null);
   const [pending, setPending] = useState(false);
   const [activeTab, setActiveTab] = useState<StatusTab>('all');
@@ -350,20 +353,40 @@ export default function RecurringInvoicesPage() {
 
   return (
     <div className="space-y-0">
+      {!canRecurring ? (
+        <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-4">
+          <p className="text-sm font-semibold text-amber-900">{t('upgradeTitle')}</p>
+          <p className="mt-1 text-sm text-amber-800">{t('upgradeBody')}</p>
+          <Link href="/checkout?plan=pro" className="mt-3 inline-block">
+            <Button type="button" className="bg-[#1e3a8a] text-white hover:bg-[#1e40af]">
+              {t('upgradeCta')}
+            </Button>
+          </Link>
+        </div>
+      ) : null}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-s-navy">{t('title')}</h1>
         <div className="flex flex-wrap items-center gap-2">
-          <Link href="/recurring-invoices/new">
-            <Button type="button" className="bg-[#1e3a8a] text-white hover:bg-[#1e40af]">
-              <Plus className="h-4 w-4" />
-              {t('new')}
-            </Button>
-          </Link>
+          {canRecurring ? (
+            <Link href="/recurring-invoices/new">
+              <Button type="button" className="bg-[#1e3a8a] text-white hover:bg-[#1e40af]">
+                <Plus className="h-4 w-4" />
+                {t('new')}
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/checkout?plan=pro">
+              <Button type="button" className="bg-[#1e3a8a] text-white hover:bg-[#1e40af]">
+                <Plus className="h-4 w-4" />
+                {t('upgradeCta')}
+              </Button>
+            </Link>
+          )}
           <Button
             type="button"
             variant="ghost"
             className="border border-s-border bg-white"
-            disabled={pending}
+            disabled={pending || !canRecurring}
             onClick={() => void runDue()}
           >
             <RefreshCw className={cn('h-4 w-4', pending && 'animate-spin')} />

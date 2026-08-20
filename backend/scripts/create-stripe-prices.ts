@@ -1,5 +1,5 @@
 /**
- * Crée les produits et prix Stripe CAD (Essentiel + Business, mensuel et annuel).
+ * Crée le produit et les prix Stripe CAD pour SoftFacture Pro (mensuel + annuel).
  *
  * Usage (depuis backend/) :
  *   npx tsx scripts/create-stripe-prices.ts
@@ -12,11 +12,12 @@ import Stripe from 'stripe';
 
 config({ path: resolve(process.cwd(), '.env') });
 
-const YEARLY_MONTHS_CHARGED = 10;
-const PLANS = [
-  { key: 'PRO', name: 'SoftFacture Canada Essentiel', monthly: 34.9 },
-  { key: 'BUSINESS', name: 'SoftFacture Canada Business', monthly: 59.9 },
-] as const;
+const PLAN = {
+  key: 'PRO',
+  name: 'SoftFacture Canada Pro',
+  monthly: 9.99,
+  yearly: 99,
+} as const;
 
 function toCents(amount: number): number {
   return Math.round(amount * 100);
@@ -30,48 +31,41 @@ async function main() {
   }
 
   const stripe = new Stripe(secret);
-  const envLines: string[] = [];
 
-  for (const plan of PLANS) {
-    const products = await stripe.products.list({ limit: 100, active: true });
-    const product =
-      products.data.find((p) => p.metadata.softfacture_plan === plan.key) ??
-      (await stripe.products.create({
-        name: plan.name,
-        metadata: { softfacture_plan: plan.key, currency: 'cad' },
-      }));
+  const products = await stripe.products.list({ limit: 100, active: true });
+  const product =
+    products.data.find((p) => p.metadata.softfacture_plan === PLAN.key) ??
+    (await stripe.products.create({
+      name: PLAN.name,
+      metadata: { softfacture_plan: PLAN.key, currency: 'cad' },
+    }));
 
-    const yearly = Math.round(plan.monthly * YEARLY_MONTHS_CHARGED * 100) / 100;
+  const monthlyPrice = await stripe.prices.create({
+    product: product.id,
+    currency: 'cad',
+    unit_amount: toCents(PLAN.monthly),
+    recurring: { interval: 'month' },
+    tax_behavior: 'exclusive',
+    nickname: `${PLAN.key} monthly CAD`,
+    metadata: { softfacture_plan: PLAN.key, interval: 'month' },
+  });
 
-    const monthlyPrice = await stripe.prices.create({
-      product: product.id,
-      currency: 'cad',
-      unit_amount: toCents(plan.monthly),
-      recurring: { interval: 'month' },
-      tax_behavior: 'exclusive',
-      nickname: `${plan.key} monthly CAD`,
-      metadata: { softfacture_plan: plan.key, interval: 'month' },
-    });
+  const yearlyPrice = await stripe.prices.create({
+    product: product.id,
+    currency: 'cad',
+    unit_amount: toCents(PLAN.yearly),
+    recurring: { interval: 'year' },
+    tax_behavior: 'exclusive',
+    nickname: `${PLAN.key} yearly CAD`,
+    metadata: { softfacture_plan: PLAN.key, interval: 'year' },
+  });
 
-    const yearlyPrice = await stripe.prices.create({
-      product: product.id,
-      currency: 'cad',
-      unit_amount: toCents(yearly),
-      recurring: { interval: 'year' },
-      tax_behavior: 'exclusive',
-      nickname: `${plan.key} yearly CAD`,
-      metadata: { softfacture_plan: plan.key, interval: 'year' },
-    });
-
-    envLines.push(`STRIPE_PRICE_${plan.key}=${monthlyPrice.id}`);
-    envLines.push(`STRIPE_PRICE_${plan.key}_YEARLY=${yearlyPrice.id}`);
-    console.log(`${plan.name}: product ${product.id}`);
-    console.log(`  monthly $${plan.monthly} → ${monthlyPrice.id}`);
-    console.log(`  yearly  $${yearly} → ${yearlyPrice.id}`);
-  }
-
+  console.log(`${PLAN.name}: product ${product.id}`);
+  console.log(`  monthly $${PLAN.monthly} → ${monthlyPrice.id}`);
+  console.log(`  yearly  $${PLAN.yearly} → ${yearlyPrice.id}`);
   console.log('\nAjouter dans backend/.env :\n');
-  console.log(envLines.join('\n'));
+  console.log(`STRIPE_PRICE_PRO=${monthlyPrice.id}`);
+  console.log(`STRIPE_PRICE_PRO_YEARLY=${yearlyPrice.id}`);
 }
 
 main().catch((err) => {

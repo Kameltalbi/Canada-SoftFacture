@@ -46,7 +46,6 @@ interface Labels {
   popularBadge: string;
   ctaStarter: string;
   ctaPro: string;
-  ctaBusiness: string;
   interacTooltip: string;
   footnote: string;
   trust: {
@@ -65,7 +64,7 @@ interface Labels {
     rows: Record<string, string>;
     cells: Record<string, Record<string, string>>;
   };
-  plans: Record<PlanId, PlanLabels>;
+  plans: Record<'starter' | 'pro', PlanLabels>;
   faqTitle: string;
   faq: { [key: string]: { q: string; a: string } };
   finalCta: { title: string; subtitle: string; cta: string };
@@ -287,22 +286,20 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
   const monthly = {
     starter: planPrices.starter,
     pro: planPrices.pro,
-    business: planPrices.business,
   };
-  /** Annuel = mensuel × 10 (2 mois offerts), jamais × 12. */
+  /** Annuel Pro = 99 $ (≈ 10 mois), jamais × 12. */
   const annual = {
-    starter: yearlyPriceHt(planPrices.starter),
-    pro: yearlyPriceHt(planPrices.pro),
-    business: yearlyPriceHt(planPrices.business),
+    starter: yearlyPriceHt(planPrices.starter, 'starter'),
+    pro: yearlyPriceHt(planPrices.pro, 'pro'),
   };
   const annualCompareAt = {
     starter: Math.round(planPrices.starter * 12 * 100) / 100,
     pro: Math.round(planPrices.pro * 12 * 100) / 100,
-    business: Math.round(planPrices.business * 12 * 100) / 100,
   };
   const prices = yearly ? annual : monthly;
   const period = yearly ? labels.perYear : labels.perMonth;
   const cycleQuery = yearly ? '&cycle=yearly' : '';
+  const publicPlans = ['starter', 'pro'] as const;
 
   return (
     <div style={{ background: '#F8FAFC' }}>
@@ -372,13 +369,13 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
         </FadeIn>
       </section>
 
-      {/* ── PLAN CARDS — 3 cartes style FreshBooks ── */}
-      <section className="mx-auto max-w-5xl px-4 pb-20 md:px-8">
-        <div className="grid items-stretch gap-5 lg:grid-cols-3">
+      {/* ── PLAN CARDS — Gratuit + Pro ── */}
+      <section className="mx-auto max-w-4xl px-4 pb-20 md:px-8">
+        <div className="grid items-stretch gap-5 md:grid-cols-2">
           {/* GRATUIT */}
           <FadeIn delay={0}>
             <div
-              className="flex flex-col rounded-2xl bg-white p-7 transition-all duration-300 hover:-translate-y-0.5"
+              className="flex h-full flex-col rounded-2xl bg-white p-7 transition-all duration-300 hover:-translate-y-0.5"
               style={{ boxShadow: '0 4px 24px rgba(15,23,42,.08)', border: '1px solid #E2E8F0' }}
             >
               <p className="text-lg font-bold text-[#0F172A]">{labels.plans.starter.name}</p>
@@ -406,13 +403,12 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
             </div>
           </FadeIn>
 
-          {/* PRO — Most Popular, fond navy */}
+          {/* PRO */}
           <FadeIn delay={80}>
             <div
-              className="relative flex flex-col rounded-2xl p-7 transition-all duration-300 hover:-translate-y-0.5"
+              className="relative flex h-full flex-col rounded-2xl p-7 transition-all duration-300 hover:-translate-y-0.5"
               style={{ background: '#0B1F52', boxShadow: '0 8px 40px rgba(11,31,82,.3)' }}
             >
-              {/* Most Popular intégré comme FreshBooks */}
               <div className="mb-3 flex items-center gap-1.5">
                 <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
                 <span className="text-sm font-bold text-amber-400">{labels.popularBadge}</span>
@@ -454,45 +450,6 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
               </div>
             </div>
           </FadeIn>
-
-          {/* EXPERT */}
-          <FadeIn delay={160}>
-            <div
-              className="flex flex-col rounded-2xl bg-white p-7 transition-all duration-300 hover:-translate-y-0.5"
-              style={{ boxShadow: '0 4px 24px rgba(15,23,42,.08)', border: '1px solid #E2E8F0' }}
-            >
-              <p className="text-lg font-bold text-[#0F172A]">{labels.plans.business.name}</p>
-              <p className="mt-0.5 text-sm text-[#64748B]">{labels.plans.business.audience}</p>
-              <div className="mt-5">
-                <PriceDisplay
-                  amount={prices.business}
-                  period={period}
-                  compareAt={yearly ? annualCompareAt.business : undefined}
-                />
-              </div>
-              <p className="mt-2 text-xs font-semibold text-[#10B981]">{labels.trialBadge}</p>
-              {yearly && <p className="text-xs text-[#64748B]">{labels.billedYearly}</p>}
-              <hr className="my-5 border-slate-100" />
-              <HighlightList highlights={labels.plans.business.highlights} />
-              <div className="mt-6 space-y-2">
-                <Link href={`/register?plan=business${cycleQuery}`} className="block">
-                  <button
-                    type="button"
-                    className="w-full rounded-lg py-3 text-sm font-bold text-white transition-all duration-300 hover:opacity-90"
-                    style={{ background: '#10B981' }}
-                  >
-                    {labels.ctaBusiness}
-                  </button>
-                </Link>
-                <Link
-                  href={`/register?plan=business${cycleQuery}`}
-                  className="block text-center text-xs font-medium text-[#64748B] hover:underline"
-                >
-                  ou Essai gratuit 30 jours
-                </Link>
-              </div>
-            </div>
-          </FadeIn>
         </div>
         <p className="mt-6 text-center text-xs text-[#64748B]">{labels.footnote}</p>
       </section>
@@ -517,10 +474,10 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
                     <th className="rounded-tl-2xl px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#64748B]">
                       {labels.compare.feature}
                     </th>
-                    {(['starter', 'pro', 'business'] as PlanId[]).map((p, i) => (
+                    {publicPlans.map((p, i) => (
                       <th
                         key={p}
-                        className={`px-4 py-4 text-center text-sm font-bold ${i === 2 ? 'rounded-tr-2xl' : ''}`}
+                        className={`px-4 py-4 text-center text-sm font-bold ${i === 1 ? 'rounded-tr-2xl' : ''}`}
                         style={{
                           color: p === 'pro' ? '#0B1F52' : '#0F172A',
                           background: p === 'pro' ? '#EEF2FF' : 'transparent',
@@ -546,7 +503,7 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
                       <td className="px-6 py-3 font-medium text-[#0F172A]">
                         {labels.compare.rows[row.key]}
                       </td>
-                      {(['starter', 'pro', 'business'] as PlanId[]).map((p) => (
+                      {publicPlans.map((p) => (
                         <td
                           key={p}
                           className="px-4 py-3 text-center text-[#64748B]"
@@ -586,19 +543,19 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
             {[
               {
                 quote:
-                  'Enfin un logiciel qui gère la TPS et la TVQ sans configuration compliquée. Je gagne des heures chaque semaine.',
+                  'Enfin un logiciel qui gère la TPS et la TVQ sans configuration compliquée. Je gagne du temps chaque semaine.',
                 author: 'Marie-Ève T.',
                 role: 'Consultante RH, Montréal',
               },
               {
                 quote:
-                  "L'intégration Interac e-Transfert est parfaite. Nos paiements sont reçus 3 fois plus vite qu'avant.",
+                  'Le plan gratuit illimité m’a convaincu. J’ai passé à Pro uniquement pour les factures récurrentes.',
                 author: 'Jean-François L.',
                 role: 'Agence web, Québec',
               },
               {
                 quote:
-                  'Migration depuis QuickBooks en 30 minutes. Le support francophone était là à chaque étape.',
+                  'Simple, en français, et adapté aux PME canadiennes. Exactement ce qu’il me fallait.',
                 author: 'Sarah B.',
                 role: 'Architecte, Ottawa',
               },
@@ -671,12 +628,12 @@ export function PricingPagePremium({ planPrices, labels }: Props) {
                     {labels.finalCta.cta}
                   </button>
                 </Link>
-                <Link href="/register?plan=business">
+                <Link href="/register?plan=pro">
                   <button
                     type="button"
                     className="rounded-lg border border-white/25 px-8 py-3.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-white/10"
                   >
-                    {labels.ctaBusiness}
+                    {labels.ctaPro}
                   </button>
                 </Link>
               </div>

@@ -37,11 +37,11 @@ export const PLAN_PDF_LIMITS: Record<SubscriptionPlan, PdfPlanLimits> = {
     allowedTemplates: ['CLASSIC', 'MODERN', 'MONO', 'BLUE_PRO'],
   },
   BUSINESS: {
-    maxTemplates: 3,
-    unifiedTemplate: false,
+    maxTemplates: 2,
+    unifiedTemplate: true,
     allowAccentColor: true,
-    perDocumentAccentColor: true,
-    allowedTemplates: ['CLASSIC', 'MODERN', 'MINIMAL', 'MONO', 'BLUE_PRO'],
+    perDocumentAccentColor: false,
+    allowedTemplates: ['CLASSIC', 'MODERN', 'MONO', 'BLUE_PRO'],
   },
 };
 

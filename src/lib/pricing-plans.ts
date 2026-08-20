@@ -1,22 +1,34 @@
 export const PLAN_IDS = ['starter', 'pro', 'business'] as const;
 export type PlanId = (typeof PLAN_IDS)[number];
 
-/** Plan Gratuit illimité (slug technique `starter`, comme SoftFacture v2). */
+/** Plans affichés sur /tarifs (Business fusionné dans Pro). */
+export const PUBLIC_PLAN_IDS = ['starter', 'pro'] as const satisfies readonly PlanId[];
+
+/** Plan Gratuit illimité (slug technique `starter`). */
 export const FREE_PLAN_ID: PlanId = 'starter';
 
-/** Plan payant mis en avant — Essentiel. */
+/** Plan payant mis en avant — Pro. */
 export const HIGHLIGHTED_PLAN_ID: PlanId = 'pro';
 
-export const PAID_PLAN_IDS = ['pro', 'business'] as const satisfies readonly PlanId[];
+/** Checkout : seul Pro est vendu (Business legacy → traité comme Pro). */
+export const PAID_PLAN_IDS = ['pro'] as const satisfies readonly PlanId[];
 
-/** Annuel : 10 mois facturés, 2 mois offerts. */
+/** Annuel Pro = 99 $ ≈ 10 mois (2 mois offerts). */
 export const YEARLY_MONTHS_CHARGED = 10;
 
-/** Prix avant taxes affichés sur /tarifs — garder synchronisé avec backend/src/lib/billing/plans.ts */
+/** Prix avant taxes mensuels — sync backend/src/lib/billing/plans.ts */
 export const PLAN_PRICES_HT_CAD: Record<PlanId, number> = {
   starter: 0,
-  pro: 34.9,
-  business: 59.9,
+  pro: 9.99,
+  /** Legacy : même tarif que Pro (fusion commerciale). */
+  business: 9.99,
+};
+
+/** Prix annuels HT CAD (fixes). */
+export const PLAN_YEARLY_PRICES_HT_CAD: Record<PlanId, number> = {
+  starter: 0,
+  pro: 99,
+  business: 99,
 };
 
 /** @deprecated Utiliser PLAN_PRICES_HT_CAD */
@@ -50,20 +62,33 @@ export function isFreePlan(value: string | null | undefined): boolean {
 }
 
 export function isPaidPlan(value: string | null | undefined): boolean {
-  return isPlanId(value) && !isFreePlan(value);
+  return value === 'pro' || value === 'business';
+}
+
+/** Normalise business → pro pour l’UI commerciale. */
+export function toPublicPlanId(planId: PlanId): 'starter' | 'pro' {
+  return planId === 'starter' ? 'starter' : 'pro';
 }
 
 /** Inscription (visiteur) ou checkout (connecté, plans payants). */
-export function planCtaHref(planId: PlanId, loggedIn = false): string {
-  if (!loggedIn) return `/register?plan=${planId}`;
-  return isFreePlan(planId) ? '/dashboard' : `/checkout?plan=${planId}`;
+export function planCtaHref(planId: PlanId, loggedIn = false, yearly = false): string {
+  const publicId = toPublicPlanId(planId);
+  if (!loggedIn) {
+    const cycle = yearly && publicId === 'pro' ? '&cycle=yearly' : '';
+    return `/register?plan=${publicId}${cycle}`;
+  }
+  if (isFreePlan(publicId)) return '/dashboard';
+  return yearly ? `/checkout?plan=pro&cycle=yearly` : `/checkout?plan=pro`;
 }
 
 export function priceHtToTtc(htCad: number, vatRate = SUBSCRIPTION_VAT_RATE): number {
   return Math.round(htCad * (1 + vatRate / 100) * 100) / 100;
 }
 
-export function yearlyPriceHt(monthlyHt: number): number {
+export function yearlyPriceHt(monthlyHt: number, planId?: PlanId): number {
+  if (planId) return PLAN_YEARLY_PRICES_HT_CAD[planId];
+  if (monthlyHt <= 0) return 0;
+  if (Math.abs(monthlyHt - 9.99) < 0.001) return 99;
   return Math.round(monthlyHt * YEARLY_MONTHS_CHARGED * 100) / 100;
 }
 
@@ -77,27 +102,22 @@ export function formatEur(amount: number): string {
 }
 
 /** Keys for plan card bullet highlights (i18n: pricing.plans.{id}.highlights.{key}) */
-export const PLAN_HIGHLIGHT_KEYS: Record<PlanId, string[]> = {
-  starter: ['clients', 'invoices', 'dashboard', 'payments', 'reminders', 'pdf', 'users'],
-  pro: [
-    'everything',
-    'recurring',
+export const PLAN_HIGHLIGHT_KEYS: Record<'starter' | 'pro', string[]> = {
+  starter: [
+    'clients',
+    'quotes',
+    'invoices',
+    'products',
+    'pdf',
+    'taxes',
     'deposits',
     'creditNotes',
     'payments',
-    'reminders',
-    'accountant',
+    'dashboard',
+    'export',
     'users',
   ],
-  business: [
-    'everything',
-    'stock',
-    'stockAdvanced',
-    'expenses',
-    'users',
-    'multiCompany',
-    'support',
-  ],
+  pro: ['everything', 'recurring', 'users', 'pdfAdvanced', 'stock', 'support'],
 };
 
 export type ComparisonRowType = 'text' | 'boolean';
@@ -108,25 +128,14 @@ export const COMPARISON_ROWS: { key: string; type: ComparisonRowType }[] = [
   { key: 'invoices', type: 'text' },
   { key: 'creditNotesDeposits', type: 'boolean' },
   { key: 'recurring', type: 'boolean' },
-  { key: 'reminders', type: 'text' },
   { key: 'payments', type: 'text' },
-  { key: 'accountingExport', type: 'text' },
-  { key: 'accountantAccess', type: 'boolean' },
-  { key: 'stock', type: 'text' },
   { key: 'pdfTemplates', type: 'text' },
+  { key: 'stock', type: 'text' },
   { key: 'dashboard', type: 'text' },
-  { key: 'signature', type: 'boolean' },
-  { key: 'multiCompany', type: 'text' },
-  { key: 'api', type: 'boolean' },
-  { key: 'expenses', type: 'boolean' },
   { key: 'support', type: 'text' },
 ];
 
-export const COMPARISON_BOOLEAN: Record<string, Record<PlanId, boolean>> = {
-  creditNotesDeposits: { starter: false, pro: true, business: true },
-  recurring: { starter: false, pro: true, business: true },
-  accountantAccess: { starter: false, pro: true, business: true },
-  signature: { starter: false, pro: false, business: true },
-  api: { starter: false, pro: false, business: true },
-  expenses: { starter: false, pro: false, business: true },
+export const COMPARISON_BOOLEAN: Record<string, Record<'starter' | 'pro', boolean>> = {
+  creditNotesDeposits: { starter: true, pro: true },
+  recurring: { starter: false, pro: true },
 };

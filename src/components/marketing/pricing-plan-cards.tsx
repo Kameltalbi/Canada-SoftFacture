@@ -9,7 +9,7 @@ import {
   HIGHLIGHTED_PLAN_ID,
   isFreePlan,
   PLAN_HIGHLIGHT_KEYS,
-  PLAN_IDS,
+  PUBLIC_PLAN_IDS,
 } from '@/lib/pricing-plans';
 import type { PlanId } from '@/lib/pricing-plans';
 import type { BillingPlansResponse } from '@/lib/billing-api';
@@ -30,10 +30,11 @@ export function PricingPlanCards({
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
-      {PLAN_IDS.map((planId) => {
+    <div className="grid gap-6 md:grid-cols-2">
+      {PUBLIC_PLAN_IDS.map((planId) => {
         const highlighted = planId === HIGHLIGHTED_PLAN_ID;
-        const isCurrent = currentPlanId === planId;
+        const isCurrent =
+          currentPlanId === planId || (currentPlanId === 'business' && planId === 'pro');
         const priceFormatted = formatCad(planPrices[planId]);
 
         return (

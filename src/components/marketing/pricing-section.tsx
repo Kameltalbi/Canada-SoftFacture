@@ -1,7 +1,7 @@
 import { PricingToggleCards } from '@/components/marketing/pricing-toggle-cards';
 import { cn } from '@/lib/utils';
 import { getPublicBillingPlans, planPricesHtFromBilling } from '@/lib/billing-api';
-import { COMPARISON_BOOLEAN, COMPARISON_ROWS, PLAN_IDS } from '@/lib/pricing-plans';
+import { COMPARISON_BOOLEAN, COMPARISON_ROWS, PUBLIC_PLAN_IDS } from '@/lib/pricing-plans';
 import { Check, X, ShieldCheck, Clock, Globe, CreditCard } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
@@ -92,7 +92,6 @@ export async function PricingSection({
             ctaByPlan: {
               starter: t('ctaStarter'),
               pro: t('ctaPro'),
-              business: t('ctaBusiness'),
             },
             interacTooltip: t('interacTooltip'),
             plans: {
@@ -101,11 +100,16 @@ export async function PricingSection({
                 audience: t('plans.starter.audience'),
                 highlights: {
                   clients: t('plans.starter.highlights.clients'),
+                  quotes: t('plans.starter.highlights.quotes'),
                   invoices: t('plans.starter.highlights.invoices'),
-                  dashboard: t('plans.starter.highlights.dashboard'),
-                  payments: t('plans.starter.highlights.payments'),
-                  reminders: t('plans.starter.highlights.reminders'),
+                  products: t('plans.starter.highlights.products'),
                   pdf: t('plans.starter.highlights.pdf'),
+                  taxes: t('plans.starter.highlights.taxes'),
+                  deposits: t('plans.starter.highlights.deposits'),
+                  creditNotes: t('plans.starter.highlights.creditNotes'),
+                  payments: t('plans.starter.highlights.payments'),
+                  dashboard: t('plans.starter.highlights.dashboard'),
+                  export: t('plans.starter.highlights.export'),
                   users: t('plans.starter.highlights.users'),
                 },
               },
@@ -115,25 +119,10 @@ export async function PricingSection({
                 highlights: {
                   everything: t('plans.pro.highlights.everything'),
                   recurring: t('plans.pro.highlights.recurring'),
-                  deposits: t('plans.pro.highlights.deposits'),
-                  creditNotes: t('plans.pro.highlights.creditNotes'),
-                  payments: t('plans.pro.highlights.payments'),
-                  reminders: t('plans.pro.highlights.reminders'),
-                  accountant: t('plans.pro.highlights.accountant'),
                   users: t('plans.pro.highlights.users'),
-                },
-              },
-              business: {
-                name: t('plans.business.name'),
-                audience: t('plans.business.audience'),
-                highlights: {
-                  everything: t('plans.business.highlights.everything'),
-                  stock: t('plans.business.highlights.stock'),
-                  stockAdvanced: t('plans.business.highlights.stockAdvanced'),
-                  expenses: t('plans.business.highlights.expenses'),
-                  users: t('plans.business.highlights.users'),
-                  multiCompany: t('plans.business.highlights.multiCompany'),
-                  support: t('plans.business.highlights.support'),
+                  pdfAdvanced: t('plans.pro.highlights.pdfAdvanced'),
+                  stock: t('plans.pro.highlights.stock'),
+                  support: t('plans.pro.highlights.support'),
                 },
               },
             },
@@ -151,7 +140,7 @@ export async function PricingSection({
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50">
                   <th className="px-4 py-3 font-semibold text-slate-900">{t('compare.feature')}</th>
-                  {PLAN_IDS.map((planId) => (
+                  {PUBLIC_PLAN_IDS.map((planId) => (
                     <th
                       key={planId}
                       className={cn(
@@ -178,7 +167,7 @@ export async function PricingSection({
                     <td className="px-4 py-3 font-medium text-slate-700">
                       {t(`compare.rows.${row.key}`)}
                     </td>
-                    {PLAN_IDS.map((planId) => (
+                    {PUBLIC_PLAN_IDS.map((planId) => (
                       <td key={planId} className="px-4 py-3 text-slate-600">
                         {row.type === 'boolean' ? (
                           <CompareCell

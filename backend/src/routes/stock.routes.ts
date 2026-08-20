@@ -172,7 +172,7 @@ router.post('/inventory', async (req, res) => {
   const plan = await getOrganizationPlan(oid);
   if (!planHasStockInventory(plan)) {
     return res.status(403).json({
-      error: 'L’inventaire physique est disponible avec l’offre Business',
+      error: 'L’inventaire physique est disponible avec l’offre Pro',
       code: 'PLAN_INVENTORY',
     });
   }

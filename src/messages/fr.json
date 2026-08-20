@@ -120,7 +120,7 @@
     "previewSectionTitle": "Découvrez SoftFacture en action",
     "previewSectionDesc": "Soumissions, factures, clients et tableau de bord réunis dans une interface claire et moderne.",
     "pricingTeaserTitle": "Facturez gratuitement, sans limite",
-    "pricingTeaserNote": "Plan Gratuit à vie : clients, devis et factures illimités, sans carte de crédit. Essentiel et Business : essai de {days} jours.",
+    "pricingTeaserNote": "Plan Gratuit à vie : clients, devis et factures illimités, sans carte de crédit. Pro : essai de {days} jours.",
     "pricingTeaserCta": "Voir les tarifs",
     "faqTitle": "Questions fréquentes",
     "faq1Q": "SoftFacture est-elle adaptée aux taxes canadiennes ?",
@@ -130,7 +130,7 @@
     "faq3Q": "Mes données sont-elles sécurisées ?",
     "faq3A": "Oui. Toutes vos données sont chiffrées, protégées et sauvegardées régulièrement. Nous sommes conformes à la Loi 25 (Québec) et à la LPRPDE (Canada).",
     "faq4Q": "Le plan Gratuit est-il vraiment illimité ?",
-    "faq4A": "Oui. Clients, devis et factures sont illimités, à vie, sans carte de crédit. Les plans Essentiel et Business ajoutent des outils avancés (relances, récurrent, stock, etc.).",
+    "faq4A": "Oui. Clients, devis et factures sont illimités, à vie, sans carte de crédit. Le plan Pro ajoute les factures récurrentes, jusqu’à 5 utilisateurs et l’inventaire.",
     "faq5Q": "Puis-je créer des soumissions ?",
     "faq5A": "Oui. Créez des soumissions personnalisées et convertissez-les en factures en un seul clic.",
     "faq6Q": "SoftFacture convient-elle aux petites entreprises ?",
@@ -159,27 +159,27 @@
     "footerBrandNote": "SoftFacture Canada est une marque de Nexiora Inc."
   },
   "pricing": {
-    "title": "Un plan gratuit illimité, et deux offres pour aller plus loin",
-    "subtitle": "Factures, devis et clients illimités — gratuit à vie. Essentiel et Business : essai 30 jours, sans engagement.",
+    "title": "Facturation canadienne simple — gratuit pour démarrer",
+    "subtitle": "Clients, devis et factures illimités à 0 $. Passez à Pro pour les factures récurrentes et jusqu’à 5 utilisateurs.",
     "forever": "Gratuit à vie",
     "noCrmNote": "",
     "perMonth": "/mois",
     "perYear": "/an",
-    "billedYearly": "Facturé annuellement — 10 mois payés, 2 mois offerts",
+    "billedYearly": "Facturé annuellement — 99 $ (2 mois offerts)",
     "billingToggle": {
       "monthly": "Mensuel",
       "yearly": "Annuel",
-      "yearlyBadge": "2 mois offerts sur les plans payants",
-      "yearlyNote": "Abonnement annuel : payez 10 mois (pas 12) et profitez de 12 mois d'accès complet."
+      "yearlyBadge": "2 mois offerts sur Pro",
+      "yearlyNote": "Abonnement annuel Pro : 99 $ CAD (équivaut à 10 mois)."
     },
     "trialBadge": "1 mois d'essai gratuit inclus",
     "popularBadge": "Le plus populaire",
     "cta": "Commencer gratuitement",
     "ctaStarter": "Commencer gratuitement",
-    "ctaPro": "Choisir Essentiel",
-    "ctaBusiness": "Choisir Business",
-    "interacTooltip": "Interac e-Transfert est le moyen de paiement préféré des PME canadiennes — rapide, sans frais de carte.",
-    "footnote": "Prix avant taxes (en CAD). TPS 5 % et TVQ 9,975 % (Québec) en sus. Abonnement sans engagement.",
+    "ctaPro": "Choisir Pro",
+    "ctaBusiness": "Choisir Pro",
+    "interacTooltip": "Suivi des paiements dans SoftFacture (payé / non payé / partiel).",
+    "footnote": "Prix avant taxes (CAD). TPS 5 % et TVQ 9,975 % (Québec) en sus le cas échéant. Sans engagement.",
     "currentPlan": "Offre actuelle",
     "currentPlanCta": "Offre active",
     "choosePlan": "Choisir cette offre",
@@ -188,7 +188,7 @@
       "noCommitment": "Sans engagement",
       "frenchSupport": "Support francophone",
       "securePayment": "Paiement sécurisé",
-      "canadaHosting": "Données hébergées au Canada"
+      "canadaHosting": "Conçu pour le Canada"
     },
     "compare": {
       "title": "Comparez les fonctionnalités en détail",
@@ -220,81 +220,65 @@
           "users": "1",
           "quotes": "Illimités",
           "invoices": "Illimitées",
-          "reminders": "Manuelles",
           "payments": "Suivi manuel (payé / non payé)",
-          "accountingExport": "Basique",
           "stock": "Catalogue articles",
           "pdfTemplates": "Logo et export PDF",
           "dashboard": "Tableau de bord",
-          "multiCompany": "1 société",
           "support": "Courriel"
         },
         "pro": {
           "users": "5",
           "quotes": "Illimités",
           "invoices": "Illimitées",
-          "reminders": "Relances assistées",
-          "payments": "Stripe + Interac e-Transfert",
-          "accountingExport": "Avancé, tous formats",
-          "stock": "Catalogue articles",
+          "payments": "Suivi des paiements",
+          "stock": "Inventaire (entrées / sorties)",
           "pdfTemplates": "Personnalisation avancée",
-          "dashboard": "CA, impayés, prévisionnel",
-          "multiCompany": "1 société",
-          "support": "Courriel prioritaire 24h"
-        },
-        "business": {
-          "users": "10",
-          "quotes": "Illimités",
-          "invoices": "Illimitées",
-          "reminders": "Personnalisées par client et échéance",
-          "payments": "Stripe + Interac + rapprochement bancaire",
-          "accountingExport": "Avancé + API",
-          "stock": "Entrées/sorties, alertes, inventaire, multi-dépôts",
-          "pdfTemplates": "Personnalisation avancée",
-          "dashboard": "Rentabilité client et projet",
-          "multiCompany": "2 sociétés",
-          "support": "Téléphone + chat réponse 4h"
+          "dashboard": "Tableau de bord",
+          "support": "Courriel prioritaire"
         }
       }
     },
     "plans": {
       "starter": {
         "name": "Gratuit",
-        "audience": "Pour facturer gratuitement, sans limite.",
+        "audience": "Pour facturer sans limite, à vie.",
         "highlights": {
           "clients": "Clients illimités",
-          "invoices": "Devis et factures illimités",
-          "dashboard": "Tableau de bord",
-          "payments": "Suivi des paiements (payé / non payé)",
-          "reminders": "Relances manuelles",
+          "quotes": "Devis illimités",
+          "invoices": "Factures illimitées",
+          "products": "Catalogue produits / services",
           "pdf": "Export PDF et envoi courriel",
-          "users": "1 utilisateur · 1 société"
+          "taxes": "TPS / TVQ / TVH",
+          "deposits": "Acomptes",
+          "creditNotes": "Avoirs",
+          "payments": "Suivi des paiements",
+          "dashboard": "Tableau de bord",
+          "export": "Export des données",
+          "users": "1 utilisateur"
         }
       },
       "pro": {
-        "name": "Essentiel",
-        "audience": "Pour encaisser plus vite : paiements, relances et factures récurrentes.",
+        "name": "Pro",
+        "audience": "Pour automatiser et collaborer en équipe.",
         "highlights": {
           "everything": "Tout le Gratuit, plus :",
           "recurring": "Factures récurrentes",
-          "deposits": "Factures d'acompte",
-          "creditNotes": "Avoirs",
-          "payments": "Paiements partiels + Interac e-Transfert",
-          "reminders": "Relances automatiques",
-          "accountant": "Accès expert-comptable",
-          "users": "5 utilisateurs · 1 société"
+          "users": "Jusqu’à 5 utilisateurs",
+          "pdfAdvanced": "PDF personnalisés",
+          "stock": "Inventaire stock",
+          "support": "Support prioritaire"
         }
       },
       "business": {
-        "name": "Business",
-        "audience": "Pour piloter stock, notes de frais et plusieurs sociétés.",
+        "name": "Pro",
+        "audience": "Fusionné dans Pro.",
         "highlights": {
-          "everything": "Tout l'Essentiel, plus :",
-          "stock": "Gestion des stocks",
-          "stockAdvanced": "Multi-dépôts",
-          "expenses": "Notes de frais",
-          "users": "10 utilisateurs par société",
-          "multiCompany": "2 sociétés",
+          "everything": "Tout le Gratuit, plus :",
+          "stock": "Inventaire stock",
+          "stockAdvanced": "Inventaire stock",
+          "expenses": "Support prioritaire",
+          "users": "Jusqu’à 5 utilisateurs",
+          "multiCompany": "1 société",
           "support": "Support prioritaire"
         }
       }
@@ -303,7 +287,7 @@
       "title": "Questions fréquentes",
       "free": {
         "q": "Le plan Gratuit est-il vraiment illimité ?",
-        "a": "Oui. Clients, devis et factures sont illimités, à vie, sans carte de crédit. Les plans Essentiel et Business ajoutent des outils avancés (relances, récurrent, stock, etc.)."
+        "a": "Oui. Clients, devis et factures sont illimités, à vie, sans carte de crédit. Les acomptes et avoirs restent inclus. Les factures récurrentes et les sièges supplémentaires sont réservés au plan Pro."
       },
       "cancel": {
         "q": "Puis-je annuler à tout moment ?",
@@ -314,8 +298,8 @@
         "a": "Non. Le prix affiché est le seul montant facturé, auquel s'ajoutent les taxes applicables (TPS 5 % + TVQ 9,975 % au Québec). Aucun frais de mise en place, ni de module obligatoire."
       },
       "hosting": {
-        "q": "Mes données sont-elles hébergées au Canada ?",
-        "a": "Oui. L'ensemble de votre infrastructure — bases de données, sauvegardes et serveurs — est hébergé physiquement au Québec, Canada, conformément aux exigences de la Loi 25."
+        "q": "SoftFacture est-il pensé pour le Canada ?",
+        "a": "Oui. SoftFacture Canada est conçu pour la facturation des PME canadiennes (CAD, TPS/TVQ/TVH) avec une interface en français et en anglais."
       },
       "taxes": {
         "q": "Les taxes TPS / TVH / TVP sont-elles gérées ?",
@@ -323,16 +307,16 @@
       },
       "import": {
         "q": "Puis-je importer mes clients existants ?",
-        "a": "Oui. Vous pouvez importer votre liste de clients via un fichier CSV depuis votre tableau de bord, ou utiliser notre API (plan Business) pour une intégration automatisée."
+        "a": "Oui. Vous pouvez importer votre liste de clients via un fichier CSV depuis votre tableau de bord."
       },
       "upgrade": {
-        "q": "Puis-je changer de plan à tout moment ?",
-        "a": "Oui. Vous pouvez passer à un plan supérieur ou inférieur à tout moment. La différence de prix est calculée au prorata de la période restante."
+        "q": "Puis-je passer à Pro à tout moment ?",
+        "a": "Oui. Vous pouvez passer du Gratuit à Pro quand vous voulez. L’essai de 30 jours s’applique à la première souscription Pro."
       }
     },
     "finalCta": {
-      "title": "Découvrez une gestion plus simple de votre activité",
-      "subtitle": "Structurez vos devis, factures et paiements — quel que soit votre métier.",
+      "title": "Commencez gratuitement dès aujourd’hui",
+      "subtitle": "Créez des devis et factures illimités — passez à Pro seulement si vous en avez besoin.",
       "cta": "Créer un compte gratuit"
     }
   },
@@ -381,7 +365,7 @@
     "prefilledFromRegister": "Reprise de votre inscription.",
     "contactFromRegister": "Contact administrateur (inscription)",
     "step3Title": "Choisissez votre offre",
-    "step3Subtitle": "Plan Gratuit à vie, ou essai de {days} jours sur Essentiel et Business — sans engagement.",
+    "step3Subtitle": "Plan Gratuit à vie, ou essai de {days} jours sur Pro — sans engagement.",
     "country": "Pays",
     "companyName": "Raison sociale / travailleur autonome",
     "companyNamePlaceholder": "Exemple Inc. ou Jean Dupont",
@@ -878,7 +862,7 @@
   "stock": {
     "title": "Stock",
     "subtitle": "Vue d’ensemble de vos produits stockables et de leur disponibilité.",
-    "rulesHint": "Les sorties sont déduites à la validation des factures ; les entrées sont créditées à la validation des avoirs. Les ajustements manuels passent par le stock initial ou l’inventaire (offre Business).",
+    "rulesHint": "Les sorties sont déduites à la validation des factures ; les entrées sont créditées à la validation des avoirs. Les ajustements manuels passent par le stock initial ou l’inventaire (offre Pro).",
     "alerts": "{count} produit(s) sous le seuil d'alerte",
     "product": "Produit",
     "category": "Catégorie",
@@ -910,8 +894,8 @@
     "clearFilter": "Tout l’historique",
     "openDocument": "Voir le document",
     "runInventory": "Lancer un inventaire",
-    "inventoryBusiness": "Inventaire (Business)",
-    "inventoryUpgrade": "L’inventaire physique est inclus dans l’offre Business.",
+    "inventoryBusiness": "Inventaire (Pro)",
+    "inventoryUpgrade": "L’inventaire physique est inclus dans l’offre Pro.",
     "inventoryTitle": "Inventaire physique",
     "inventoryDesc": "Saisissez les quantités comptées. Les écarts seront enregistrés comme ajustements.",
     "inventorySubmit": "Valider l’inventaire",
@@ -971,7 +955,7 @@
     "vatOnDebitsEnabled": "Taxe sur les débits",
     "vatOnDebitsEnabledHint": "Si activé, vous pourrez cocher cette option sur chaque facture éligible selon votre régime fiscal.",
     "moduleBillingTitle": "Abonnement & facturation",
-    "moduleBillingDesc": "Gérez votre offre Gratuit, Essentiel ou Business.",
+    "moduleBillingDesc": "Gérez votre offre Gratuit ou Pro.",
     "moduleBillingCta": "Voir mon abonnement",
     "section_entreprise": "Entreprise",
     "section_facturation": "Facturation",
@@ -1157,8 +1141,8 @@
     "pdfTemplatePlanLocked": "Ce template n'est pas disponible avec votre offre actuelle.",
     "template_all_documents": "Tous les documents",
     "pdfPlan_starter": "Offre Gratuit",
-    "pdfPlan_pro": "Offre Essentiel",
-    "pdfPlan_business": "Offre Business",
+    "pdfPlan_pro": "Offre Pro",
+    "pdfPlan_business": "Offre Pro (legacy)",
     "pdfPlanDesc_starter": "Un seul modèle (Classique) pour tous vos documents, sans personnalisation des couleurs.",
     "pdfPlanDesc_pro": "Deux modèles au choix, appliqués à tous les documents, avec une couleur d'accent personnalisable.",
     "pdfPlanDesc_business": "Trois modèles : un par type de document (factures, devis, autres), avec une couleur d'accent par type.",
@@ -1166,7 +1150,7 @@
     "pdfColorsTitle": "Couleurs d'accent",
     "pdfAccentColor": "Couleur (code hex)",
     "pdfAccentColorHint": "Ex. #0f766e — en-têtes de tableaux et éléments mis en avant.",
-    "pdfColorsLocked": "La personnalisation des couleurs est disponible à partir de l'offre Essentiel.",
+    "pdfColorsLocked": "La personnalisation des couleurs est disponible à partir de l'offre Pro.",
     "pdfTemplateUnused": "Non utilisé",
     "template_invoice": "Factures",
     "template_quote": "Devis",
@@ -1215,7 +1199,7 @@
   "tarifs": {
     "heroTitle": "Tarifs SoftFacture Canada",
     "heroBrandNote": "SoftFacture Canada est une marque de Nexiora Inc.",
-    "heroSubtitle": "Plan Gratuit à vie, puis Essentiel et Business en dollars canadiens (CAD), avant taxes. TPS 5 % et TVQ 9,975 % (Québec) en sus. Essai 30 jours sur les plans payants."
+    "heroSubtitle": "Plan Gratuit à vie, puis Pro en dollars canadiens (CAD), avant taxes. TPS 5 % et TVQ 9,975 % (Québec) en sus. Essai 30 jours sur Pro."
   },
   "checkout": {
     "title": "Finaliser votre abonnement",
@@ -1226,8 +1210,8 @@
     "stripeNotConfigured": "Le paiement en ligne n’est pas disponible pour le moment. Réessayez plus tard ou contactez le support.",
     "plan": "Offre",
     "plan_starter": "Gratuit",
-    "plan_pro": "Essentiel",
-    "plan_business": "Business",
+    "plan_pro": "Pro",
+    "plan_business": "Pro",
     "cycle": "Facturation",
     "cycleMonthly": "Mensuel",
     "cycleYearly": "Annuel",
@@ -1289,7 +1273,7 @@
   },
   "admin": {
     "title": "Administration",
-    "subtitle": "Vue globale plateforme (administrateurs).",
+    "subtitle": "Choisissez l'offre Gratuit ou Pro adaptée à votre volume.",
     "users": "Utilisateurs",
     "stats": "Statistiques"
   },
@@ -1362,7 +1346,10 @@
     "toastNoClientEmail": "Aucun courriel enregistré pour ce client.",
     "paginationRows": "Lignes {start} à {end} sur {total}",
     "paginationPrev": "Précédent",
-    "paginationNext": "Suivant"
+    "paginationNext": "Suivant",
+    "upgradeTitle": "Factures récurrentes — plan Pro",
+    "upgradeBody": "Automatisez vos factures mensuelles ou périodiques avec le plan Pro (9,99 $/mois ou 99 $/an).",
+    "upgradeCta": "Passer à Pro"
   },
   "status": {
     "DRAFT": "Brouillon",

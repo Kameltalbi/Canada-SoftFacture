@@ -1,6 +1,6 @@
 import { apiFetch } from '@/lib/api-client';
 import {
-  PLAN_IDS,
+  PUBLIC_PLAN_IDS,
   PLAN_PRICES_HT_EUR,
   PLAN_TO_SUBSCRIPTION_API,
   priceHtToTtc,
@@ -86,7 +86,7 @@ function staticBillingPlansResponse(): BillingPlansResponse {
     vatRatePercent: SUBSCRIPTION_VAT_RATE,
     trialDays: TRIAL_DAYS,
     paymentProviderConfigured: false,
-    plans: PLAN_IDS.map((slug) => ({
+    plans: PUBLIC_PLAN_IDS.map((slug) => ({
       slug,
       plan: PLAN_TO_SUBSCRIPTION_API[slug],
       priceHtEur: PLAN_PRICES_HT_EUR[slug],

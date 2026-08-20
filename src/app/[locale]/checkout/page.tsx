@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { MarketingShell } from '@/components/marketing/marketing-shell';
 import { CheckoutForm } from '@/components/checkout/checkout-form';
 import { getPublicBillingPlans } from '@/lib/billing-api';
-import { HIGHLIGHTED_PLAN_ID, isFreePlan, isPlanId } from '@/lib/pricing-plans';
+import { HIGHLIGHTED_PLAN_ID, isFreePlan, isPlanId, toPublicPlanId } from '@/lib/pricing-plans';
 
 type Props = {
   searchParams: Promise<{ plan?: string; cycle?: string }>;
@@ -10,10 +10,11 @@ type Props = {
 
 export default async function CheckoutPage({ searchParams }: Props) {
   const params = await searchParams;
-  const plan = isPlanId(params.plan) ? params.plan : HIGHLIGHTED_PLAN_ID;
-  if (isFreePlan(plan)) {
+  const rawPlan = isPlanId(params.plan) ? params.plan : HIGHLIGHTED_PLAN_ID;
+  if (isFreePlan(rawPlan)) {
     redirect('/register?plan=starter');
   }
+  const plan = toPublicPlanId(rawPlan);
   const cycle = params.cycle === 'yearly' ? 'yearly' : 'monthly';
   const billing = await getPublicBillingPlans();
 

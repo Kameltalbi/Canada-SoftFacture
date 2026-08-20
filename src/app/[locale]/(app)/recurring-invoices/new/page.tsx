@@ -59,6 +59,9 @@ export default function NewRecurringInvoicePage() {
   const router = useRouter();
   const toast = useToast();
   const { token, user } = useAuth();
+  const canRecurring =
+    user?.organization?.subscriptionPlan === 'PRO' ||
+    user?.organization?.subscriptionPlan === 'BUSINESS';
   const defaultVat = toNumber(user?.organization?.defaultVatRate ?? 20);
   const [clients, setClients] = useState<ClientOpt[] | null>(null);
   const [products, setProducts] = useState<ProductOpt[] | null>(null);
@@ -105,6 +108,13 @@ export default function NewRecurringInvoicePage() {
       toast.push(e instanceof Error ? e.message : 'Erreur', 'error')
     );
   }, [token, load, toast]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (!canRecurring) {
+      router.replace('/checkout?plan=pro');
+    }
+  }, [user, canRecurring, router]);
 
   useEffect(() => {
     if (user?.organization?.defaultCurrency) {

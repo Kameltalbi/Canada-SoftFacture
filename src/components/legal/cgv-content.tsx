@@ -6,11 +6,11 @@ import {
 } from '@/lib/legal-site';
 import { LegalSection } from '@/components/legal/legal-page-layout';
 import { Link } from '@/i18n/navigation';
-import { PLAN_PRICES_HT_CAD, TRIAL_DAYS } from '@/lib/pricing-plans';
+import { PLAN_PRICES_HT_CAD, PLAN_YEARLY_PRICES_HT_CAD, TRIAL_DAYS } from '@/lib/pricing-plans';
 
 export function CgvContent() {
   const L = LEGAL_SITE;
-  const prices = `Gratuit 0 $ CAD (illimité), Essentiel $${PLAN_PRICES_HT_CAD.pro.toFixed(2)} CAD/mois, Business $${PLAN_PRICES_HT_CAD.business.toFixed(2)} CAD/mois (avant TPS/TVQ)`;
+  const prices = `Gratuit 0 $ CAD (illimité), Pro $${PLAN_PRICES_HT_CAD.pro.toFixed(2)} CAD/mois ou $${PLAN_YEARLY_PRICES_HT_CAD.pro.toFixed(2)} CAD/an (avant TPS/TVQ)`;
 
   return (
     <>
@@ -37,7 +37,7 @@ export function CgvContent() {
             <strong>Utilisateur</strong> : personne physique ou morale titulaire d&apos;un compte.
           </li>
           <li>
-            <strong>Abonnement</strong> : formule payante mensuelle (Essentiel, Business). Le plan
+            <strong>Abonnement</strong> : formule payante mensuelle ou annuelle (Pro). Le plan
             Gratuit est illimité et sans frais.
           </li>
           <li>
@@ -84,9 +84,9 @@ export function CgvContent() {
       <LegalSection id="essai" title="5. Période d'essai">
         <p>
           Sauf indication contraire, un essai gratuit de {TRIAL_DAYS} jours est offert à la première
-          souscription d&apos;un plan payant (Essentiel ou Business). Le plan Gratuit est accessible
-          sans essai ni carte de crédit. L&apos;Utilisateur peut annuler sans frais avant la fin de
-          la période d&apos;essai. À l&apos;issue de l&apos;essai, l&apos;abonnement est reconduit
+          souscription d&apos;un plan payant (Pro). Le plan Gratuit est accessible sans essai ni
+          carte de crédit. L&apos;Utilisateur peut annuler sans frais avant la fin de la période
+          d&apos;essai. À l&apos;issue de l&apos;essai, l&apos;abonnement est reconduit
           automatiquement au tarif de l&apos;offre choisie, sauf annulation préalable.
         </p>
       </LegalSection>

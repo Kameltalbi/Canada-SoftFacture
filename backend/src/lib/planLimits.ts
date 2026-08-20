@@ -5,7 +5,8 @@ import { prisma } from './db.js';
 export const PLAN_MAX_USERS: Record<SubscriptionPlan, number> = {
   STARTER: 1,
   PRO: 5,
-  BUSINESS: 10,
+  /** Fusion commerciale Business → Pro (5 sièges). */
+  BUSINESS: 5,
 };
 
 export function maxUsersForPlan(plan: SubscriptionPlan): number {
