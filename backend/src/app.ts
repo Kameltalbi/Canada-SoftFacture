@@ -14,6 +14,7 @@ import quotesRoutes from './routes/quotes.routes.js';
 import superadminRoutes from './routes/superadmin.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
 import paymentsRoutes from './routes/payments.routes.js';
+import paymentRemindersRoutes from './routes/payment-reminders.routes.js';
 import recurringRoutes from './routes/recurring.routes.js';
 import stockRoutes from './routes/stock.routes.js';
 import categoriesRoutes from './routes/categories.routes.js';
@@ -78,6 +79,7 @@ export function createApp() {
 
   app.use('/api/uploads', express.static(uploadsDir));
 
+  app.use('/api/payment-reminders', express.json({ limit: '5mb' }));
   app.use(express.json({ limit: '2mb' }));
   if (isEinvoiceFeaturesEnabled()) {
     app.use('/api/webhooks/pa', paWebhooksRoutes);
@@ -129,6 +131,13 @@ export function createApp() {
   }
   app.use('/api/quotes', authMiddleware, requireOrg, requireOnboardingComplete, quotesRoutes);
   app.use('/api/payments', authMiddleware, requireOrg, requireOnboardingComplete, paymentsRoutes);
+  app.use(
+    '/api/payment-reminders',
+    authMiddleware,
+    requireOrg,
+    requireOnboardingComplete,
+    paymentRemindersRoutes
+  );
   app.use(
     '/api/recurring-invoices',
     authMiddleware,

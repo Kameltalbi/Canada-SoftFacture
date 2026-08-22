@@ -12,6 +12,11 @@ export function planHasRecurringInvoices(plan: SubscriptionPlan): boolean {
   return isProOrHigher(plan);
 }
 
+/** Recouvrement et relances manuelles — Pro et legacy Business. */
+export function planHasRecouvrement(plan: SubscriptionPlan): boolean {
+  return isProOrHigher(plan);
+}
+
 export async function getOrganizationPlan(organizationId: string): Promise<SubscriptionPlan> {
   const org = await prisma.organization.findUnique({
     where: { id: organizationId },

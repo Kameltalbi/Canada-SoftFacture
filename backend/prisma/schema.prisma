@@ -241,6 +241,7 @@ model Organization {
   products Product[]
   invoices Invoice[]
   payments Payment[]
+  paymentReminders PaymentReminder[]
   quotes   Quote[]
   customTaxes CustomTax[]
   recurringInvoices RecurringInvoice[]
@@ -307,6 +308,7 @@ model User {
   organization     Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   invitationsSent  UserInvitation[] @relation("InvitationsSent")
   passwordResets   PasswordReset[]
+  paymentReminders PaymentReminder[] @relation("ReminderAuthor")
   /** Loi 25 — Consentement aux CGU/DPA/Politique de confidentialité */
   termsAcceptedAt  DateTime?
   termsVersion     String?
@@ -465,6 +467,7 @@ model Invoice {
   updatedAt      DateTime      @updatedAt
   lines          InvoiceLine[]
   payments       Payment[]
+  paymentReminders PaymentReminder[]
   stockMovements StockMovement[]
   einvoiceTransmissions EInvoiceTransmission[]
   auditLog              InvoiceAuditLog?
@@ -599,6 +602,28 @@ model Payment {
 
   @@index([organizationId])
   @@index([invoiceId])
+}
+
+model PaymentReminder {
+  id                  String       @id @default(cuid())
+  organizationId      String
+  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invoiceId           String
+  invoice             Invoice      @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  clientId            String?
+  channel             String
+  outcome             String
+  notes               String?
+  contactedAt         DateTime     @default(now())
+  promisedPaymentDate DateTime?
+  nextReminderDate    DateTime?
+  createdById         String?
+  createdBy           User?        @relation("ReminderAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([invoiceId, contactedAt])
 }
 
 model InvoiceLine {

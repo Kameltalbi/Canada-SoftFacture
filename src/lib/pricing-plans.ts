@@ -107,17 +107,17 @@ export const PLAN_HIGHLIGHT_KEYS: Record<'starter' | 'pro', string[]> = {
     'clients',
     'quotes',
     'invoices',
+    'payments',
     'products',
     'pdf',
     'taxes',
     'deposits',
     'creditNotes',
-    'payments',
     'dashboard',
     'export',
     'users',
   ],
-  pro: ['everything', 'recurring', 'users', 'pdfAdvanced', 'stock', 'support'],
+  pro: ['everything', 'recurring', 'collections', 'users', 'pdfAdvanced', 'stock', 'support'],
 };
 
 export type ComparisonRowType = 'text' | 'boolean';
@@ -128,6 +128,7 @@ export const COMPARISON_ROWS: { key: string; type: ComparisonRowType }[] = [
   { key: 'invoices', type: 'text' },
   { key: 'creditNotesDeposits', type: 'boolean' },
   { key: 'recurring', type: 'boolean' },
+  { key: 'collections', type: 'boolean' },
   { key: 'payments', type: 'text' },
   { key: 'pdfTemplates', type: 'text' },
   { key: 'stock', type: 'text' },
@@ -138,4 +139,5 @@ export const COMPARISON_ROWS: { key: string; type: ComparisonRowType }[] = [
 export const COMPARISON_BOOLEAN: Record<string, Record<'starter' | 'pro', boolean>> = {
   creditNotesDeposits: { starter: true, pro: true },
   recurring: { starter: false, pro: true },
+  collections: { starter: false, pro: true },
 };

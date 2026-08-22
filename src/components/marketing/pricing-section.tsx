@@ -119,6 +119,7 @@ export async function PricingSection({
                 highlights: {
                   everything: t('plans.pro.highlights.everything'),
                   recurring: t('plans.pro.highlights.recurring'),
+                  collections: t('plans.pro.highlights.collections'),
                   users: t('plans.pro.highlights.users'),
                   pdfAdvanced: t('plans.pro.highlights.pdfAdvanced'),
                   stock: t('plans.pro.highlights.stock'),

@@ -46,6 +46,7 @@ export async function PricingPageServer() {
             invoices: t('compare.rows.invoices'),
             creditNotesDeposits: t('compare.rows.creditNotesDeposits'),
             recurring: t('compare.rows.recurring'),
+            collections: t('compare.rows.collections'),
             payments: t('compare.rows.payments'),
             stock: t('compare.rows.stock'),
             pdfTemplates: t('compare.rows.pdfTemplates'),
@@ -100,6 +101,7 @@ export async function PricingPageServer() {
             highlights: {
               everything: t('plans.pro.highlights.everything'),
               recurring: t('plans.pro.highlights.recurring'),
+              collections: t('plans.pro.highlights.collections'),
               users: t('plans.pro.highlights.users'),
               pdfAdvanced: t('plans.pro.highlights.pdfAdvanced'),
               stock: t('plans.pro.highlights.stock'),

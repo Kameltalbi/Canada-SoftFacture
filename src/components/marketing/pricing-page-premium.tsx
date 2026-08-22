@@ -91,6 +91,7 @@ const HIGHLIGHT_ICONS: Record<string, React.ReactNode> = {
   payments: <CreditCard className="h-4 w-4" />,
   interac: <Zap className="h-4 w-4" />,
   reminders: <Bell className="h-4 w-4" />,
+  collections: <Bell className="h-4 w-4" />,
   recurring: <RefreshCw className="h-4 w-4" />,
   stock: <Package className="h-4 w-4" />,
   accountant: <UserCheck className="h-4 w-4" />,

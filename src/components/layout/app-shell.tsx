@@ -17,6 +17,7 @@ import {
   Inbox,
   Warehouse,
   Menu,
+  CreditCard,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/navigation';
@@ -29,8 +30,9 @@ import { useLogout } from '@/hooks/use-logout';
 import { FEATURES } from '@/lib/feature-flags';
 import { LocaleSwitcher } from '@/components/locale-switcher';
 import { organizationManagesStock } from '@/lib/stock-management';
+import { isProPlan } from '@/lib/plan-access';
 
-const billingLinks = [
+const billingLinksBase = [
   { href: '/invoices', key: 'invoices' as const, icon: FileText },
   ...(FEATURES.einvoiceUi
     ? [{ href: '/received-invoices' as const, key: 'receivedInvoices' as const, icon: Inbox }]
@@ -39,6 +41,15 @@ const billingLinks = [
   { href: '/invoices/deposit/new', key: 'depositInvoices' as const, icon: Receipt },
   { href: '/recurring-invoices', key: 'recurring' as const, icon: RefreshCw },
 ];
+
+function billingLinksForPlan(isPro: boolean) {
+  return isPro
+    ? [
+        ...billingLinksBase,
+        { href: '/recouvrement', key: 'recouvrement' as const, icon: CreditCard },
+      ]
+    : billingLinksBase;
+}
 
 const mainNav = [
   { href: '/dashboard', key: 'dashboard' as const, icon: LayoutDashboard },
@@ -62,7 +73,8 @@ function isNavActive(pathname: string, href: string): boolean {
 }
 
 function isBillingActive(pathname: string): boolean {
-  return billingLinks.some((l) => isNavActive(pathname, l.href));
+  if (pathname === '/recouvrement' || pathname.startsWith('/recouvrement/')) return true;
+  return billingLinksBase.some((l) => isNavActive(pathname, l.href));
 }
 
 function formatHeaderDateParts(date: Date): { date: string; time: string } {
@@ -116,6 +128,8 @@ export function AppShell({
   const orgInitials = orgInitialsFromName(orgName || user.name || user.email || 'SF');
   const { date: headerDate, time: headerTime } = formatHeaderDateParts(now);
   const showStockNav = organizationManagesStock(organization);
+  const isPro = isProPlan(organization?.subscriptionPlan);
+  const billingLinks = billingLinksForPlan(isPro);
 
   const navLinkClass = (active: boolean, collapsed: boolean) =>
     cn(
@@ -153,13 +167,19 @@ export function AppShell({
       >
         <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-4 py-4">
           {orgLogoUrl ? (
-            <img src={orgLogoUrl} alt={orgName} className="h-10 max-w-[8rem] object-contain object-left" />
+            <img
+              src={orgLogoUrl}
+              alt={orgName}
+              className="h-10 max-w-[8rem] object-contain object-left"
+            />
           ) : (
             <div className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-700">
                 {orgInitials.slice(0, 2)}
               </div>
-              {orgName ? <p className="truncate text-sm font-semibold text-slate-800">{orgName}</p> : null}
+              {orgName ? (
+                <p className="truncate text-sm font-semibold text-slate-800">{orgName}</p>
+              ) : null}
             </div>
           )}
           <button
@@ -174,24 +194,43 @@ export function AppShell({
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-3">
           {!isSuperadmin && (
             <>
-              <Link href="/dashboard" onClick={closeMobileSidebar}
-                className={navLinkClass(isNavActive(pathname, '/dashboard'), false)}>
+              <Link
+                href="/dashboard"
+                onClick={closeMobileSidebar}
+                className={navLinkClass(isNavActive(pathname, '/dashboard'), false)}
+              >
                 <LayoutDashboard className="h-4 w-4 shrink-0" />
                 {t('dashboard')}
               </Link>
               <div>
-                <button type="button" onClick={() => { setBillingOpen((v) => !v); expandBillingMobile(); }}
-                  className={navLinkClass(isBillingActive(pathname), false)}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBillingOpen((v) => !v);
+                    expandBillingMobile();
+                  }}
+                  className={navLinkClass(isBillingActive(pathname), false)}
+                >
                   <FileText className="h-4 w-4 shrink-0" />
                   <span className="flex-1 text-start">{t('billing')}</span>
-                  <ChevronRight className={cn('h-4 w-4 shrink-0 transition', billingOpen ? 'rotate-90' : '')} />
+                  <ChevronRight
+                    className={cn('h-4 w-4 shrink-0 transition', billingOpen ? 'rotate-90' : '')}
+                  />
                 </button>
                 {billingOpen ? (
                   <div className="ms-4 mt-0.5 space-y-0.5 border-s-2 border-slate-100 ps-2">
                     {billingLinks.map((item) => (
-                      <Link key={item.href} href={item.href} onClick={closeMobileSidebar}
-                        className={cn('flex items-center gap-2 rounded-md px-2 py-2 text-sm transition',
-                          isNavActive(pathname, item.href) ? 'font-medium text-brand' : 'text-slate-500 hover:text-slate-800')}>
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={closeMobileSidebar}
+                        className={cn(
+                          'flex items-center gap-2 rounded-md px-2 py-2 text-sm transition',
+                          isNavActive(pathname, item.href)
+                            ? 'font-medium text-brand'
+                            : 'text-slate-500 hover:text-slate-800'
+                        )}
+                      >
                         <item.icon className="h-3.5 w-3.5 shrink-0" />
                         {t(item.key)}
                       </Link>
@@ -202,23 +241,33 @@ export function AppShell({
               {mainNav.slice(1, -1).map((item) => {
                 if (item.href === '/stock' && !showStockNav) return null;
                 return (
-                  <Link key={item.href} href={item.href} onClick={closeMobileSidebar}
-                    className={navLinkClass(isNavActive(pathname, item.href), false)}>
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={closeMobileSidebar}
+                    className={navLinkClass(isNavActive(pathname, item.href), false)}
+                  >
                     <item.icon className="h-4 w-4 shrink-0" />
                     {t(item.key)}
                   </Link>
                 );
               })}
-              <Link href="/settings" onClick={closeMobileSidebar}
-                className={navLinkClass(isNavActive(pathname, '/settings'), false)}>
+              <Link
+                href="/settings"
+                onClick={closeMobileSidebar}
+                className={navLinkClass(isNavActive(pathname, '/settings'), false)}
+              >
                 <Settings className="h-4 w-4 shrink-0" />
                 {t('settings')}
               </Link>
             </>
           )}
           {user.role === 'SUPERADMIN' ? (
-            <Link href="/admin" onClick={closeMobileSidebar}
-              className={navLinkClass(pathname.startsWith('/admin'), false)}>
+            <Link
+              href="/admin"
+              onClick={closeMobileSidebar}
+              className={navLinkClass(pathname.startsWith('/admin'), false)}
+            >
               <Shield className="h-4 w-4 shrink-0" />
               {t('admin')}
             </Link>

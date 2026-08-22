@@ -12,12 +12,14 @@ export function Modal({
   children,
   onClose,
   footer,
+  className,
 }: {
   open: boolean;
   title: string;
   children: React.ReactNode;
   onClose: () => void;
   footer?: React.ReactNode;
+  className?: string;
 }) {
   useEffect(() => {
     if (!open) return;
@@ -42,7 +44,8 @@ export function Modal({
       />
       <div
         className={cn(
-          'relative z-10 w-full max-w-md rounded-2xl border border-s-border bg-white p-6 shadow-2xl'
+          'relative z-10 w-full max-w-md rounded-2xl border border-s-border bg-white p-6 shadow-2xl',
+          className
         )}
       >
         <div className="mb-4 flex items-start justify-between gap-4">

@@ -35,9 +35,11 @@ export function initializeEmailService() {
 
 interface EmailOptions {
   to: string;
+  cc?: string;
   subject: string;
   html: string;
   text?: string;
+  attachments?: Array<{ filename: string; content: string; encoding: 'base64' }>;
 }
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
@@ -49,9 +51,11 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     await transporter.sendMail({
       from: `${APP_BRAND_FULL} <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
       to: options.to,
+      cc: options.cc,
       subject: options.subject,
       html: options.html,
       text: options.text,
+      attachments: options.attachments,
     });
     logger.info({ to: options.to, subject: options.subject }, 'Email sent');
     return true;
