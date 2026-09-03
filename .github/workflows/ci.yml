@@ -10,7 +10,10 @@ jobs:
   backend-tests:
     name: Backend Tests
     runs-on: ubuntu-latest
-    
+    # CI Postgres service only — never production URLs/secrets.
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/softfacture_test?schema=public
+
     services:
       postgres:
         image: postgres:16-alpine
@@ -47,14 +50,11 @@ jobs:
 
       - name: Run database migrations
         working-directory: ./backend
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/softfacture_test?schema=public
         run: npx prisma migrate deploy
 
       - name: Run backend tests
         working-directory: ./backend
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/softfacture_test?schema=public
           JWT_SECRET: test-secret-key-for-ci-environment
         run: npm run test
 

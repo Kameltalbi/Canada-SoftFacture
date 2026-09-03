@@ -4,7 +4,7 @@ test('homepage loads successfully', async ({ page }) => {
   await page.goto('/');
 
   // Check that the page loads without errors
-  await expect(page).toHaveTitle(/SoftFacture France/);
+  await expect(page).toHaveTitle(/SoftFacture Canada/);
 });
 
 test('navigation works', async ({ page }) => {
