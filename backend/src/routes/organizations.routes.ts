@@ -29,7 +29,12 @@ import {
   slugToSubscriptionPlan,
   TRIAL_DAYS,
 } from '../lib/billing/plans.js';
-import { normalizeSiret, normalizeVatNumber, isValidEmail } from '../lib/billing/validation.js';
+import {
+  isValidEmail,
+  normalizeSiret,
+  normalizeVatNumber,
+  resolveOrgCountry,
+} from '../lib/billing/validation.js';
 import { requireOnboardingComplete } from '../middleware/onboarding.js';
 import { APP_BRAND } from '../lib/appBrand.js';
 import { logger } from '../lib/logger.js';
@@ -109,7 +114,7 @@ const onboardingCompleteSchema = z.object({
   address: z.string().min(3).max(300),
   postalCode: z.string().min(4).max(10),
   city: z.string().min(2).max(100),
-  country: z.string().length(2).default('FR'),
+  country: z.string().length(2).default('CA'),
   adminName: z.string().min(2).max(120),
   phone: z.string().min(8).max(24),
   billingEmail: z.string().email().max(200),
@@ -133,7 +138,7 @@ router.post('/onboarding/complete', requireRoles('ADMIN'), async (req, res) => {
 
   const siret = normalizeSiret(parsed.data.siret);
   if (!siret) {
-    return res.status(400).json({ error: 'SIRET invalide (14 chiffres attendus)' });
+    return res.status(400).json({ error: 'NEQ ou BN invalide (9 ou 10 chiffres attendus)' });
   }
 
   const billingEmail = parsed.data.billingEmail.trim().toLowerCase();
@@ -143,7 +148,7 @@ router.post('/onboarding/complete', requireRoles('ADMIN'), async (req, res) => {
 
   const vatNumber = normalizeVatNumber(parsed.data.vatNumber);
   if (parsed.data.vatNumber?.trim() && !vatNumber) {
-    return res.status(400).json({ error: 'N° de TVA intracommunautaire invalide' });
+    return res.status(400).json({ error: 'N° TPS / TVQ invalide' });
   }
 
   const plan = slugToCheckoutPlan(parsed.data.plan) ?? slugToSubscriptionPlan(parsed.data.plan);
@@ -153,6 +158,8 @@ router.post('/onboarding/complete', requireRoles('ADMIN'), async (req, res) => {
   const trialEndsAt = new Date();
   trialEndsAt.setDate(trialEndsAt.getDate() + TRIAL_DAYS);
   const companyName = parsed.data.companyName.trim();
+  // Preserve explicit org country; SoftFacture Canada default is CA.
+  const country = resolveOrgCountry(existing.country);
 
   try {
     const [org, user] = await prisma.$transaction([
@@ -168,7 +175,7 @@ router.post('/onboarding/complete', requireRoles('ADMIN'), async (req, res) => {
           address: parsed.data.address.trim(),
           postalCode: parsed.data.postalCode.trim(),
           city: parsed.data.city.trim(),
-          country: parsed.data.country.toUpperCase(),
+          country,
           subscriptionPlan: plan,
           billingStatus: paid ? 'TRIAL' : 'ACTIVE',
           trialEndsAt: paid ? trialEndsAt : null,

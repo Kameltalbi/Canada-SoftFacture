@@ -18,6 +18,11 @@ import {
   TRIAL_DAYS,
   type PlanId,
 } from '@/lib/pricing-plans';
+import {
+  isValidCanadianBusinessNumber,
+  orgCountryLabel,
+  resolveOrgCountry,
+} from '@/lib/org-country';
 import { cn } from '@/lib/utils';
 
 type Step = 1 | 2 | 3;
@@ -40,6 +45,9 @@ export function OnboardingWizard() {
   const [city, setCity] = useState('');
   const [vatNumber, setVatNumber] = useState('');
   const [plan, setPlan] = useState<PlanId>(FREE_PLAN_ID);
+
+  const countryCode = resolveOrgCountry(user?.organization?.country);
+  const countryLabel = orgCountryLabel(countryCode);
 
   useEffect(() => {
     if (!user || hydratedRef.current) return;
@@ -66,8 +74,7 @@ export function OnboardingWizard() {
       toast.push(t('errors.companyName'), 'error');
       return false;
     }
-    const digits = siret.replace(/\D/g, '');
-    if (digits.length !== 14) {
+    if (!isValidCanadianBusinessNumber(siret)) {
       toast.push(t('errors.siret'), 'error');
       return false;
     }
@@ -109,7 +116,7 @@ export function OnboardingWizard() {
         address: address.trim(),
         postalCode: postalCode.trim(),
         city: city.trim(),
-        country: 'FR',
+        country: countryCode,
         adminName: adminName,
         phone: phone,
         billingEmail: billingEmail,
@@ -144,7 +151,7 @@ export function OnboardingWizard() {
                 <label className="mb-1 block text-xs font-medium text-slate-600">
                   {t('country')}
                 </label>
-                <Input value="France" readOnly disabled className="bg-slate-50" />
+                <Input value={countryLabel} readOnly disabled className="bg-slate-50" />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-slate-600">
@@ -160,8 +167,8 @@ export function OnboardingWizard() {
                 <Input
                   value={siret}
                   onChange={(e) => setSiret(e.target.value)}
-                  placeholder="12345678901234"
-                  maxLength={17}
+                  placeholder="1234567890"
+                  maxLength={14}
                   required
                 />
                 <p className="mt-1 text-[10px] text-slate-500">{t('siretHint')}</p>
@@ -224,7 +231,7 @@ export function OnboardingWizard() {
                   <Input
                     value={postalCode}
                     onChange={(e) => setPostalCode(e.target.value)}
-                    placeholder="75001"
+                    placeholder="H2X 1Y4"
                     required
                   />
                 </div>
@@ -235,7 +242,7 @@ export function OnboardingWizard() {
                   <Input
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    placeholder="Paris"
+                    placeholder="Montréal"
                     required
                   />
                 </div>
@@ -247,7 +254,7 @@ export function OnboardingWizard() {
                 <Input
                   value={vatNumber}
                   onChange={(e) => setVatNumber(e.target.value)}
-                  placeholder="FR12345678901"
+                  placeholder="123456789RT0001"
                 />
                 <p className="mt-1 text-[10px] text-slate-500">{t('vatHint')}</p>
               </div>

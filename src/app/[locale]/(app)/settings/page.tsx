@@ -103,7 +103,7 @@ type CustomTax = {
   updatedAt: string;
 };
 
-const CURRENCIES = ['CAD', 'USD', 'EUR', 'GBP', 'CHF'] as const; 
+const CURRENCIES = ['CAD', 'USD', 'EUR', 'GBP', 'CHF'] as const;
 
 function SettingsPageContent() {
   const t = useTranslations('settings');
@@ -526,7 +526,7 @@ function SettingsPageContent() {
                   value={form.country}
                   disabled={readOnly}
                   onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))}
-                  placeholder="FR"
+                  placeholder="CA"
                 />
               </div>
             </div>
@@ -770,7 +770,8 @@ function SettingsPageContent() {
                 </div>
               </div>
               <p className="mt-3 text-[10px] text-s-muted">
-                Le taux par défaut s&apos;applique aux nouvelles lignes. Vous pouvez modifier le taux sur chaque ligne de facture. TPS + TVQ combinées au Québec = 14,975%.
+                Le taux par défaut s&apos;applique aux nouvelles lignes. Vous pouvez modifier le
+                taux sur chaque ligne de facture. TPS + TVQ combinées au Québec = 14,975%.
               </p>
             </div>
 

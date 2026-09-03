@@ -101,7 +101,7 @@ export function mapClientImportRows(
       return;
     }
 
-    const country = cellValue(row, mapping.country).toUpperCase() || 'FR';
+    const country = cellValue(row, mapping.country).toUpperCase() || 'CA';
 
     valid.push({
       name,
@@ -111,7 +111,7 @@ export function mapClientImportRows(
       taxId: cellValue(row, mapping.taxId) || null,
       address: cellValue(row, mapping.address) || null,
       city: cellValue(row, mapping.city) || null,
-      country: country.length === 2 ? country : 'FR',
+      country: country.length === 2 ? country : 'CA',
     });
   });
 

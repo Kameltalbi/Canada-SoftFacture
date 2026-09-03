@@ -1,3 +1,16 @@
+/** Code pays ISO par défaut SoftFacture Canada. */
+export const DEFAULT_ORG_COUNTRY = 'CA';
+
+/**
+ * Pays organisation : conserve une valeur ISO déjà enregistrée, sinon Canada.
+ * `existingCountry ?? "CA"` — n’écrase jamais un pays explicite.
+ */
+export function resolveOrgCountry(existingCountry?: string | null): string {
+  const code = existingCountry?.trim().toUpperCase();
+  if (code && /^[A-Z]{2}$/.test(code)) return code;
+  return DEFAULT_ORG_COUNTRY;
+}
+
 /**
  * NEQ (Numéro d'entreprise du Québec) : 10 chiffres.
  * Ex. : 1234567890
@@ -17,8 +30,8 @@ export function normalizeNeq(input: string | null | undefined): string | null {
 export function normalizeBn(input: string | null | undefined): string | null {
   if (!input?.trim()) return null;
   const digits = input.replace(/\D/g, '');
-  if (digits.length < 9) return null;
-  return digits.slice(0, 9);
+  if (digits.length !== 9) return null;
+  return digits;
 }
 
 /**
