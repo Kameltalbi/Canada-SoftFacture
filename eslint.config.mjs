@@ -24,6 +24,7 @@ const eslintConfig = [
       "backend/src/generated/**",
       // Config PM2 (CommonJS + require) — hors périmètre TypeScript/ESM du projet
       "ecosystem.config.cjs",
+      "ecosystem-canada.config.cjs",
     ],
   },
 ];
