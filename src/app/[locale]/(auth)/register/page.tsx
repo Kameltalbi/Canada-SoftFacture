@@ -60,9 +60,11 @@ function RegisterContent() {
       toast.push(t('welcome'));
 
       const plan = searchParams.get('plan');
+      const cycle = searchParams.get('cycle');
 
       if (isPlanId(plan) && isPaidPlan(plan)) {
-        router.replace(`/checkout?plan=pro`);
+        const cycleParam = cycle === 'yearly' ? '&cycle=yearly' : '';
+        router.replace(`/checkout?plan=pro${cycleParam}`);
       } else {
         router.replace('/dashboard');
       }
