@@ -162,13 +162,8 @@ export function createApp() {
   );
   app.use('/api/dashboard', authMiddleware, requireOrg, requireOnboardingComplete, dashboardRoutes);
   app.use('/api/billing', billingPublicRouter);
-  app.use(
-    '/api/billing',
-    authMiddleware,
-    requireOrg,
-    requireOnboardingComplete,
-    billingProtectedRoutes
-  );
+  // Checkout / subscription must work before onboarding (register → /checkout funnel).
+  app.use('/api/billing', authMiddleware, requireOrg, billingProtectedRoutes);
 
   app.use('/api/superadmin', authMiddleware, requireRoles('SUPERADMIN'), superadminRoutes);
 
